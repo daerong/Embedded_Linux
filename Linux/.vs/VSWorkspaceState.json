@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\buzzer",
+    "\\dip_switch",
+    "\\dot",
+    "\\fnd",
+    "\\include",
+    "\\led",
+    "\\push_switch",
+    "\\step_motor",
+    "\\text_lcd"
+  ],
+  "SelectedNode": "\\buzzer",
+  "PreviewInSolutionExplorer": false
+}
