@@ -44,8 +44,7 @@ static ssize_t iom_buzzer_read(struct file *file, char *buf, size_t count, loff_
 	return 1;
 }
 
-static ssize_t iom_buzzer_write(struct file *file, const char *buf, size_t count, loff_t
-	*f_pos) {
+static ssize_t iom_buzzer_write(struct file *file, const char *buf, size_t count, loff_t *f_pos) {
 	unsigned char value;
 	unsigned short _s_value;
 
