@@ -6,6 +6,7 @@ void user_signal(int sig) { quit = 1; }		// 시그널 받으면 호출되는 함수
 int main(void) {
 	int dev;					// device handler
 	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
+	int i;
 
 	dev = open(PUSH_SWITCH_DEVICE, O_RDONLY);
 	assert2(dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
@@ -17,7 +18,7 @@ int main(void) {
 		usleep(400000);
 		
 		read(dev, &push_sw_buf, sizeof(push_sw_buf));
-		for (int i = 0; i < PUSH_SWITCH_MAX_BUTTON; i++) {
+		for (i = 0; i < PUSH_SWITCH_MAX_BUTTON; i++) {
 			printf("[%d] ", push_sw_buf[i]);
 		}
 		printf("\n");
