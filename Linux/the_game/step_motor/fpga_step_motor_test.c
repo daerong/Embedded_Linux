@@ -20,29 +20,46 @@ int main(int argc, char **argv) {
 	int dir;				// argv[2]
 	int speed;				// argv[3]
 
-	if (argc != 4) {
-		usage();
-		exit(1);
-	}
+	char sys = 'S';
 
-	action = atoi(argv[1]);
-	assert(action == STEP_MOTOR_OFF || action == STEP_MOTOR_ON, "Invalid motor action");
+	action = STEP_MOTOR_ON;
+	dir = STEP_MOTOR_DIR_LEFT;
+	speed = STEP_MOTOR_SPDVAL_MIN;
 
-	dir = atoi(argv[2]);
-	assert(dir == STEP_MOTOR_DIR_LEFT || dir == STEP_MOTOR_DIR_RIGHT, "Invalid motor direction");
-
-	speed = atoi(argv[3]);
-	assert(STEP_MOTOR_SPDVAL_MIN <= speed && speed <= STEP_MOTOR_SPDVAL_MAX, "Invalid motor speed");
-
-	memset(state, 0, sizeof(state));
-	state[0] = (unsigned char)action;
-	state[1] = (unsigned char)dir;
-	state[2] = (unsigned char)speed;
 
 	dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
 	assert2(dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
 
-	write(dev, state, 3);
+	while (sys != 'E') {
+		printf("Insert mode (Change speed, Left, Right, End) : ");
+		scanf("%c", &sys);
+
+		switch (sys) {
+		case 'C':
+			printf("Insert speed 0~255, (now : %d) : ", speed);
+			scanf("%d", &speed);
+			assert(STEP_MOTOR_SPDVAL_MIN <= speed && speed <= STEP_MOTOR_SPDVAL_MAX, "Invalid motor speed");
+			break;
+
+		case 'L':
+			dir = STEP_MOTOR_DIR_LEFT;
+			break;
+
+		case 'R':
+			dir = STEP_MOTOR_DIR_RIGHT;
+			break;
+
+		default:
+			sys = 'E'
+		}
+
+		memset(state, 0, sizeof(state));
+		state[0] = (unsigned char)action;
+		state[1] = (unsigned char)dir;
+		state[2] = (unsigned char)speed;
+
+		write(dev, state, 3);
+	}
 
 	close(dev);
 	return 0;
