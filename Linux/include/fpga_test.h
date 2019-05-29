@@ -28,7 +28,7 @@
 #define DIP_SWITCH_DEVICE "/dev/fpga_dip_switch"
 
 #define PUSH_SWITCH_DEVICE "/dev/fpga_push_switch"
-#define IOM_PUSH_SWITCH_MAX_BUTTON 9
+#define PUSH_SWITCH_MAX_BUTTON 9
 
 #define BUZZER_DEVICE "/dev/fpga_buzzer"
 #define BUZZER_ON 0
