@@ -3,8 +3,6 @@
 #include <termios.h>
 #include <stdio.h>
 
-
-
 #define ENTER 13
 #define ESCAPE 27
 #define BACK_SPACE 8
@@ -83,6 +81,24 @@ unsigned char getche(void)
 	return getch_(1);
 }
 
+void fndUpdate(int dev, char *data) {
+	ssize_t ret;
+
+	ret = write(dev, data, FND_MAX_DIGIT);
+	assert2(ret >= 0, "Device write error", FND_DEVICE);
+	sleep(1);
+}
+
+void fndReset(int dev) {
+	unsigned char data[4];
+	memset(data, 0, sizeof(data));
+	ssize_t ret;
+
+	ret = write(dev, &data, FND_MAX_DIGIT);
+	assert2(ret >= 0, "Device write error", FND_DEVICE);
+	sleep(1);
+}
+
 int sameCheck(unsigned char *num_arr, int index, int repeat){
 	for(int i = 0; i<repeat; i++){
 		if(i==index) continue;
@@ -93,7 +109,7 @@ int sameCheck(unsigned char *num_arr, int index, int repeat){
 	return 0;
 }
 
-int setNum(unsigned char *num_arr, int size) {
+int setNum(int dev, unsigned char *num_arr, int size) {
 	if (size != 4) return 1;
 
 	int status = 1;
@@ -178,7 +194,7 @@ int setNum(unsigned char *num_arr, int size) {
 
 			}
 
-
+			fndUpdate(dev, num_arr);
 		}
 		if (!num_arr[3]) {
 			index = 3;
@@ -212,36 +228,66 @@ void checkResult(unsigned char *target_arr, unsigned char *answer_arr, int *stri
 			}
 		}
 	}
-
-	return 0;
 }
 
-int showResult(int *strike, int *ball){
-	if(*strike == 4) return 0;
-}
+void ledUpdate(int dev, unsigned char *data) {
+	ssize_t ret;
 
-int fndUpdate(int dev, char *data) {
-	ret = write(dev, data, FND_MAX_DIGIT);
-	assert2(ret >= 0, "Device write error", FND_DEVICE);
+	ret = write(dev, data, 1);
+	assert2(ret >= 0, "Device write error", LED_DEVICE);
 	sleep(1);
+}
 
-	memset(data, 0, sizeof(data));
-	ret = read(dev, data, FND_MAX_DIGIT);
-	assert2(ret >= 0, "Device read error", FND_DEVICE);
+void ledReset(int dev) {
+	unsigned char data = 0;
+	ssize_t ret;
 
-	printf("Current FND value: ");
-	for (i = 0; i < data_len; i++) {
-		printf("%d", data[i]);
+	ret = write(dev, &data, 1);
+	assert2(ret >= 0, "Device write error", LED_DEVICE);
+	sleep(1);
+}
+
+int showResult(int dev, int *strike, int *ball){
+	unsigned char result = 0;
+
+	switch (*strike) {
+	case 4:
+		result += 128
+	case 3:
+		result += 64
+	case 2:
+		result += 32
+	case 1:
+		result += 16
 	}
-	printf("\n");
+
+	switch (*ball) {
+	case 4:
+		result += 8
+	case 3:
+		result += 4
+	case 2:
+		result += 2
+	case 1:
+		result += 1
+	}
+
+	assert(LED_MIN <= result && result <= LED_MAX, "Invalid parameter range");
+	ledUpdate(dev, &result);
+
+	if(*strike == 4) return 0;
+	return 1;
 }
 
 /* Let's test it out */
 int main(void) {
 	int fnd_dev;
+	int led_dev;
 
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
+	led_dev = open(LED_DEVICE, O_RDWR);
+	assert2(led_dev >= 0, "Device open error", LED_DEVICE);
 
 	unsigned char target_num[4];
 	unsigned char answer_num[4];
@@ -253,18 +299,22 @@ int main(void) {
 	int result = 1;
 	int strike, ball;
 
-	if (setNum(target_num, sizeof(target_num))) return 1;
+	if (setNum(fnd_dev, target_num, sizeof(target_num))) return 1;
+
+
 
 	while(result){
-		if (setNum(answer_num, sizeof(answer_num))) return 1;
+		if (setNum(fnd_dev, answer_num, sizeof(answer_num))) return 1;
 		checkResult(target_num, answer_num, &strike, &ball);
-		result = showResult(&strike, &ball);
+		result = showResult(led_dev, &strike, &ball);
+
+		sleep(3000);
+		fndReset(fnd_dev);
+		ledReset(led_dev);
 	}
 
-
-
-
 	close(fnd_dev);
+	close(led_dev);
 	printf("Program end.\n");
 
 	return 0;
