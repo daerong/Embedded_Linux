@@ -100,7 +100,8 @@ void fndReset(int dev) {
 }
 
 int sameCheck(unsigned char *num_arr, int index, int repeat){
-	for(int i = 0; i<repeat; i++){
+	int i;
+	for(i = 0; i<repeat; i++){
 		if(i==index) continue;
 		
 		if(num_arr[i] == num_arr[index]) return 1;
@@ -190,8 +191,6 @@ int setNum(int dev, unsigned char *num_arr, int size) {
 				num_arr[index] = 0;
 				if (index < 3) index++;
 				break;
-			default:
-
 			}
 
 			fndUpdate(dev, num_arr);
@@ -219,9 +218,10 @@ int setNum(int dev, unsigned char *num_arr, int size) {
 void checkResult(unsigned char *target_arr, unsigned char *answer_arr, int *strike, int *ball){
 	*strike = 0;
 	*ball = 0;
+	int i, j;
 
-	for(int i = 1; i < 4; i++){
-		for(int j = 1; j < 4; j++){
+	for(i = 1; i < 4; i++){
+		for(j = 1; j < 4; j++){
 			if(target_arr[i] == answer_arr[j]){
 				if(i == j) (*strike)++;
 				else (*ball)++;
@@ -252,24 +252,24 @@ int showResult(int dev, int *strike, int *ball){
 
 	switch (*strike) {
 	case 4:
-		result += 128
+		result += 128;
 	case 3:
-		result += 64
+		result += 64;
 	case 2:
-		result += 32
+		result += 32;
 	case 1:
-		result += 16
+		result += 16;
 	}
 
 	switch (*ball) {
 	case 4:
-		result += 8
+		result += 8;
 	case 3:
-		result += 4
+		result += 4;
 	case 2:
-		result += 2
+		result += 2;
 	case 1:
-		result += 1
+		result += 1;
 	}
 
 	assert(LED_MIN <= result && result <= LED_MAX, "Invalid parameter range");
