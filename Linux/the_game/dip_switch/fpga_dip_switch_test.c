@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 
 	while (timer) {
 		usleep(1000000);
-		read(dev, &dip_sw_buf, &timer);
+		timer = read(dev, &dip_sw_buf, timer);
 		printf("Read dip switch: 0x");
 		if (dip_sw_buf & 0x80) printf("1");
 		else printf("0");

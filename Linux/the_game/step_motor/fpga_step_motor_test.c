@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 			break;
 
 		default:
-			sys = 'E'
+			sys = 'E';
 		}
 
 		memset(state, 0, sizeof(state));

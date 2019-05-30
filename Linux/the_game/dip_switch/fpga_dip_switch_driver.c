@@ -31,7 +31,7 @@ static int iom_dip_switch_release(struct inode *inode, struct file *file) {
 	return 0;
 }
 
-static ssize_t iom_dip_switch_read(struct file *file, char *buf, size_t *count, loff_t *f_pos) {
+static ssize_t iom_dip_switch_read(struct file *file, char *buf, size_t count, loff_t *f_pos) {
 	unsigned char value;
 	unsigned short _s_value;
 
@@ -42,7 +42,7 @@ static ssize_t iom_dip_switch_read(struct file *file, char *buf, size_t *count, 
 		return -EFAULT;
 	}
 
-	return *count - 1;
+	return count - 1;
 }
 
 int __init iom_dip_switch_init(void) {
