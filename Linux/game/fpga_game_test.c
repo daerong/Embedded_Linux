@@ -30,16 +30,17 @@ int main(void) {
 	(void)signal(SIGINT, user_signal);		// SIGINT 시그널 핸들러 등록
 	printf("Press <ctrl+c> to quit.\n");
 
+	target = 0;
+
 	while (!quit) {
 		usleep(100000);
-
-		target = 0;
 
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (i = 0; i < PUSH_SWITCH_MAX_BUTTON; i++) {
 			if (push_sw_buf[i] == 1) {
 				answer_num[target] = i + 1;
-				target++;
+				if(target < 4) target++;
+				else target = 0;
 				break;
 			}
 		}
