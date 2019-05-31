@@ -23,17 +23,17 @@ int main(int argc, char **argv) {
 	else if (number >= 1) data_len = 1;
 	else data_len = 0;
 
-	assert2(data_len > 4, "You can only word that unionized less than 4 characters", FND_DEVICE);
+	assert2(data_len <= 4, "You can only word that unionized less than 4 characters", FND_DEVICE);
 
-	data[3] = '0' + number / 1000;
-	data[2] = '0' + number / 100;
-	data[1] = '0' + number / 10;
-	data[0] = '0' + number % 10;
+	data[3] = '0' + (number / 1000);
+	data[2] = '0' + (number / 100);
+	data[1] = '0' + (number / 10);
+	data[0] = '0' + (number % 10);
+
+	printf("%c%c%c%c\n", data[3], data[2], data[1], data[0]);
 
 	dev = open(FND_DEVICE, O_RDWR);
 	assert2(dev >= 0, "Device open error", FND_DEVICE);
-
-	printf("%c%c%c%c\n",data[3], data[2], data[1], data[0]);
 
 	while(stat) {
 		ret = write(dev, data, FND_MAX_DIGIT);
