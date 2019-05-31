@@ -47,23 +47,23 @@ int main(int argc, char **argv) {
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
 		sleep(1);
 
-		if (data[0] != 0) {
-			data[0]--;
-		}
-		else if (data[1] != 0) {
-			data[1]--;
-			data[0] = 9;
+		if (data[3] != 0) {
+			data[3]--;
 		}
 		else if (data[2] != 0) {
 			data[2]--;
-			data[1] = 9;
-			data[0] = 9;
+			data[3] = 9;
 		}
-		else if (data[3] != 0) {
-			data[3]--;
+		else if (data[1] != 0) {
+			data[1]--;
 			data[2] = 9;
+			data[3] = 9;
+		}
+		else if (data[0] != 0) {
+			data[0]--;
 			data[1] = 9;
-			data[0] = 9;
+			data[2] = 9;
+			data[3] = 9;
 		}
 		else {
 			stat = 0;
