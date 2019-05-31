@@ -26,20 +26,18 @@ int main(int argc, char **argv) {
 
 	assert2(data_len <= 4, "You can only word that unionized less than 4 characters", FND_DEVICE);
 
-	index[3] = number / 1000;
+	index[0] = number / 1000;
 	number = number - index[3]*1000;
-	index[2] = number / 100;
+	index[1] = number / 100;
 	number = number - index[2]*100;
-	index[1] = number / 10;
+	index[2] = number / 10;
 	number = number - index[1]*10;
-	index[0] = number;
+	index[3] = number;
 
-	data[3] = index[3];
-	data[2] = index[2];
-	data[1] = index[1];
-	data[0] = index[0];
-
-	printf("%d%d%d%d\n%c%c%c%c\n", index[3], index[2], index[1], index[0], data[3], data[2], data[1], data[0]);
+	data[3] = index[3];		// 1의 자리
+	data[2] = index[2];		// 10의 자리
+	data[1] = index[1];		// 100의 자리
+	data[0] = index[0];		// 1000의 자리
 
 	dev = open(FND_DEVICE, O_RDWR);
 	assert2(dev >= 0, "Device open error", FND_DEVICE);
