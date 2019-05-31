@@ -63,7 +63,7 @@ int __init iom_step_motor_init(void) {
 	}
 
 	// 물리 주소를 가상 주소에 mapping한다.
-	iom_fpga_step_motor_addr = ioremap(IOM_LED_ADDRESS, 0x6); // 사용할 메모리 크기
+	iom_fpga_step_motor_addr = ioremap(IOM_STEP_MOTOR_ADDRESS, 0x6); // 사용할 메모리 크기
 	printk("init module %s, major number: %d\n", IOM_STEP_MOTOR_NAME, IOM_STEP_MOTOR_MAJOR);
 	
 	return 0;
