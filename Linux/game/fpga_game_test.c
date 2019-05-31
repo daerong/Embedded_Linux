@@ -127,7 +127,7 @@ int main(void) {
 
 		buzzer_state = BUZZER_TOGGLE(buzzer_state);
 
-		if (dip_switch_dev) {
+		if (buzzer_state) {
 			ret = write(buzzer_dev, &buzzer_state, 1);
 			assert2(ret >= 0, "Device write error", BUZZER_DEVICE);
 		}
