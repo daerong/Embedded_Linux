@@ -1,5 +1,8 @@
 #include "../include/fpga_test.h"
 
+// FND MODULE
+// LED MODULE
+
 unsigned char quit = 0;
 //void user_signal(int sig) { quit = 1; }		// 시그널 받으면 호출되는 함수
 
