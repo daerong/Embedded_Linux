@@ -49,10 +49,6 @@ int main(int argc, char **argv) {
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
 		sleep(1);
 
-		for (i = 0; i < data_len; i++) {
-			printf("%c%c%c%c\n", data[3], data[2], data[1], data[0]);
-		}
-
 		if (data[0] != '0') {
 			data[0]--;
 		}
