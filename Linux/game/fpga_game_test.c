@@ -38,8 +38,8 @@ int main(void) {
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (i = 0; i < PUSH_SWITCH_MAX_BUTTON; i++) {
 			if (push_sw_buf[i] == 1) {
-				target = i;
-				answer_num[3] = target;
+				answer_num[target] = i + 1;
+				target++;
 				break;
 			}
 		}
