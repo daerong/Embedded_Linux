@@ -35,7 +35,15 @@ int main(int argc, char **argv) {
 	dev = open(FND_DEVICE, O_RDWR);
 	assert2(dev >= 0, "Device open error", FND_DEVICE);
 
-	while(stat) {
+	ret = write(dev, data, FND_MAX_DIGIT);
+	assert2(ret >= 0, "Device write error", FND_DEVICE);
+	sleep(1);
+
+	memset(data, 0, sizeof(data));
+	ret = read(dev, data, FND_MAX_DIGIT);
+	assert2(ret >= 0, "Device read error", FND_DEVICE);
+
+	/*while(stat) {
 		ret = write(dev, data, FND_MAX_DIGIT);
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
 		sleep(1);
@@ -71,7 +79,7 @@ int main(int argc, char **argv) {
 		else {
 			stat = 0;
 		}
-	}
+	}*/
 
 	close(dev);
 	return 0;
