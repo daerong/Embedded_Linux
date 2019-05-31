@@ -6,6 +6,7 @@ int main(int argc, char **argv) {
 	ssize_t ret;
 	int data_len;
 	int number;
+	int index[4];
 	int i;
 	char c;
 	char usage[50];
@@ -25,10 +26,18 @@ int main(int argc, char **argv) {
 
 	assert2(data_len <= 4, "You can only word that unionized less than 4 characters", FND_DEVICE);
 
-	data[3] = '0' + (number / 1000);
-	data[2] = '0' + (number / 100);
-	data[1] = '0' + (number / 10);
-	data[0] = '0' + (number % 10);
+	index[3] = number / 1000;
+	number = number - index[3];
+	index[2] = number / 100;
+	number = number - index[2];
+	index[1] = number / 10;
+	number = number - index[1];
+	index[0] = number;
+
+	data[3] = '0' + index[3];
+	data[2] = '0' + index[2];
+	data[1] = '0' + index[1];
+	data[0] = '0' + index[0];
 
 	printf("%c%c%c%c\n", data[3], data[2], data[1], data[0]);
 
@@ -43,7 +52,7 @@ int main(int argc, char **argv) {
 	ret = read(dev, data, FND_MAX_DIGIT);
 	assert2(ret >= 0, "Device read error", FND_DEVICE);
 
-	/*while(stat) {
+	while(stat) {
 		ret = write(dev, data, FND_MAX_DIGIT);
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
 		sleep(1);
@@ -79,7 +88,7 @@ int main(int argc, char **argv) {
 		else {
 			stat = 0;
 		}
-	}*/
+	}
 
 	close(dev);
 	return 0;
