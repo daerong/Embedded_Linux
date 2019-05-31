@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 	data[1] = '0' + index[1];
 	data[0] = '0' + index[0];
 
-	printf("%c%c%c%c\n", data[3], data[2], data[1], data[0]);
+	printf("%d%d%d%d\n%c%c%c%c\n", index[3], index[2], index[1], index[0], data[3], data[2], data[1], data[0]);
 
 	dev = open(FND_DEVICE, O_RDWR);
 	assert2(dev >= 0, "Device open error", FND_DEVICE);
