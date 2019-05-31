@@ -111,6 +111,7 @@ int sameCheck(unsigned char *num_arr, int index, int repeat){
 }
 
 int setNum(int dev, unsigned char *num_arr, int size) {
+	printf("key_input\n");
 	if (size != 4) return 1;
 
 	int status = 1;
