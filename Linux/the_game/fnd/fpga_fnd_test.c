@@ -27,11 +27,11 @@ int main(int argc, char **argv) {
 	assert2(data_len <= 4, "You can only word that unionized less than 4 characters", FND_DEVICE);
 
 	index[0] = number / 1000;
-	number = number - index[3]*1000;
+	number = number - index[0]*1000;
 	index[1] = number / 100;
-	number = number - index[2]*100;
+	number = number - index[1]*100;
 	index[2] = number / 10;
-	number = number - index[1]*10;
+	number = number - index[2]*10;
 	index[3] = number;
 
 	data[3] = index[3];		// 1ÀÇ ÀÚ¸®
