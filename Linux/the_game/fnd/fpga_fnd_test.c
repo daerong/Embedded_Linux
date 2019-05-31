@@ -5,7 +5,7 @@ int main(int argc, char **argv) {
 	unsigned char data[4];		// argv[1] 나누어 담을 char 배열
 	ssize_t ret;
 	int data_len;
-	char *number;
+	int number;
 	int i;
 	char c;
 	char usage[50];
@@ -15,17 +15,20 @@ int main(int argc, char **argv) {
 
 
 	printf("Insert number : ");
-	scanf("%s", &number);
+	scanf("%d", &number);
 
-	data_len = strlen(number);
+	if (number >= 1000) data_len = 4;
+	else if (number >= 100) data_len = 3;
+	else if (number >= 10) data_len = 2;
+	else if (number >= 1) data_len = 1;
+	else data_len = 0;
+
 	assert2(data_len > 4, "You can only word that unionized less than 4 characters", FND_DEVICE);
 
-	for (i = 0; i < data_len; i++) {
-		c = number[i];
-		assert('0' <= c && c <= '9', "Invalid digit value");
-		data[i] = c - '0';
-	}
-
+	data[3] = '0' + number / 1000;
+	data[2] = '0' + number / 100;
+	data[1] = '0' + number / 10;
+	data[0] = '0' + number % 10;
 
 	dev = open(FND_DEVICE, O_RDWR);
 	assert2(dev >= 0, "Device open error", FND_DEVICE);
@@ -47,23 +50,23 @@ int main(int argc, char **argv) {
 		}
 		printf("\n");
 
-		if (data[0] != 0) {
+		if (data[0] != '0') {
 			data[0]--;
 		}
-		else if (data[1] != 0) {
+		else if (data[1] != '0') {
 			data[1]--;
-			data[0] = 9;
+			data[0] = '9';
 		}
-		else if (data[2] != 0) {
+		else if (data[2] != '0') {
 			data[2]--;
-			data[1] = 9;
-			data[0] = 9;
+			data[1] = '9';
+			data[0] = '9';
 		}
-		else if (data[3] != 0) {
+		else if (data[3] != '0') {
 			data[3]--;
-			data[2] = 9;
-			data[1] = 9;
-			data[0] = 9;
+			data[2] = '9';
+			data[1] = '9';
+			data[0] = '9';
 		}
 		else {
 			stat = 0;
