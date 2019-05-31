@@ -122,90 +122,90 @@ int setNum(int dev, unsigned char *num_arr, int size) {
 			temp = getche();
 			switch (temp) {
 			case LEFT:
-				if (index < 3) index++;
+				if (index > 0) index--;
 				break;
 			case RIGHT:
-				if (index > 0) index--;
+				if (index < 3) index++;
 				break;
 			case ZERO:
 			case KEY_ZERO:
-				num_arr[index] = '0';
+				num_arr[index] = 0;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;		
 				break;
 			case ONE:
 			case KEY_ONE:
-				num_arr[index] = '1';
+				num_arr[index] = 1;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case TWO:
 			case KEY_TWO:
-				num_arr[index] = '2';
+				num_arr[index] = 2;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case THREE:
 			case KEY_THREE:
-				num_arr[index] = '3';
+				num_arr[index] = 3;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case FOUR:
 			case KEY_FOUR:
-				num_arr[index] = '4';
+				num_arr[index] = 4;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case FIVE:
 			case KEY_FIVE:
-				num_arr[index] = '5';
+				num_arr[index] = 5;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case SIX:
 			case KEY_SIX:
-				num_arr[index] = '6';
+				num_arr[index] = 6;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case SEVEN:
 			case KEY_SEVEN:
-				num_arr[index] = '7';
+				num_arr[index] = 7;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case EIGHT:
 			case KEY_EIGHT:
-				num_arr[index] = '8';
+				num_arr[index] = 8;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case NINE:
 			case KEY_NINE:
-				num_arr[index] = '9';
+				num_arr[index] = 9;
 				if (sameCheck(num_arr, index, size)) num_arr[index] = 0;
 				else if (index > 0) index--;	
 				break;
 			case BACK_SPACE:
 				num_arr[index] = 0;
-				if (index < 3) index++;
+				if (index > 0) index--;
 				break;
 			}
 
 			fndUpdate(dev, num_arr);
 		}
-		if (!num_arr[3]) {
-			index = 3;
-		}
-		else if (!num_arr[2]) {
-			index = 2;
+		if (!num_arr[0]) {
+			index = 0;
 		}
 		else if (!num_arr[1]) {
 			index = 1;
 		}
-		else if (!num_arr[0]) {
-			index = 0;
+		else if (!num_arr[2]) {
+			index = 2;
+		}
+		else if (!num_arr[3]) {
+			index = 3;
 		}
 		else {
 			status = 0;
@@ -308,7 +308,7 @@ int main(void) {
 		checkResult(target_num, answer_num, &strike, &ball);
 		result = showResult(led_dev, &strike, &ball);
 
-		sleep(3000);
+		sleep(3);
 		fndReset(fnd_dev);
 		ledReset(led_dev);
 	}
