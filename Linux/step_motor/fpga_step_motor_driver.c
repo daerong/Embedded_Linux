@@ -1,15 +1,9 @@
-#include "../include/fpga_driver.h"
-
-typedef struct STEP_MOTOR {
-	int action;
-	int dir;
-	int speed;
-} STEP_MOTOR;
+#include "../include/fpga_driver.h"z
 
 static int step_motor_port_usage = 0;
 static unsigned char *iom_fpga_step_motor_addr;	 // 가상 주소를 저장할 변수
 
-static ssize_t iom_step_motor_write(struct file *file, STEP_MOTOR buf, size_t count, loff_t *f_pos);
+static ssize_t iom_step_motor_write(struct file *file, const char *buf, size_t count, loff_t *f_pos);
 //static ssize_t iom_step_motor_read(struct file *file, char *buf, size_t count, loff_t *f_pos);
 static int iom_step_motor_open(struct inode *inode, struct file *file);
 static int iom_step_motor_release(struct inode *inode, struct file *file);
@@ -37,20 +31,15 @@ static int iom_step_motor_release(struct inode *inode, struct file *file) {
 	return 0;
 }
 
-static ssize_t iom_step_motor_write(struct file *file, STEP_MOTOR buf, size_t count, loff_t *f_pos) {
+static ssize_t iom_step_motor_write(struct file *file, const char *buf, size_t count, loff_t *f_pos) {
 	unsigned char value[3];
 	unsigned short _s_value = 0;
-
-	unsigned char copy_buf[3];
-	copy_buf[0] = buf.action;
-	copy_buf[1] = buf.dir;
-	copy_buf[2] = buf.speed;
 
 	if (count != 3) {							// 정상 종료 시 0을 반환
 		return -EFAULT;
 	}
 
-	if (copy_from_user(&value, copy_buf, count)) {	// 정상 종료 시 0을 반환
+	if (copy_from_user(&value, buf, count)) {	// 정상 종료 시 0을 반환
 		return -EFAULT;
 	}
 

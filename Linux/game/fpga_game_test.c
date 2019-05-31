@@ -7,6 +7,13 @@ typedef struct STEP_MOTOR {
 	int speed;
 } STEP_MOTOR;
 
+void motorFunction(unsigned char *data, STEP_MOTOR target) {
+	memset(data, 0, sizeof(data));
+	data[0] = target.action;
+	data[1] = target.dir;
+	data[2] = target.speed;
+}
+
 unsigned char quit = 0;
 void user_signal(int sig) { quit = 1; }		// 시그널 받으면 호출되는 함수
 
@@ -16,7 +23,8 @@ int main(void) {
 	unsigned char answer_num[4];
 	unsigned char led_data;
 	unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
-	STEP_MOTOR motor_data;
+	STEP_MOTOR motor_dat;
+	unsigned char motor_data[3];
 
 	//memset(target_num, 0, sizeof(target_num));
 	memset(answer_num, 0, sizeof(answer_num));
@@ -71,7 +79,7 @@ int main(void) {
 		for (i = 0; i < PUSH_SWITCH_MAX_BUTTON; i++) {
 			if (push_sw_buf[i] == 1) {
 				answer_num[target] = i + 1;
-				if(target < 4) target++;
+				if (target < 4) target++;
 				else target = 0;
 				break;
 			}
@@ -100,9 +108,11 @@ int main(void) {
 	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, "Correct", 7);
 	write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 
-	motor_data.action = 1;
-	motor_data.dir = 0;
-	motor_data.speed = 10;
+	motor_dat.action = 1;
+	motor_dat.dir = 0;
+	motor_dat.speed = 10;
+	motorFunction(motor_data, motor_dat);
+
 	write(step_motor_dev, motor_data, 3);
 
 	while (timer--) {
@@ -112,9 +122,11 @@ int main(void) {
 		sleep(1);
 	}
 
-	motor_data.action = 0;
-	motor_data.dir = 0;
-	motor_data.speed = 0;
+	motor_dat.action = 0;
+	motor_dat.dir = 0;
+	motor_dat.speed = 0;
+	motorFunction(motor_data, motor_dat);
+
 	write(step_motor_dev, motor_data, 3);
 
 	close(fnd_dev);
