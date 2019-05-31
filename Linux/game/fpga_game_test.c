@@ -15,6 +15,7 @@ int main(void) {
 	int fnd_dev;
 	int led_dev;
 	int push_switch_dev;					// device handler
+	int dot_dev;
 
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
@@ -22,9 +23,13 @@ int main(void) {
 	assert2(led_dev >= 0, "Device open error", LED_DEVICE);
 	push_switch_dev = open(PUSH_SWITCH_DEVICE, O_RDONLY);
 	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
+	dot_dev = open(DOT_DEVICE, O_WRONLY);
+	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
 
 	int i;
 	int target;
+	int status;
+	int timer;
 
 	ssize_t ret;
 
@@ -32,8 +37,10 @@ int main(void) {
 	printf("Press <ctrl+c> to quit.\n");
 
 	target = 0;
+	status = 1;
+	timer = 20;
 
-	while (!quit) {
+	while (status) {
 		usleep(100000);
 
 		led_data = 0;
@@ -57,6 +64,7 @@ int main(void) {
 		if (target_num[2] == answer_num[2]) led_data += 32;
 		if (target_num[1] == answer_num[1]) led_data += 64;
 		if (target_num[0] == answer_num[0]) led_data += 128;
+		if (led_data == 240) status = 0;
 
 		assert(LED_MIN <= led_data && led_data <= LED_MAX, "Invalid parameter range");
 
@@ -66,8 +74,17 @@ int main(void) {
 		usleep(100000);
 	}
 
+
+	while (timer--) {
+		ret = write(dot_dev, fpga_number[timer % 10], sizeof(fpga_number[timer % 10]));
+		assert2(ret >= 0, "Device write error", DOT_DEVICE);
+
+		sleep(1);
+	}
+
 	close(fnd_dev);
 	close(led_dev);
 	close(push_switch_dev);
+	close(dot_dev);
 	return 0;
 }
