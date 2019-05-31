@@ -31,8 +31,8 @@
 #define PUSH_SWITCH_MAX_BUTTON 9
 
 #define BUZZER_DEVICE "/dev/fpga_buzzer"
-#define BUZZER_ON 0
-#define BUZZER_OFF 1
+#define BUZZER_ON 1
+#define BUZZER_OFF 0
 #define BUZZER_TOGGLE(x) (1-(x))
 
 #define STEP_MOTOR_DEVICE "/dev/fpga_step_motor"
