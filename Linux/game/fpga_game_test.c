@@ -119,15 +119,16 @@ int main(void) {
 
 	write(step_motor_dev, motor_data, 3);
 
+	read(dip_switch_dev, &dip_sw_buf, 1);
+
 	while (timer--) {
-		read(dip_switch_dev, &dip_sw_buf, 1);
 
 		ret = write(dot_dev, fpga_number[timer % 10], sizeof(fpga_number[timer % 10]));
 		assert2(ret >= 0, "Device write error", DOT_DEVICE);
 
-		buzzer_state = BUZZER_TOGGLE(buzzer_state);
-
 		if (dip_sw_buf) {
+			buzzer_state = BUZZER_TOGGLE(buzzer_state);
+
 			ret = write(buzzer_dev, &buzzer_state, 1);
 			assert2(ret >= 0, "Device write error", BUZZER_DEVICE);
 		}
