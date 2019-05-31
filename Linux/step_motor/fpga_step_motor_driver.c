@@ -41,11 +41,16 @@ static ssize_t iom_step_motor_write(struct file *file, STEP_MOTOR buf, size_t co
 	unsigned char value[3];
 	unsigned short _s_value = 0;
 
+	unsigned char copy_buf[3];
+	copy_buf[0] = buf.action;
+	copy_buf[1] = buf.dir;
+	copy_buf[2] = buf.speed;
+
 	if (count != 3) {							// 정상 종료 시 0을 반환
 		return -EFAULT;
 	}
 
-	if (copy_from_user(&value, buf, count)) {	// 정상 종료 시 0을 반환
+	if (copy_from_user(&value, copy_buf, count)) {	// 정상 종료 시 0을 반환
 		return -EFAULT;
 	}
 
