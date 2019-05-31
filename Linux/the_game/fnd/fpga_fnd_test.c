@@ -34,10 +34,10 @@ int main(int argc, char **argv) {
 	number = number - index[1]*10;
 	index[0] = number;
 
-	data[3] = '0' + index[3];
-	data[2] = '0' + index[2];
-	data[1] = '0' + index[1];
-	data[0] = '0' + index[0];
+	data[3] = index[3];
+	data[2] = index[2];
+	data[1] = index[1];
+	data[0] = index[0];
 
 	printf("%d%d%d%d\n%c%c%c%c\n", index[3], index[2], index[1], index[0], data[3], data[2], data[1], data[0]);
 
@@ -49,23 +49,23 @@ int main(int argc, char **argv) {
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
 		sleep(1);
 
-		if (data[0] != '0') {
+		if (data[0] != 0) {
 			data[0]--;
 		}
-		else if (data[1] != '0') {
+		else if (data[1] != 0) {
 			data[1]--;
-			data[0] = '9';
+			data[0] = 9;
 		}
-		else if (data[2] != '0') {
+		else if (data[2] != 0) {
 			data[2]--;
-			data[1] = '9';
-			data[0] = '9';
+			data[1] = 9;
+			data[0] = 9;
 		}
-		else if (data[3] != '0') {
+		else if (data[3] != 0) {
 			data[3]--;
-			data[2] = '9';
-			data[1] = '9';
-			data[0] = '9';
+			data[2] = 9;
+			data[1] = 9;
+			data[0] = 9;
 		}
 		else {
 			stat = 0;
