@@ -68,7 +68,7 @@ int __init iom_buzzer_init(void) {
 	}
 
 	// 물리 주소를 가상 주소에 mapping한다.
-	iom_fpga_buzzer_addr = ioremap(IOM_DIP_SWITCH_ADDRESS, 0x1);
+	iom_fpga_buzzer_addr = ioremap(IOM_BUZZER_ADDRESS, 0x1);
 	printk("init module %s, major number: %d\n", IOM_BUZZER_NAME, IOM_BUZZER_MAJOR);
 
 	return 0;

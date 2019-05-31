@@ -20,6 +20,8 @@ int main(void) {
 	int push_switch_dev;					// device handler
 	int dot_dev;
 	int text_lcd_dev;
+	int step_motor_dev;
+	int buzzer_dev;
 
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
@@ -31,6 +33,10 @@ int main(void) {
 	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
+	step_motor_dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
+	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
+	buzzer_dev = open(BUZZER_DEVICE, O_RDWR);
+	assert2(buzzer_dev >= 0, "Device open error", BUZZER_DEVICE);
 
 	int i;
 	int target;
@@ -97,6 +103,8 @@ int main(void) {
 	close(push_switch_dev);
 	close(dot_dev);
 	close(text_lcd_dev);
+	close(step_motor_dev);
+	close(buzzer_dev);
 
 	return 0;
 }
