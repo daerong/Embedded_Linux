@@ -49,7 +49,7 @@ int __init iom_dip_switch_init(void) {
 	int result = register_chrdev(IOM_DIP_SWITCH_MAJOR, IOM_DIP_SWITCH_NAME, &iom_dip_switch_fops);
 
 	if (result < 0) {
-		printk(KERN_WARNING "Can't get any major number!\n");
+		printk(KERN_WARNING "Can't get any major number\n");
 		return result;
 	}
 
