@@ -9,14 +9,17 @@ int main(void) {
 	unsigned char target_num[4] = { 7,5,3,1 };
 	unsigned char answer_num[4];
 	unsigned char led_data;
+	unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
 
 	//memset(target_num, 0, sizeof(target_num));
 	memset(answer_num, 0, sizeof(answer_num));
+	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 
 	int fnd_dev;
 	int led_dev;
 	int push_switch_dev;					// device handler
 	int dot_dev;
+	int text_lcd_dev;
 
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
@@ -26,6 +29,8 @@ int main(void) {
 	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
 	dot_dev = open(DOT_DEVICE, O_WRONLY);
 	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
+	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
+	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 
 	int i;
 	int target;
@@ -75,6 +80,10 @@ int main(void) {
 		usleep(100000);
 	}
 
+	memcpy(text_lcd_buf, "Successful", 10);
+	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, "Correct", 7);
+	write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
+
 
 	while (timer--) {
 		ret = write(dot_dev, fpga_number[timer % 10], sizeof(fpga_number[timer % 10]));
@@ -87,5 +96,7 @@ int main(void) {
 	close(led_dev);
 	close(push_switch_dev);
 	close(dot_dev);
+	close(text_lcd_dev);
+
 	return 0;
 }
