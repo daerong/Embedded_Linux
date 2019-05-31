@@ -61,7 +61,7 @@ int main(void) {
 		assert(LED_MIN <= led_data && led_data <= LED_MAX, "Invalid parameter range");
 
 
-		ret = write(dev, &led_data, 1);
+		ret = write(led_dev, &led_data, 1);
 		assert2(ret >= 0, "Device write error", LED_DEVICE);
 		usleep(100000);
 	}
