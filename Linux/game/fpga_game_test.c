@@ -121,6 +121,7 @@ int main(void) {
 
 	while (timer--) {
 		read(dip_switch_dev, &dip_sw_buf, 1);
+		printf("Read dip switch: 0x%02X\n", dip_sw_buf);
 
 		ret = write(dot_dev, fpga_number[timer % 10], sizeof(fpga_number[timer % 10]));
 		assert2(ret >= 0, "Device write error", DOT_DEVICE);
