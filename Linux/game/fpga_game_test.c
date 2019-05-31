@@ -1,4 +1,5 @@
 #include "../include/fpga_test.h"
+#include "../include/fpga_dot_font.h"
 
 unsigned char quit = 0;
 void user_signal(int sig) { quit = 1; }		// 시그널 받으면 호출되는 함수
