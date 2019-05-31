@@ -1,5 +1,11 @@
 #include "../include/fpga_driver.h"
 
+typedef struct STEP_MOTOR {
+	int action;
+	int dir;
+	int speed;
+} STEP_MOTOR;
+
 static int step_motor_port_usage = 0;
 static unsigned char *iom_fpga_step_motor_addr;	 // 가상 주소를 저장할 변수
 
@@ -31,7 +37,7 @@ static int iom_step_motor_release(struct inode *inode, struct file *file) {
 	return 0;
 }
 
-static ssize_t iom_step_motor_write(struct file *file, const char *buf, size_t count, loff_t *f_pos) {
+static ssize_t iom_step_motor_write(struct file *file, STEP_MOTOR buf, size_t count, loff_t *f_pos) {
 	unsigned char value[3];
 	unsigned short _s_value = 0;
 

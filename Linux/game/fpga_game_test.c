@@ -1,6 +1,12 @@
 #include "../include/fpga_test.h"
 #include "../include/fpga_dot_font.h"
 
+typedef struct STEP_MOTOR {
+	int action;
+	int dir;	
+	int speed;
+} STEP_MOTOR;
+
 unsigned char quit = 0;
 void user_signal(int sig) { quit = 1; }		// 시그널 받으면 호출되는 함수
 
@@ -10,6 +16,7 @@ int main(void) {
 	unsigned char answer_num[4];
 	unsigned char led_data;
 	unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
+	STEP_MOTOR motor_data;
 
 	//memset(target_num, 0, sizeof(target_num));
 	memset(answer_num, 0, sizeof(answer_num));
@@ -93,6 +100,10 @@ int main(void) {
 	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, "Correct", 7);
 	write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 
+	motor_data.action = 1;
+	motor_data.dir = 0;
+	motor_data.speed = 10;
+	write(step_motor_dev, motor_data, 3);
 
 	while (timer--) {
 		ret = write(dot_dev, fpga_number[timer % 10], sizeof(fpga_number[timer % 10]));
@@ -100,6 +111,11 @@ int main(void) {
 
 		sleep(1);
 	}
+
+	motor_data.action = 0;
+	motor_data.dir = 0;
+	motor_data.speed = 0;
+	write(step_motor_dev, motor_data, 3);
 
 	close(fnd_dev);
 	close(led_dev);
