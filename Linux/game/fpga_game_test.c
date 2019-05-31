@@ -53,10 +53,10 @@ int main(void) {
 		usleep(100000);
 
 
-		if (target_num[3] == answer_num[3]) led_data += 1;
-		if (target_num[2] == answer_num[2]) led_data += 2;
-		if (target_num[1] == answer_num[1]) led_data += 4;
-		if (target_num[0] == answer_num[0]) led_data += 8;
+		if (target_num[3] == answer_num[3]) led_data += 16;
+		if (target_num[2] == answer_num[2]) led_data += 32;
+		if (target_num[1] == answer_num[1]) led_data += 64;
+		if (target_num[0] == answer_num[0]) led_data += 128;
 
 		assert(LED_MIN <= led_data && led_data <= LED_MAX, "Invalid parameter range");
 
