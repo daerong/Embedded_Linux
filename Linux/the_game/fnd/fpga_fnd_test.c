@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	dev = open(FND_DEVICE, O_RDWR);
 	assert2(dev >= 0, "Device open error", FND_DEVICE);
 
-
+	printf("%c%c%c%c\n",data[3], data[2], data[1], data[0]);
 
 	while(stat) {
 		ret = write(dev, data, FND_MAX_DIGIT);
