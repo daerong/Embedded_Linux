@@ -7,6 +7,7 @@ int main(void) {
 	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
 	unsigned char target_num[4] = { 7,5,3,1 };
 	unsigned char answer_num[4];
+	unsigned char led_data;
 
 	//memset(target_num, 0, sizeof(target_num));
 	memset(answer_num, 0, sizeof(answer_num));
@@ -35,6 +36,8 @@ int main(void) {
 	while (!quit) {
 		usleep(100000);
 
+		led_data = 0;
+
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (i = 0; i < PUSH_SWITCH_MAX_BUTTON; i++) {
 			if (push_sw_buf[i] == 1) {
@@ -47,8 +50,20 @@ int main(void) {
 
 		ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
-		sleep(1);
+		usleep(100000);
 
+
+		if (target_num[3] == and_eq [3]) led_data += 1;
+		if (target_num[2] == and_eq [2]) led_data += 2;
+		if (target_num[1] == and_eq [1]) led_data += 4;
+		if (target_num[0] == and_eq [0]) led_data += 8;
+
+		assert(LED_MIN <= led_data && led_data <= LED_MAX, "Invalid parameter range");
+
+
+		ret = write(dev, &led_data, 1);
+		assert2(ret >= 0, "Device write error", LED_DEVICE);
+		usleep(100000);
 	}
 
 	close(fnd_dev);
