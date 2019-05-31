@@ -25,10 +25,12 @@ int main(void) {
 	unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
 	STEP_MOTOR motor_dat;
 	unsigned char motor_data[3];
+	unsigned char buzzer_state;
 
 	//memset(target_num, 0, sizeof(target_num));
 	memset(answer_num, 0, sizeof(answer_num));
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
+	buzzer_state = BUZZER_ON;
 
 	int fnd_dev;
 	int led_dev;
@@ -68,7 +70,7 @@ int main(void) {
 
 	target = 0;
 	status = 1;
-	timer = 20;
+	timer = 10;
 
 	while (status) {
 		usleep(100000);
@@ -119,8 +121,16 @@ int main(void) {
 		ret = write(dot_dev, fpga_number[timer % 10], sizeof(fpga_number[timer % 10]));
 		assert2(ret >= 0, "Device write error", DOT_DEVICE);
 
+		buzzer_state = BUZZER_TOGGLE(buzzer_state);
+		ret = write(buzzer_dev, &buzzer_state, 1);
+		assert2(ret >= 0, "Device write error", BUZZER_DEVICE);
+
 		sleep(1);
 	}
+
+	buzzer_state = BUZZER_OFF;
+	ret = write(buzzer_dev, &buzzer_state, 1);
+	assert2(ret >= 0, "Device write error", BUZZER_DEVICE);
 
 	motor_dat.action = 0;
 	motor_dat.dir = 0;

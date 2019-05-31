@@ -1,4 +1,4 @@
-#include "../include/fpga_driver.h"z
+#include "../include/fpga_driver.h"
 
 static int step_motor_port_usage = 0;
 static unsigned char *iom_fpga_step_motor_addr;	 // 가상 주소를 저장할 변수
