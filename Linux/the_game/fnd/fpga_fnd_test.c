@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 	while(stat) {
 		ret = write(dev, data, FND_MAX_DIGIT);
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
-		sleep(1000);
+		sleep(1);
 
 		memset(data, 0, sizeof(data));
 		ret = read(dev, data, FND_MAX_DIGIT);
