@@ -115,7 +115,7 @@ int main(void) {
 	}
 
 	fan_status = 0xf;
-	write(fan_dev, fan_status, 1);
+	write(fan_dev, &fan_status, 1);
 
 	memcpy(text_lcd_buf, "Successful", 10);
 	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, "Correct", 7);
@@ -157,7 +157,7 @@ int main(void) {
 	write(step_motor_dev, motor_data, 3);
 
 	fan_status = 0x0;
-	write(fan_dev, fan_status, 1);
+	write(fan_dev, &fan_status, 1);
 
 	close(fnd_dev);
 	close(led_dev);
