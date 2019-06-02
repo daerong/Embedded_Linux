@@ -5,8 +5,8 @@ KDIR := /work/achroimx6q/achroimx_kernel
 all:
 make -C $(KDIR) SUBDIRS=$(PWD) modules
 app:
-arm-none-linux-gnueabi-gcc ext_sensor_app.c -o ext_sens_test -static
-arm-none-linux-gnueabi-gcc hc-sr04_app.c -o us_test -static
+arm-none-linux-gnueabi-gcc -o ext_sensor_test ext_sensor_app.c -static
+arm-none-linux-gnueabi-gcc -o us_test hc-sr04_app.c -static
 install:
 cp -a *.ko /tftpboot/
 cp -a *test /tftpboot/
