@@ -27,12 +27,14 @@ int main(void) {
 	unsigned char motor_data[3];
 	unsigned char buzzer_state;
 	unsigned char dip_sw_buf;
+	unsigned char fan_status;
 
 	//memset(target_num, 0, sizeof(target_num));
 	memset(answer_num, 0, sizeof(answer_num));
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 	buzzer_state = BUZZER_ON;
 	dip_sw_buf = 0;
+	fan_status = 0;
 
 	int fnd_dev;
 	int led_dev;
@@ -112,7 +114,8 @@ int main(void) {
 		usleep(100000);
 	}
 
-	write(fan_dev, 1, 1);
+	fan_status = 0xf;
+	write(fan_dev, fan_status, 1);
 
 	memcpy(text_lcd_buf, "Successful", 10);
 	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, "Correct", 7);
@@ -153,7 +156,8 @@ int main(void) {
 
 	write(step_motor_dev, motor_data, 3);
 
-	write(fan_dev, 0, 1);
+	fan_status = 0x0;
+	write(fan_dev, fan_status, 1);
 
 	close(fnd_dev);
 	close(led_dev);
