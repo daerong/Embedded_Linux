@@ -8,7 +8,7 @@ CC = arm-none-linux-gnueabi-gcc
 all:
 	make -C $(KDIR) SUBDIRS=$(PWD) modules
 app:
-	$(CC) ext_sensor_app.c -o ext_sensor_test -static
+	$(CC) ext_sensor_app.c -o ext_sens_test -static
 	$(CC) hc-sr04_app.c -o us_test -static
 install:
 	cp -a *.ko /tftpboot/
@@ -21,3 +21,4 @@ clean:
 	rm -rf modules.order
 	rm -rf *.o
 	rm -rf ext_sens_test
+	±× -rf us_test

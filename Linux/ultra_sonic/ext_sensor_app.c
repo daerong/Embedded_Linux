@@ -32,7 +32,8 @@ int main(void){
 		else if (buf[0] == '1') {
 			printf("< Searching >\n");
 		}
-		for (loop = 0; loop < 1000000; loop++) {};
+
+		delay(500);
 	}
 	close(fd);
 	return 0;
