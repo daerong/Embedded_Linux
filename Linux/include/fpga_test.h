@@ -43,8 +43,6 @@
 #define STEP_MOTOR_SPDVAL_MIN 0 // min value, fastest
 #define STEP_MOTOR_SPDVAL_MAX 255 // max vlaue, slowest
 
-#define FAN_DEVICE "/dev/gpio_fan"
-
 void assert(int cond, char *msg) {
 	if (!cond) {
 		printf("%s\n", msg);

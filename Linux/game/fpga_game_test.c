@@ -27,14 +27,12 @@ int main(void) {
 	unsigned char motor_data[3];
 	unsigned char buzzer_state;
 	unsigned char dip_sw_buf;
-	unsigned char fan_status;
 
 	//memset(target_num, 0, sizeof(target_num));
 	memset(answer_num, 0, sizeof(answer_num));
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 	buzzer_state = BUZZER_ON;
 	dip_sw_buf = 0;
-	fan_status = 0;
 
 	int fnd_dev;
 	int led_dev;
@@ -44,8 +42,6 @@ int main(void) {
 	int step_motor_dev;
 	int buzzer_dev;
 	int dip_switch_dev;
-
-	int fan_dev;
 
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
@@ -63,8 +59,6 @@ int main(void) {
 	assert2(buzzer_dev >= 0, "Device open error", BUZZER_DEVICE);
 	dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
 	assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
-	fan_dev = open(FAN_DEVICE, O_RDWR);
-	assert2(fan_dev >= 0, "Device open error", FAN_DEVICE);
 
 	int i;
 	int target;
@@ -114,9 +108,6 @@ int main(void) {
 		usleep(100000);
 	}
 
-	fan_status = 0xf;
-	write(fan_dev, &fan_status, 1);
-
 	memcpy(text_lcd_buf, "Successful", 10);
 	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, "Correct", 7);
 	write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
@@ -156,9 +147,6 @@ int main(void) {
 
 	write(step_motor_dev, motor_data, 3);
 
-	fan_status = 0x0;
-	write(fan_dev, &fan_status, 1);
-
 	close(fnd_dev);
 	close(led_dev);
 	close(push_switch_dev);
@@ -167,7 +155,6 @@ int main(void) {
 	close(step_motor_dev);
 	close(buzzer_dev);
 	close(dip_switch_dev);
-	close(fan_dev);
 
 	return 0;
 }

@@ -53,7 +53,4 @@
 #define IOM_STEP_MOTOR_ADDRESS 0x0800000C
 #define IOM_STEP_MOTOR_NAME "fpga_step_motor"
 
-#define FAN_OUT IMX_GPIO_NR(2, 0)
-
-
 #endif
