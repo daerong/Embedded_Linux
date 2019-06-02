@@ -13,3 +13,8 @@ cp -a *test /tftpboot/
 clean:
 rm -rf *.ko
 rm -rf *.mod*
+rm -rf .*.cmd
+rm -rf Module.symvers
+rm -rf modules.order
+rm -rf *.o
+rm -rf ext_sens_test
