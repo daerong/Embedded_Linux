@@ -21,4 +21,4 @@ clean:
 	rm -rf modules.order
 	rm -rf *.o
 	rm -rf ext_sens_test
-	±× -rf us_test
+	rm -rf us_test
