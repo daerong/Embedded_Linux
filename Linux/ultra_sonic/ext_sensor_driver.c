@@ -6,7 +6,6 @@ AUTH : gmlee@huins.com */
 #include <linux/input.h>
 #include <linux/kdev_t.h>
 #include <linux/cdev.h>
-
 #define GPIO_DATA IMX_GPIO_NR(2,0)
 static int ext_sensor_open(struct inode *inode, struct file *file);
 static int ext_sensor_release(struct inode *inode, struct file *file);

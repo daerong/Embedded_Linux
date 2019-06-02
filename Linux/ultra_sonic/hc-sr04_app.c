@@ -1,8 +1,12 @@
+/* Achro-i.MX6Q External Sensor Test Application
+File : hc-sr04_app.c
+Auth : gmlee@huins.com */
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
-int main(void){
+int main(void)
+{
 	int fd;
 	int retn;
 	char buf[10] = { 0 };
