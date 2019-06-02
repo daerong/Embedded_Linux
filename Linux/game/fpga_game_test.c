@@ -1,8 +1,6 @@
 #include "../include/fpga_test.h"
 #include "../include/fpga_dot_font.h"
 
-#define FAN_OUT IMX_GPIO_NR(2, 0)
-
 typedef struct STEP_MOTOR {
 	int action;
 	int dir;	
@@ -45,6 +43,8 @@ int main(void) {
 	int buzzer_dev;
 	int dip_switch_dev;
 
+	int fan_dev;
+
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
 	led_dev = open(LED_DEVICE, O_RDWR);
@@ -61,21 +61,8 @@ int main(void) {
 	assert2(buzzer_dev >= 0, "Device open error", BUZZER_DEVICE);
 	dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
 	assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
-
-	int rtc;
-	rtc = gpio_request(FAN_OUT, "FAN");				// GPIO 핀은 allocation 되어야 함
-	assert(rtc == 0, "FAN pin request fail");
-	//rtc = gpio_direction_input(FAN_OUT);			// GPIO가 입력으로 사용될 경우
-	//assert(rtc == 0, "FAN pin setting fail");
-	rtc = gpio_direction_output(FAN_OUT, 0);		// GPIO가 출력으로 사용될 경우, 0이나 1의 값을 세팅해주어야 함
-	assert(rtc == 0, "FAN pin setting fail");
-
-	//gpio_get_value(FAN_OUT);						// 값 읽기
-	//gpio_set_value(FAN_OUT, 1);					// 값 세팅
-
-	//int gpio_to_irq(unsigned int gpio);				// 몇몇 GPIO 컨트롤러는 GPIO 입력 값이 바뀌면 인터럽트를 걸어주는데, 이 IRQ 번호를 얻고 싶으면 이 함수를 사용한다.
-
-	//gpio_free(FAN_OUT);							// GPIO 핀 allocation 해제
+	fan_dev = open(FAN_DEVICE, O_RDWR);
+	assert2(fan_dev >= 0, "Device open error", FAN_DEVICE);
 
 	int i;
 	int target;
@@ -125,11 +112,11 @@ int main(void) {
 		usleep(100000);
 	}
 
+	write(fan_dev, 1, 1);
+
 	memcpy(text_lcd_buf, "Successful", 10);
 	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, "Correct", 7);
 	write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
-
-	gpio_set_value(FAN_OUT, 1);
 
 	motor_dat.action = 1;
 	motor_dat.dir = 0;
@@ -166,6 +153,8 @@ int main(void) {
 
 	write(step_motor_dev, motor_data, 3);
 
+	write(fan_dev, 0, 1);
+
 	close(fnd_dev);
 	close(led_dev);
 	close(push_switch_dev);
@@ -174,10 +163,7 @@ int main(void) {
 	close(step_motor_dev);
 	close(buzzer_dev);
 	close(dip_switch_dev);
-
-	gpio_set_value(FAN_OUT, 0);
-
-	gpio_free(FAN_OUT);				// GPIO 핀 allocation 해제
+	close(fan_dev);
 
 	return 0;
 }

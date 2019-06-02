@@ -10,13 +10,6 @@
 #include <string.h>
 #include <signal.h>
 
-//#include <linux/module.h>
-//#include <linux/cdev.h>
-//#include <linux/fs.h>
-#include <linux/gpio.h>
-//#include <linux/kdev_t.h>
-//#include <linux/interrupt.h>
-
 #define LED_DEVICE "/dev/fpga_led"
 #define LED_MIN 0
 #define LED_MAX 255
@@ -49,6 +42,8 @@
 #define STEP_MOTOR_DIR_RIGHT 1
 #define STEP_MOTOR_SPDVAL_MIN 0 // min value, fastest
 #define STEP_MOTOR_SPDVAL_MAX 255 // max vlaue, slowest
+
+#define FAN_DEVICE "/dev/gpio_fan"
 
 void assert(int cond, char *msg) {
 	if (!cond) {

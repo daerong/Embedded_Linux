@@ -13,6 +13,11 @@
 #include <linux/ioport.h>
 #include <linux/version.h>
 
+#include <linux/cdev.h>
+#include <linux/gpio.h>
+#include <linux/kdev_t.h>
+#include <linux/interrupt.h>
+
 #define IOM_LED_MAJOR 260 // Major number
 #define IOM_LED_ADDRESS 0x08000016 // Physical address
 #define IOM_LED_NAME "fpga_led"
@@ -47,6 +52,8 @@
 #define IOM_STEP_MOTOR_MAJOR 267
 #define IOM_STEP_MOTOR_ADDRESS 0x0800000C
 #define IOM_STEP_MOTOR_NAME "fpga_step_motor"
+
+#define FAN_OUT IMX_GPIO_NR(2, 0)
 
 
 #endif
