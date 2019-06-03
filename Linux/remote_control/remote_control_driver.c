@@ -27,6 +27,9 @@ struct timeval after;		// struct timeval {
 struct timeval before;
 u32 irq = -1;
 
+u32 data;
+int index = 0;
+
 static int remote_control_open(struct inode *inode, struct file *filp);
 static int remote_control_release(struct inode *inode, struct file *filp);
 static int remote_control_read(struct file *filp, char *buf, size_t count, loff_t *f_pos);
@@ -71,7 +74,16 @@ static int remote_control_read(struct file *filp, char *buf, size_t count, loff_
 static irqreturn_t remote_control_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
 	if (gpio_get_value(IR_DATA)) {			// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
 		do_gettimeofday(&after);
-		printk(KERN_ALERT" Distance : %.0ld [us] \n ", after.tv_usec - before.tv_usec);
+		if (after.tv_usec - before.tv_usec < 10) {
+			data | (0x00000001 << index++);
+		}
+		else if (after.tv_usec - before.tv_usec > 1000) {
+			data & 0x00000000;
+			index = 0;
+		}
+		else {
+			data & (0xFFFFFFFF - (0x00000001 << index++));
+		}
 		memset(&before, 0, sizeof(struct timeval));
 		memset(&after, 0, sizeof(struct timeval));
 	}
