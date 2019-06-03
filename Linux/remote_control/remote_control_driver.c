@@ -55,7 +55,7 @@ static int remote_control_release(struct inode *inode, struct file *filp) {
 	return 0;
 }
 static int remote_control_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {				
-	printk(KERN_ALERT" Data : %lu\n", (unsigned long)target);
+	printk(KERN_ALERT" Data : %lu\n", (unsigned long)data);
 
 	return 0;
 }
