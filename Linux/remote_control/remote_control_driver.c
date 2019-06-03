@@ -55,17 +55,7 @@ static int remote_control_release(struct inode *inode, struct file *filp) {
 	return 0;
 }
 static int remote_control_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {				
-	int target = gpio_get_value(IR_DATA);		// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
-	unsigned char *p = (char *)&target;
-	int i;
-
-	for (i = 0; i < 4; i++) {
-		buf[i] = *(p + i);
-		printk(KERN_ALERT"[%c]", *(p + i));
-
-	}
-	
-	printk(KERN_ALERT" Data : %d\n ", target);
+	printk(KERN_ALERT" Data : %lu\n", (unsigned long)target);
 
 	return 0;
 }
