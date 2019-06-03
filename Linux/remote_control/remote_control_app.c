@@ -20,11 +20,11 @@ int main(void)
 		printf("< remote control device has been detected >\n");
 	}
 	while (1) {
-		read(fd, buf, 4);
-		for (loop = 0; loop < 4; loop++) {
-			printf("%c", buf[loop]);
-			printf("\n");
-		}
+		//read(fd, buf, 4);
+		//for (loop = 0; loop < 4; loop++) {
+		//	printf("%c", buf[loop]);
+		//	printf("\n");
+		//}
 	}
 	close(fd);
 	return 0;

@@ -37,6 +37,7 @@ struct file_operations remote_control_fops = {
 	.read = remote_control_read
 };
 
+static irqreturn_t remote_control_interrupt(int irq, void *dev_id, struct pt_regs *regs);
 static int remote_control_register_cdev(void);
 void output_sonicburst(void);
 int gpio_init(void);
@@ -57,13 +58,27 @@ static int remote_control_read(struct file *filp, char *buf, size_t count, loff_
 
 	for (i = 0; i < 4; i++) {
 		buf[i] = *(p + i);
-		printk(KERN_ALERT"%c", *(p + i));
+		printk(KERN_ALERT"[%c]", *(p + i));
 
 	}
 	
 	printk(KERN_ALERT" Data : %d\n ", target);
 
 	return 0;
+}
+
+
+static irqreturn_t remote_control_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
+	if (gpio_get_value(IR_DATA)) {			// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
+		do_gettimeofday(&after);
+		printk(KERN_ALERT" Distance : %.0ld [us] \n ", after.tv_usec - before.tv_usec);
+		memset(&before, 0, sizeof(struct timeval));
+		memset(&after, 0, sizeof(struct timeval));
+	}
+	else {
+		do_gettimeofday(&before);			// do_gettimeofday(struct timeval *tv) : 초 / 마이크로초 단위의 절대시간을 얻어옴
+	}
+	return IRQ_HANDLED;		// 올바른 경우 IRQ_HANDLED를 관련 없는 경우 IRQ_NONE를 리턴
 }
 static int remote_control_register_cdev(void) {
 	int error;
@@ -106,6 +121,21 @@ int gpio_init(void) {
 		printk(KERN_ALERT "<Echo Pin Setting Fail>\n");
 		goto fail;
 	}
+	rtc = gpio_to_irq(IR_DATA);								// int gpio_to_irq(unsigned int gpio); : gpio에 해당하는 interrupt 주소를 리턴해주는 함수
+	if (rtc < 0) {
+		printk(KERN_ALERT "<irq Pin GPIO Request Fail>\n");
+		goto fail;
+	}
+	else {
+		irq = rtc;
+	}
+	rtc = request_irq(irq, (void*)remote_control_interrupt, IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_DISABLED, "us", NULL);
+	// int request_irq(unsigned int irq, irqreturn_t (*handler)(int, void*, struct pt_regs*), unsigned long frags, const char* device, void* dev_id); : 인터럽트 서비스 함수 등록
+	if (rtc) {
+		printk(KERN_ALERT "<irq Register Fail>\n");
+		goto fail;
+	}
+	printk(KERN_INFO "HC-SR04 Enable\n");
 	return 0;
 fail:
 	return -1;
