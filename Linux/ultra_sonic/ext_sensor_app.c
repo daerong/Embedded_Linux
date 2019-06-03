@@ -23,6 +23,7 @@ int main(void){
 	else {
 		printf("< ext_sens device has been detected >\n");
 	}
+
 	while (1) {
 		read(fd, buf, 10);
 		if (buf[0] == '0')
@@ -33,7 +34,7 @@ int main(void){
 			printf("< Searching >\n");
 		}
 
-		delay(500);
+		sleep(1);
 	}
 	close(fd);
 	return 0;
