@@ -52,16 +52,17 @@ static int remote_control_release(struct inode *inode, struct file *filp) {
 	return 0;
 }
 static int remote_control_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {				
-	unsigned char value[4];
-	unsigned short _s_value = (int)gpio_get_value(IR_DATA);		// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
-	value[0] = (_s_value >> 12) & 0xF;
-	value[1] = (_s_value >> 8) & 0xF;
-	value[2] = (_s_value >> 4) & 0xF;
-	value[3] = (_s_value >> 0) & 0xF;
+	int target = gpio_get_value(IR_DATA);		// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
+	unsigned char *p = (char *)&target;
 
-	if (copy_to_user(buf, value, 4)) {			// 정상 종료 시 0을 반환
-		return -EFAULT;
+	for (int i = 0; i < 4; i++) {
+		buf[i] = *(p + i);
+		printk(KERN_ALERT"%c", *(p + i));
+
 	}
+	
+	printk(KERN_ALERT" Data : %d\n ", target);
+
 	return 0;
 }
 static int remote_control_register_cdev(void) {

@@ -21,7 +21,7 @@ int main(void)
 	}
 	while (1) {
 		read(fd, buf, 4);
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 4; i++) {
 			printf("%c", buf[i]);
 			printf("\n");
 		}
