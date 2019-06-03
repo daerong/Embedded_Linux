@@ -37,7 +37,6 @@ struct file_operations remote_control_fops = {
 	.read = remote_control_read
 };
 
-static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs);
 static int remote_control_register_cdev(void);
 void output_sonicburst(void);
 int gpio_init(void);
@@ -54,8 +53,9 @@ static int remote_control_release(struct inode *inode, struct file *filp) {
 static int remote_control_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {				
 	int target = gpio_get_value(IR_DATA);		// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
 	unsigned char *p = (char *)&target;
+	int i;
 
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		buf[i] = *(p + i);
 		printk(KERN_ALERT"%c", *(p + i));
 
