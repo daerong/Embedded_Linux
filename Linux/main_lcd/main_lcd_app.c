@@ -6,9 +6,10 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <linux/input.h>
+#include <linux/input.h>
 
 //touch screen device path
-#define TOUCHSCREEN_DEVICE "/dev/input/event1"
+#define TOUCHSCREEN_DEVICE "/dev/input/event4"
 #define EVENT_BUF_NUM 65
 
 int main(void) {
@@ -23,7 +24,7 @@ int main(void) {
 	int x, y;
 
 	//device open
-	dev = open(TOUCHSCREEN_DEVICE, O_RDONLY);
+	dev = open(TOUCHSCREEN_DEVICE, O_RDWR);
 
 	//device open error check
 	if (dev < 0) {
