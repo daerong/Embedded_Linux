@@ -28,8 +28,7 @@ void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsign
 int main(int argc, char** argv){
     int ret;
     int frame_fd;
-    U16 pixel;			// U16은 short 즉, 16비트.
-    int offset;  
+    U16 pixel;			// U16은 short 즉, 16비트. 
     struct fb_var_screeninfo fvs;
 
 	frame_fd = open(LCD_DEVICE, O_RDWR);
@@ -61,7 +60,7 @@ int main(int argc, char** argv){
 } 
 
 void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsigned short pixel) {
-	offset = ypos * fvs->xres * sizeof(pixel) + xpos * sizeof(pixel);	// (xpos, ypos) 위치
+	int offset = ypos * fvs->xres * sizeof(pixel) + xpos * sizeof(pixel);	// (xpos, ypos) 위치
 	assert(lseek(fd, offset, SEEK_SET) >= 0, "LSeek Error.\n");
 	write(fd, &pixel, fvs->bits_per_pixel / (sizeof(pixel)));			// write 2Byte(16bit)
 }
