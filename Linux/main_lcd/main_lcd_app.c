@@ -9,18 +9,21 @@
 
 //touch screen device path
 #define TOUCHSCREEN_DEVICE "/dev/input/event1"
+#define EVENT_BUF_NUM 65
 
 int main(void) {
 
 	int dev;
-	struct input_event ev;
+	struct input_event ev[EVENT_BUF_NUM];
 	size_t ev_size = sizeof(struct input_event);
 	size_t size;
+
+	int i;
 
 	int x, y;
 
 	//device open
-	dev = open(TOUCHSCREEN_DEVICE, O_RDWR);
+	dev = open(TOUCHSCREEN_DEVICE, O_RDONLY);
 
 	//device open error check
 	if (dev < 0) {
@@ -34,9 +37,61 @@ int main(void) {
 	while (1) {
 		printf("start read\n");
 
-		size = read(dev, &ev, ev_size);
+		size = read(dev, ev, ev_size *EVENT_BUF_NUM);
+		if (size < sizeof(struct input_event))
+		{
+			printf("Device read error : %s\n", TOUCHSCREEN_DEVICE);
+			exit(1);
+		}
 
 		printf("end read\n");
+
+		for (i = 0; i < (size / sizeof(struct input_event)); i++)
+		{
+			// 각 event 발생의 type에 따른 분기 처리
+			switch (ev[i].type)
+			{
+			case EV_SYN:
+				printf("---------------------------------------n");
+				break;
+			case EV_KEY:
+				printf("Button code %d", ev[i].code);
+				switch (ev[i].value)
+				{
+				case 1:
+					printf(": pressedn");
+					break;
+				case 0:
+					printf(": releasedn");
+					break;
+				default:
+					printf("Unknown: type %d, code %d, value %d",
+						ev[i].type,
+						ev[i].code,
+						ev[i].value);
+					break;
+				}
+				break;
+			default:
+				printf("Unknown: type %d, code %d, value %dn",
+					ev[i].type,
+					ev[i].code,
+					ev[i].value);
+				break;
+			}
+		}
+/*
+
+
+
+
+
+
+
+
+
+
+
 
 		if (size < 0) {
 			printf("Touch screen wrong value\n");
@@ -55,7 +110,7 @@ int main(void) {
 			}
 		}
 
-		printf("x : %d, y: %d\n", x, y);
+		printf("x : %d, y: %d\n", x, y);*/
 	}
 
 	close(dev);
