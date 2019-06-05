@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 /*
 1번 예제 : LCD 정보를 확인하는 프로그램
@@ -9,16 +9,16 @@
 (3) fbdev ioctl…어쩌구 하는 에러 메시지 => frame buffer driver가 정상적인 동작을 하지 않아서 그런 것 같습니다.
 
 수행시키면 다음과 같은 결과를 볼 수 있습니다.
-x - resolution : 640
-y - resolution : 480
-x - resolution(virtual) : 640
-y - resolution(virtual) : 480
-Bit/Pixel : 8
-length of frame buffer memory : 8388608
+x - resolution : 1024
+y - resolution : 600
+x - resolution(virtual) : 1024
+y - resolution(virtual) : 600
+Bit/Pixel : 16
+length of frame buffer memory : 1228800
 (이 결과는 RedHat 7.3 Permedia2 8MB 그래픽 카드가 있는 시스템에서 보여주는 결과입니다.)
-화면 해상도는 640x480
-가상화면 해상도도 640x480
-픽셀당 비트 수는 8이므로 frame buffer memory의 크기는 8MB라고 해석할 수 있다.
+화면 해상도는 1024x600
+가상화면 해상도도 1024x600
+픽셀당 비트 수는 16이므로 frame buffer memory의 크기는 16MB라고 해석할 수 있다.
 
 가장 중요한 정보는 해상도와 bpp정보
 가상화면 정보는 혹시나 해서 출력해 보았고 Frame buffer memory 크기도 크게 중요한 부분은 아닙니다.

@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 /*
 4번 예제 : 랜덤 점 찍기, Ctrl+C를 누르면 중지하는 무한 루프

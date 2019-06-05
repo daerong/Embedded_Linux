@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 /*
 8번 예제 : mmap을 이용한 pixel 점 찍기.
@@ -13,7 +13,6 @@ fbvar.xres*fbvar.yres*(16/8)만큼의 Byte가 mmap으로 virtual address에 매핑되고 있
 픽셀 offset은 바이트 단위로는 먼저 소개한 fbpixel.c와 같지만 unsigned short 포인터 pfbdata와 더하므로 offset을 바이트 단위로 계산하지 않고 2byte(sizeof(unsigned short))단위로 하고 있습니다. 
 */
 
-typedef unsigned char ubyte;
 typedef unsigned int U32;
 typedef short U16;
 
@@ -39,8 +38,8 @@ int main(){
 	frame_fd = open(LCD_DEVICE, O_RDWR);
 	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
 
-	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
-	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
+	check = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
+	assert(check >= 0, "Get Information Error - VSCREENINFO!\n");
 
 	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
 	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check

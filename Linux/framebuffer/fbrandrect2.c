@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 /*
 9번 예제 : mmap을 이용한 네모 그리기.
@@ -20,13 +20,13 @@ int main(){
 	frame_fd = open(LCD_DEVICE, O_RDWR);
 	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
 
-	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
-	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
+	check = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
+	assert(check >= 0, "Get Information Error - VSCREENINFO!\n");
 
 	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
 	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
 
-	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(pixel), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
+	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(rpixel), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	// void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset); : start부터 length까지의 영역을 fd에 대응한다.
 	// start : 특별한 경우가 아니면 0, length : 메모리로 매핑할 크기, prot : 맵핑에 원하는 메모리 보호정책, flags : 매핑 유형과 동작 구성 요소, fd : file descriptor, offset : 매핑할 때 length의 시작점을 지정, return : Address
 

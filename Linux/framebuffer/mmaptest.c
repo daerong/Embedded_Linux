@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 /*
 7번 예제 : 일반적인 mmap 시스템 호출

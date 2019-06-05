@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 /*
 2번 예제 : bits_per_pixel 필드를 바꾼 후 넘겨주는 프로그램.

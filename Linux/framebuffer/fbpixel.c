@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 /*
 3번 예제 : 16 bpp 점(pixel) 찍기, write
