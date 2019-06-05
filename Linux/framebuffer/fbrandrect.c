@@ -20,8 +20,8 @@ int main(int argc, char** argv) {
 	frame_fd = open(LCD_DEVICE, O_RDWR);
 	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
 
-	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);				// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
-	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
+	check = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);				// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
+	assert(check >= 0, "Get Information Error - VSCREENINFO!\n");
 
 	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
 	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
  
 		for (repy = posy1; repy < posy2; repy++) {		// y set
 			offset = repy * fvs.xres * (sizeof(rpixel)) + posx1 * (sizeof(rpixel));
-			assert(lseek(fd, offset, SEEK_SET) >= 0, "LSeek Error.\n");
+			assert(lseek(frame_fd, offset, SEEK_SET) >= 0, "LSeek Error.\n");
 
 			for (repx = posx1; repx <= posx2; repx++) {	// x set
 				write(frame_fd, &rpixel, (sizeof(rpixel)));
