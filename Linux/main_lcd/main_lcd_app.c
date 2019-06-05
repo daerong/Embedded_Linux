@@ -9,7 +9,7 @@
 #include <linux/input.h>
 
 //touch screen device path
-#define TOUCHSCREEN_DEVICE "/dev/input/event4"
+#define TOUCHSCREEN_DEVICE "/dev/input/event1"
 #define EVENT_BUF_NUM 65
 
 int main(void) {
