@@ -28,9 +28,16 @@ int main(void) {
 		exit(1);
 	}
 
+	printf("open check\n");
+
 	//If you want to expand additional function, Study "#include <linux/input.h>, struct input_event"
 	while (1) {
+		printf("start read\n");
+
 		size = read(dev, &ev, ev_size);
+
+		printf("end read\n");
+
 		if (size < 0) {
 			printf("Touch screen wrong value\n");
 			exit(1);
