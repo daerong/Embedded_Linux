@@ -64,11 +64,10 @@ static int remote_control_read(struct file *filp, char *buf, size_t count, loff_
 static irqreturn_t remote_control_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
 	if (gpio_get_value(IR_DATA)) {			// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
 		do_gettimeofday(&after);
-		if (after.tv_usec - before.tv_usec < 10) {
+		if (after.tv_usec - before.tv_usec < 100) {
 			data = data | (0x00000001 << index++);
 		}
 		else if (after.tv_usec - before.tv_usec > 1000) {
-			data = 0x00000000;
 			index = 0;
 		}
 		else {

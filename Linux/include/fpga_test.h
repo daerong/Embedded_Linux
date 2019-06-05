@@ -3,12 +3,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <unistd.h>			// open(), close() 시스템 콜
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <fcntl.h>			// O_RDWR
 #include <string.h>
 #include <signal.h>
+
+/* main_lcd */
+#include <sys/ioctl.h>
+#include <linux/input.h>
+/* main_lcd */
+
+/* framebuffer */
+#include <sys/ioctl.h>		// ioctl() 시스템 콜
+#include <linux/fb.h>		// Frame Buffer API : fb_var_screeninfo 구조체, fb_fix_screeninfo 구조체, FBIOGET_VSCREENINFO, FBIOGET_FSCREENINFO
+#include <sys/types.h>
+#include <sys/mman.h>
+/* framebuffer */
 
 #define LED_DEVICE "/dev/fpga_led"
 #define LED_MIN 0
@@ -42,6 +54,12 @@
 #define STEP_MOTOR_DIR_RIGHT 1
 #define STEP_MOTOR_SPDVAL_MIN 0 // min value, fastest
 #define STEP_MOTOR_SPDVAL_MAX 255 // max vlaue, slowest
+
+//touch screen device path
+#define TOUCHSCREEN_DEVICE "/dev/input/event1"
+
+//framebuffer
+#define LCD_DEVICE "/dev/fb0"
 
 void assert(int cond, char *msg) {
 	if (!cond) {
