@@ -47,5 +47,5 @@ U16 random_pixel(void)
 void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsigned short pixel) {
 	int offset = ypos * fvs->xres * sizeof(pixel) + xpos * sizeof(pixel);	// (xpos, ypos) À§Ä¡
 	assert(lseek(fd, offset, SEEK_SET) >= 0, "LSeek Error.\n");
-	write(fd, &pixel, fv->bits_per_pixel / (sizeof(pixel)));			// write 2Byte(16bit)
+	write(fd, &pixel, fvs->bits_per_pixel / (sizeof(pixel)));			// write 2Byte(16bit)
 }
