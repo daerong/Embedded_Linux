@@ -7,7 +7,8 @@
 
 char touch_thread[] = "touch thread";
 
-int draw_pointer_x, int draw_pointer_y;				// 쓰레드간 공유되는 자원
+int draw_pointer_x = 0;
+int draw_pointer_y = 0;				// 쓰레드간 공유되는 자원
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;	// 쓰레드 초기화
 
 typedef unsigned int U32;
@@ -17,13 +18,13 @@ typedef struct POINT{
 	int ypos;
 } POINT;
 
-typedef enum COLOR_SET {
-
-} COLOR_SET;
-
-typedef enum DRAW_MODE {
-
-} DRAW_MODE;
+//typedef enum COLOR_SET {
+//
+//} COLOR_SET;
+//
+//typedef enum DRAW_MODE {
+//
+//} DRAW_MODE;
 
 U16 makepixel(U32 r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
@@ -70,7 +71,8 @@ int main(int argc, char *argv[]) {
 	int repx, repy;
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
-	pthread_t touch_ev_thread;			// pthread ID
+	pthread_t touch_ev_thread;			
+	int thread_id;						// pthread ID
 	void *thread_result;				// pthread return
 	int status;							// mutex result
 
@@ -92,7 +94,7 @@ int main(int argc, char *argv[]) {
 	status = pthread_mutex_init(&mutex, NULL);
 	assert(status == 0, "Mutex init error.\n");
 
-	thr_id = pthread_create(&touch_ev_thread, NULL, touch_screen_ev, (void *)&touch_thread);
+	thread_id = pthread_create(&touch_ev_thread, NULL, touch_screen_ev, (void *)&touch_thread);
 	pthread_join(touch_ev_thread, (void *)&thread_result);
 	/* Thread setting */
 
