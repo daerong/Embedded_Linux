@@ -13,7 +13,6 @@ int main(int argc, char** argv) {
 	int ret;
 	int frame_fd;
 	U16 rpixel;			// U16Àº short Áï, 16ºñÆ®.
-	int offset;
 	struct fb_var_screeninfo fvs;
 
 	frame_fd = open(LCD_DEVICE, O_RDWR);
@@ -27,7 +26,6 @@ int main(int argc, char** argv) {
 
 	while (1){
 		int xpos, ypos;
-		int offset;
 		
 		xpos = (int)((fvs.xres*1.0*rand()) / (RAND_MAX + 1.0));  // ·£´ýÁÂÇ¥ x
 		ypos = (int)((fvs.yres*1.0*rand()) / (RAND_MAX + 1.0));  // ·£´ýÁÂÇ¥ y
@@ -47,7 +45,7 @@ U16 random_pixel(void)
 }
 
 void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsigned short pixel) {
-	offset = ypos * fvs.xres * sizeof(pixel) + xpos * sizeof(pixel);	// (xpos, ypos) À§Ä¡
+	int offset = ypos * fvs.xres * sizeof(pixel) + xpos * sizeof(pixel);	// (xpos, ypos) À§Ä¡
 	assert(lseek(fd, offset, SEEK_SET) >= 0, "LSeek Error.\n");
 	write(fd, &pixel, fvs.bits_per_pixel / (sizeof(pixel)));			// write 2Byte(16bit)
 }
