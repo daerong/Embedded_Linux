@@ -15,25 +15,25 @@ int main(int argc, char** argv) {
 	//uint8_t keys[128];
 	int fd;
 	struct input_event ev;
-	U16 event_type;
+	/*U16 event_type;
 	U16 event_code;
-	S32 event_value;
+	S32 event_value;*/
 	int status;
 	char text;
 	
 	fd = open(KEYBOARD_DEVICE, O_RDONLY);
 
 	while (1) {
-		event_type = 0;
-		event_code = 0;
-		event_value = 0;
-		status = read(fd, &ev, sizeof(struct input_event);
+		//event_type = 0;
+		//event_code = 0;
+		//event_value = 0;
+		status = read(fd, &ev, sizeof(struct input_event));
 		// 에러제어 패스
-		event_type = ev.type;
-		event_code = ev.code;
-		event_value = ev.value;
-		if (type == 1 && value == 1) {
-			switch (event_code) {
+		//event_type = ev.type;
+		//event_code = ev.code;
+		//event_value = ev.value;
+		if (ev.type == 1 && ev.value == 1) {
+			switch (ev.code) {
 			case 2:
 				text = '1';
 				break;
@@ -176,7 +176,6 @@ int main(int argc, char** argv) {
 
 			printf("%c", text);
 		}
-		
 	}
 
 	close(fd);
