@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 		//event_type = ev.type;
 		//event_code = ev.code;
 		//event_value = ev.value;
-		if (ev.type == 1 && ev.value == 1) {
+		if (ev.type == 1) {
 			switch (ev.code) {
 			case 2:
 				text = '1';
