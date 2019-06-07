@@ -140,8 +140,7 @@ int main(int argc, char** argv) {
 			if(cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 		else {
-			if (cur.x < PALETTE_X_END)draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
-			else draw_cursor(&fvs, pfbdata, past_x, past_y, menubox_color);
+			draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
 			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 			past_x = cur.x;
 			past_y = cur.y;
@@ -222,7 +221,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
 			if (j + i <= 10) {
-				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > PALETTE_X_END - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
 			}
@@ -231,7 +230,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	for (i = 5; i < 15; i++) {
 		for (j = i; j < i + 3; j++) {
 			{
-				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > PALETTE_X_END - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
 			}
