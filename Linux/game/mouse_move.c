@@ -58,15 +58,14 @@ int main(int argc, char** argv) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	pixel = makepixel(0, 0, 0);									// black color
-	fill_pixel(&fvs, pfbdata, start, end, pixel)
+	fill_pixel(&fvs, pfbdata, start, end, pixel);
 
 
 
 	while (1) {
 		int xpos, ypos;
 
-		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0)
-		{
+		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR)
 				continue;
