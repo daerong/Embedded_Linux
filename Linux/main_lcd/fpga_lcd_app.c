@@ -5,7 +5,7 @@
 									// Bit / Pixel : 16
 #define FB_LENGTH X_MAX * Y_MAX		// 1024 * 600 = 614400, length of frame buffer memory : 1024 * 600 * 2 = 1228800
 
-char touch_thread[] = "touch thread";
+char keyboard_thread[] = "touch thread";
 
 int draw_pointer_x = 0;
 int draw_pointer_y = 0;				// 쓰레드간 공유되는 자원
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 	status = pthread_mutex_init(&mutex, NULL);
 	assert(status == 0, "Mutex init error.\n");
 
-	thread_id = pthread_create(&touch_ev_thread, NULL, touch_screen_ev, (void *)&touch_thread);
+	thread_id = pthread_create(&touch_ev_thread, NULL, touch_screen_ev, (void *)&keyboard_thread);
 	pthread_join(touch_ev_thread, (void *)&thread_result);
 	/* Thread setting */
 

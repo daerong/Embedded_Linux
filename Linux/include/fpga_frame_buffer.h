@@ -34,19 +34,22 @@
 // mouse event
 #define MOUSE_EVENT "/dev/input/event9"
 
-void assert(int cond, char *msg) {
-	if (!cond) {
-		printf("%s\n", msg);
-		exit(1);
-	}
-}
+// keuboard event
+#define KEYBOARD_EVENT "/dev/input/event6"
 
-void assert2(int cond, char *msg, char *src) {
-	if (!cond) {
-		printf("%s: %s\n", msg, src);
-		exit(1);
-	}
-}
+//void assert(int cond, char *msg) {
+//	if (!cond) {
+//		printf("%s\n", msg);
+//		exit(1);
+//	}
+//}
+//
+//void assert2(int cond, char *msg, char *src) {
+//	if (!cond) {
+//		printf("%s: %s\n", msg, src);
+//		exit(1);
+//	}
+//}
 
 
 #endif
