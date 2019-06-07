@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
 	int mouse_fd;
 	U16 foreground_color;			// U16은 short 즉, 16비트.
 	U16 background_color;			// U16은 short 즉, 16비트.
+	U16 menubox_color;
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
 	struct input_event ev;
@@ -52,8 +53,9 @@ int main(int argc, char** argv) {
 	DISPLAY display[TOOLBAR_END * SCREEN_Y_MAX];
 	foreground_color = makepixel(255, 255, 255);							// white color
 	background_color = makepixel(0, 0, 0);									// black color
+	menubox_color = makepixel(100, 100, 100);
 	reset_display(&fvs, pfbdata, display, background_color);
-	fill_box(&fvs, pfbdata, display, start, end, background_color);
+	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
 
 	cur.x = TOOLBAR_END / 2;
 	cur.y = SCREEN_Y_MAX / 2;
@@ -162,6 +164,7 @@ void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos,
 }
 
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
+	if (xpos > SCREEN_X_MAX) return;
 	target[ypos*TOOLBAR_END + xpos].color = pixel;
 }
 
