@@ -172,9 +172,9 @@ int main(int argc, char** argv) {
 
 			}
 
-			printf("%c\n", pnt);
+			printf("%c", pnt);
 
-			printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+			//printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 
 		}
 	}
