@@ -44,10 +44,10 @@ int main(int argc, char** argv) {
 	struct input_event ev;
 	LOCATE start;
 	LOCATE end;
-	start.xpos = TOOLBAR_X_START -1;
+	start.xpos = TOOLBAR_X_START;
 	start.ypos = 0;
-	end.xpos = TOOLBAR_X_END -1;
-	end.ypos = SCREEN_Y_MAX -1;
+	end.xpos = TOOLBAR_X_END;
+	end.ypos = SCREEN_Y_MAX;
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
@@ -182,10 +182,23 @@ void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPL
 }
 
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel) {
+	int x_start, y_start, x_end, y_end;
 	int x_temp, y_temp;
 
-	for (y_temp = start.ypos; y_temp < end.ypos; y_temp++) {
-		for (x_temp = start.xpos; x_temp < end.xpos; x_temp++) {
+	if (start.xpos < 0) x_start = 0;
+	else x_start = start.xpos;
+
+	if (start.ypos < 0) y_start = 0;
+	else y_start = start.ypos;
+
+	if (end.xpos > SCREEN_X_MAX - 1) x_end = SCREEN_X_MAX - 1;
+	else x_end = end.xpos;
+
+	if (end.ypos> SCREEN_Y_MAX - 1) y_end = SCREEN_Y_MAX - 1;
+	else y_end = end.ypos;
+
+	for (y_temp = y_start; y_temp < y_end; y_temp++) {
+		for (x_temp = x_start; x_temp < x_end; x_temp++) {
 			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
 			//target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
 		}
