@@ -7,10 +7,11 @@ typedef int S32;
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
 
-typedef struct POINT {
+typedef struct DISPLAY {
 	int xpos;
 	int ypos;
-} POINT;
+	U16 color;
+} DISPLAY;
 typedef struct MOUSE_CURSOR {
 	int x;
 	int y;
@@ -18,7 +19,9 @@ typedef struct MOUSE_CURSOR {
 
 U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT one, POINT two, unsigned short pixel);
+void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel);
+void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel);
+void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 
 int main(int argc, char** argv) {
@@ -31,8 +34,7 @@ int main(int argc, char** argv) {
 	struct input_event ev;
 
 	MOUSE_CURSOR cur;
-	POINT start;
-	POINT end;
+	DISPLAY display[SCREEN_X_MAX, SCREEN_Y_MAX];
 	start.xpos = 0;
 	start.ypos = 0;
 	end.xpos = SCREEN_X_MAX - 1;
@@ -69,10 +71,16 @@ int main(int argc, char** argv) {
 
 		if (ev.type == 1) {
 			if (ev.value == 1) {
-				if (ev.code == 272) printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				if (ev.code == 272) {
+					pixel = makepixel(255, 255, 255);									// black color
+					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
+					printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+
+					draw_display(&fvs, pfbdata, display, pixel);
+				}
 				else if (ev.code == 273) {
 					pixel = makepixel(0, 0, 0);									// black color
-					fill_pixel(&fvs, pfbdata, start, end, pixel);
+					reset_display(&fvs, pfbdata, display, pixel);
 					printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				}
 			}
@@ -88,6 +96,8 @@ int main(int argc, char** argv) {
 				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.x += xpos;
 			}
+
+			draw_display(&fvs, pfbdata, display, pixel);
 		}
 
 
@@ -132,30 +142,26 @@ void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos,
 	pfbdata[offset] = pixel;
 }
 
-void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT one, POINT two, unsigned short pixel) {
-	int x_start, x_end, y_start, y_end;
-	int x_let, y_let;
+void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
+	target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
+}
 
-	if (one.xpos > two.xpos) {
-		x_start = two.xpos;
-		x_end = one.xpos;
+void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel){
+	int x_temp, y_temp;
+	
+	for (y_temp = 0; y_temp <= SCREEN_Y_MAX; y_temp++) {
+		for (x_temp = 0; x_temp <= SCREEN_X_MAX; x_temp++) {
+			target[y_temp*SCREEN_X_MAX + x_temp].color == pixel;
+		}
 	}
-	else {
-		x_start = one.xpos;
-		x_end = two.xpos;
-	}
-	if (one.ypos > two.ypos) {
-		y_start = two.ypos;
-		y_end = one.ypos;
-	}
-	else {
-		y_start = one.ypos;
-		y_end = two.ypos;
-	}
+}
 
-	for (y_let = y_start; y_let <= y_end; y_let++) {
-		for (x_let = x_start; x_let <= x_end; x_let++) {
-			put_pixel(fvs, pfbdata, x_let, y_let, pixel);
+void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel) {
+	int x_temp, y_temp;
+
+	for (y_temp = 0; y_temp <= SCREEN_Y_MAX; y_temp++) {
+		for (x_temp = 0; x_temp <= SCREEN_X_MAX; x_temp++) {
+			put_pixel(fvs, pfbdata, x_temp, y_temp, target[y_temp*SCREEN_X_MAX + x_temp].color);
 		}
 	}
 }
@@ -171,7 +177,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 			}
 		}
 	}
-	for (i = 6; i < 15; i++) {
+	for (i = 5; i < 15; i++) {
 		for (j = i; j < i+3 ; j++) {{
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
