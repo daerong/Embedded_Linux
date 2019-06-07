@@ -220,7 +220,7 @@ void* keyboard_ev_func(void *data) {
 
 			/*memcpy(text_lcd_buf, "Successful", 10);*/
 			if (text_lcd_locate < TEXT_LCD_LINE_BUF) {
-				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt[0], 1);
+				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt, 1);
 				text_lcd_locate++;
 			}
 
