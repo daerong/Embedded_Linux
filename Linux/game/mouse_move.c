@@ -7,13 +7,20 @@ typedef int S32;
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
 
-U16 makepixel(U32  r, U32 g, U32 b);
-void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsigned short pixel);
-
-typedef struct MOUSE_CURSOR{
+typedef struct POINT {
+	int xpos;
+	int ypos;
+} POINT;
+typedef struct MOUSE_CURSOR {
 	int x;
 	int y;
 } MOUSE_CURSOR;
+
+U16 makepixel(U32  r, U32 g, U32 b);
+void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
+void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT one, POINT two, unsigned short pixel);
+
+
 
 int main(int argc, char** argv) {
 	int ret;
@@ -21,9 +28,16 @@ int main(int argc, char** argv) {
 	int mouse_fd;
 	U16 pixel;			// U16은 short 즉, 16비트.
 	struct fb_var_screeninfo fvs;
+	unsigned short *pfbdata;
 	struct input_event ev;
 
 	MOUSE_CURSOR cur;
+	POINT start;
+	POINT end;
+	start.xpos = 0;
+	start.ypos = 0;
+	end.xpos = SCREEN_X_MAX - 1;
+	end.ypos = SCREEN_Y_MAX - 1;
 
 	cur.x = fvs.xres / 2;
 	cur.y = fvs.yres / 2;
@@ -40,17 +54,11 @@ int main(int argc, char** argv) {
 	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
 	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
 
-	pixel = makepixel(255, 0, 0);									// red color
-	put_pixel(&fvs, frame_fd, 80, 100, pixel);
+	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(pixel), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
+	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
-	pixel = makepixel(0, 255, 0);									// green color
-	put_pixel(&fvs, frame_fd, 100, 80, pixel);
-
-	pixel = makepixel(0, 0, 255);									// blue color
-	put_pixel(&fvs, frame_fd, 120, 100, pixel);
-
-	pixel = makepixel(255, 255, 255);								// white color
-	put_pixel(&fvs, frame_fd, 100, 120, pixel);
+	pixel = makepixel(0, 0, 0);									// black color
+	fill_pixel(&fvs, frame_fd, start, end, pixel)
 
 
 
@@ -75,12 +83,12 @@ int main(int argc, char** argv) {
 		else if (ev.type == 2) {
 			if (ev.code == 1) {
 				ypos = ev.value;
-				//printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.y += ypos;
 			}
 			else if (ev.code == 0) {
 				xpos = ev.value;
-				//printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.x += xpos;
 			}
 		}
@@ -103,19 +111,15 @@ int main(int argc, char** argv) {
 			cur.y = SCREEN_Y_MAX - 1;
 		}
 
-		put_pixel(&fvs, frame_fd, cur.x, cur.y, pixel);
+		put_pixel(&fvs, pfbdata, cur.x, cur.y, pixel);
 	}
 
+
+	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(pixel));
 	close(frame_fd);
 	close(mouse_fd);
 
 	return 0;
-}
-
-void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsigned short pixel) {
-	int offset = ypos * fvs->xres * sizeof(pixel) + xpos * sizeof(pixel);	// (xpos, ypos) 위치
-	assert(lseek(fd, offset, SEEK_SET) >= 0, "LSeek Error.\n");
-	write(fd, &pixel, fvs->bits_per_pixel / (sizeof(pixel)));			// write 2Byte(16bit)
 }
 
 U16 makepixel(U32  r, U32 g, U32 b) {
@@ -124,4 +128,37 @@ U16 makepixel(U32  r, U32 g, U32 b) {
 	U16 z = (U16)(b >> 3);
 
 	return (z | (x << 11) | (y << 5));
+}
+
+void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
+	int offset = ypos * fvs->xres + xpos;
+	pfbdata[offset] = pixel;
+}
+
+void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT one, POINT two, unsigned short pixel) {
+	int x_start, x_end, y_start, y_end;
+	int x_let, y_let;
+
+	if (one.xpos > two.xpos) {
+		x_start = two.xpos;
+		x_end = one.xpos;
+	}
+	else {
+		x_start = one.xpos;
+		x_end = two.xpos;
+	}
+	if (one.ypos > two.ypos) {
+		y_start = two.ypos;
+		y_end = one.ypos;
+	}
+	else {
+		y_start = one.ypos;
+		y_end = two.ypos;
+	}
+
+	for (y_let = y_start; y_let <= y_end; y_let++) {
+		for (x_let = x_start; x_let <= x_end; x_let++) {
+			put_pixel(fvs, pfbdata, x_let, y_let, pixel);
+		}
+	}
 }
