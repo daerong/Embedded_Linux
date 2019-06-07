@@ -13,9 +13,6 @@ int main(int argc, char** argv) {
 	uint8_t keys[128];
 	int fd;
 	char pnt;
-	U16 event_type;
-	U16 event_code;
-	S32 event_value;
 
 	fd = open(argv[1], O_RDONLY);
 
@@ -175,12 +172,9 @@ int main(int argc, char** argv) {
 
 			}
 
-			printf("%c", pnt);
+			//printf("%c", pnt);
 
-			event_type = ev.type;
-			event_code = ev.code;
-			event_value = ev.value;
-			//printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", pnt, ev.type, ev.code, ev.value);
 
 		}
 	}
