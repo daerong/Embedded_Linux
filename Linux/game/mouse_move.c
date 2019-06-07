@@ -47,7 +47,7 @@ void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xp
 
 void* keyboard_ev_func(void *data) {
 	int keyboard_fd;
-	char pnt;						// 키보드 값
+	char pnt[1];						// 키보드 값
 	char buffer[TEXT_LCD_LINE_BUF];
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
@@ -73,82 +73,82 @@ void* keyboard_ev_func(void *data) {
 					close(keyboard_fd);
 					return;
 				case 2:
-					pnt = '1';
+					pnt[0] = '1';
 					break;
 				case 3:
-					pnt = '2';
+					pnt[0] = '2';
 					break;
 				case 4:
-					pnt = '3';
+					pnt[0] = '3';
 					break;
 				case 5:
-					pnt = '4';
+					pnt[0] = '4';
 					break;
 				case 6:
-					pnt = '5';
+					pnt[0] = '5';
 					break;
 				case 7:
-					pnt = '6';
+					pnt[0] = '6';
 					break;
 				case 8:
-					pnt = '7';
+					pnt[0] = '7';
 					break;
 				case 9:
-					pnt = '8';
+					pnt[0] = '8';
 					break;
 				case 10:
-					pnt = '9';
+					pnt[0] = '9';
 					break;
 				case 11:
-					pnt = '0';
+					pnt[0] = '0';
 					break;
 				case 12:
-					pnt = '-';
+					pnt[0] = '-';
 					break;
 				case 13:
-					pnt = '=';
+					pnt[0] = '=';
 					break;
 				case 14:
-					pnt = '\b';
+					pnt[0] = '\b';
 					break;
 				case 15:
-					pnt = '\t';
+					pnt[0] = '\t';
 					break;
 				case 16:
-					pnt = 'q';
+					pnt[0] = 'q';
 					break;
 				case 17:
-					pnt = 'w';
+					pnt[0] = 'w';
 					break;
 				case 18:
-					pnt = 'e';
+					pnt[0] = 'e';
 					break;
 				case 19:
-					pnt = 'r';
+					pnt[0] = 'r';
 					break;
 				case 20:
-					pnt = 't';
+					pnt[0] = 't';
 					break;
 				case 21:
-					pnt = 'y';
+					pnt[0] = 'y';
 					break;
 				case 22:
-					pnt = 'u';
+					pnt[0] = 'u';
 					break;
 				case 23:
-					pnt = 'i';
+					pnt[0] = 'i';
 					break;
 				case 24:
-					pnt = 'o';
+					pnt[0] = 'o';
 					break;
 				case 25:
-					pnt = 'p';
+					pnt[0] = 'p';
 					break;
 				case 26:
-					pnt = '[';
+					pnt[0] = '[';
 					break;
 				case 27:
-					pnt = ']';
+					pnt[0] = ']';
 					break;
 				case 28:
 					memset(buffer, ' ', TEXT_LCD_LINE_BUF);
@@ -158,61 +158,61 @@ void* keyboard_ev_func(void *data) {
 					text_lcd_locate = 0;
 					break;
 				case 30:
-					pnt = 'a';
+					pnt[0] = 'a';
 					break;
 				case 31:
-					pnt = 's';
+					pnt[0] = 's';
 					break;
 				case 32:
-					pnt = 'd';
+					pnt[0] = 'd';
 					break;
 				case 33:
-					pnt = 'f';
+					pnt[0] = 'f';
 					break;
 				case 34:
-					pnt = 'g';
+					pnt[0] = 'g';
 					break;
 				case 35:
-					pnt = 'h';
+					pnt[0] = 'h';
 					break;
 				case 36:
-					pnt = 'j';
+					pnt[0] = 'j';
 					break;
 				case 37:
-					pnt = 'k';
+					pnt[0] = 'k';
 					break;
 				case 38:
-					pnt = 'l';
+					pnt[0] = 'l';
 					break;
 				case 44:
-					pnt = 'z';
+					pnt[0] = 'z';
 					break;
 				case 45:
-					pnt = 'x';
+					pnt[0] = 'x';
 					break;
 				case 46:
-					pnt = 'c';
+					pnt[0] = 'c';
 					break;
 				case 47:
-					pnt = 'v';
+					pnt[0] = 'v';
 					break;
 				case 48:
-					pnt = 'b';
+					pnt[0] = 'b';
 					break;
 				case 49:
-					pnt = 'n';
+					pnt[0] = 'n';
 					break;
 				case 50:
-					pnt = 'm';
+					pnt[0] = 'm';
 					break;
 				case 51:
-					pnt = ',';
+					pnt[0] = ',';
 					break;
 				case 52:
-					pnt = '.';
+					pnt[0] = '.';
 					break;
 				case 53:
-					pnt = '/';
+					pnt[0] = '/';
 					break;
 				}
 
@@ -220,13 +220,13 @@ void* keyboard_ev_func(void *data) {
 
 			/*memcpy(text_lcd_buf, "Successful", 10);*/
 			if (text_lcd_locate < TEXT_LCD_LINE_BUF) {
-				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt, 1);
+				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt[0], 1);
 				text_lcd_locate++;
 			}
 
 			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 
-			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", pnt, keyboard_ev.type, keyboard_ev.code, keyboard_ev.value);
+			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", pnt[0], keyboard_ev.type, keyboard_ev.code, keyboard_ev.value);
 
 		}
 	}
