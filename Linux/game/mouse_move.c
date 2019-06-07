@@ -57,6 +57,8 @@ int main(int argc, char** argv) {
 	menubox_color = makepixel(50, 150, 150);
 	reset_display(&fvs, pfbdata, display, background_color);
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
+	draw_display(&fvs, pfbdata, display);
+
 
 	cur.x = PALETTE_X_END / 2;
 	cur.y = SCREEN_Y_MAX / 2;
@@ -133,7 +135,7 @@ int main(int argc, char** argv) {
 
 		if (draw_mode) {
 			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
-			put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
+			if (cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 		else {
 			draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
@@ -160,12 +162,12 @@ U16 makepixel(U32  r, U32 g, U32 b) {
 }
 
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
+	if (xpos > PALETTE_X_END) return;
 	int offset = ypos * fvs->xres + xpos;
 	pfbdata[offset] = pixel;
 }
 
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
-	if (xpos > PALETTE_X_END) return;
 	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
@@ -184,7 +186,8 @@ void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *t
 
 	for (y_temp = start.ypos; y_temp < end.ypos; y_temp++) {
 		for (x_temp = start.xpos; x_temp < end.xpos; x_temp++) {
-			target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
+			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
+			//target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
 		}
 	}
 }
