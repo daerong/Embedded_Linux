@@ -75,19 +75,34 @@ int main(int argc, char** argv) {
 		else if (ev.type == 2) {
 			if (ev.code == 1) {
 				ypos = ev.value;
-				//printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-				if (cur.y > 0 && cur.y < SCREEN_Y_MAX - 1) cur.y += ypos;
+				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				cur.y += ypos;
 			}
 			else if (ev.code == 0) {
 				xpos = ev.value;
-				//printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-				if (cur.x > 0 && cur.x < SCREEN_X_MAX - 1) cur.x += xpos;
+				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				cur.x += xpos;
 			}
 		}
+
 
 		printf("x : %d \t\t y : %d/n", cur.x, cur.y);
 
 		pixel = makepixel(255, 255, 255);
+		if (cur.x < 0) {
+			cur.x = 0;
+		}
+		else if (cur.x > SCREEN_X_MAX - 1) {
+			cur.x = SCREEN_X_MAX - 1;
+		}
+
+		if (cur.y < 0) {
+			cur.y = 0;
+		}
+		else if (cur.y > SCREEN_Y_MAX - 1) {
+			cur.y = SCREEN_Y_MAX - 1;
+		}
+
 		put_pixel(&fvs, frame_fd, cur.x, cur.y, pixel);
 	}
 
