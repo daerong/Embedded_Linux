@@ -27,11 +27,17 @@ int main(int argc, char** argv) {
 			break;
 		}
 
-		//if (ev.type == 2) {
-		//	if (ev.type == 1) {
+		if (ev.type == 1) {
+			if (ev.value == 1) {
+				if (ev.code == 272) printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				else if(ev.code == 273) printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+			}
+		}
+		else if (ev.type == 2) {
+			if (ev.code == 1) {
 				printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-		//	}
-		//}
+			}
+		}
 	}
 
 	close(fd);
