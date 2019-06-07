@@ -162,10 +162,17 @@ void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT on
 
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
 	int i, j;
-	for (i = 0; i < 15; i++) {
-		for (j = 0; j < 15; j++) {
-			if (j + i <= 15) {
+	for (i = 0; i < 10; i++) {
+		for (j = 0; j < 10; j++) {
+			if (j + i <= 10) {
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
+				int offset = (ypos + i) * fvs->xres + (xpos + j);
+				pfbdata[offset] = pixel;
+			}
+		}
+	}
+	for (i = 10; i < 20; i++) {
+		for (j = i; j < i+3 ; j++) {{
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
 			}
