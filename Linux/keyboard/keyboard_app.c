@@ -12,12 +12,12 @@ int main(int argc, char** argv) {
 
 	fd = open(argv[1], O_RDONLY);
 
-	while (1)
-	{
+	while (1){
 		struct input_event ev;
 
 		if (read(fd, &ev, sizeof(struct input_event)) < 0)
 		{
+			printf("check\n");
 			if (errno == EINTR)
 				continue;
 
