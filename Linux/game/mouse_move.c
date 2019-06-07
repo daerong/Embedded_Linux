@@ -218,13 +218,13 @@ void* keyboard_ev_func(void *data) {
 
 			}
 
-			/*memcpy(text_lcd_buf, "Successful", 10);*/
-			if (text_lcd_locate < TEXT_LCD_LINE_BUF) {
-				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt, 1);
-				text_lcd_locate++;
-			}
+			///*memcpy(text_lcd_buf, "Successful", 10);*/
+			//if (text_lcd_locate < TEXT_LCD_LINE_BUF) {
+			//	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt, 1);
+			//	text_lcd_locate++;
+			//}
 
-			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
+			//write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 
 			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", pnt[0], keyboard_ev.type, keyboard_ev.code, keyboard_ev.value);
 

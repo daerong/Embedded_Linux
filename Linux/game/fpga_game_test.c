@@ -45,8 +45,8 @@ int main(void) {
 
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
-	led_dev = open(LED_DEVICE, O_RDWR);
-	assert2(led_dev >= 0, "Device open error", LED_DEVICE);
+	led_dev = open(LEDS_DEVICE, O_RDWR);
+	assert2(led_dev >= 0, "Device open error", LEDS_DEVICE);
 	push_switch_dev = open(PUSH_SWITCH_DEVICE, O_RDONLY);
 	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
 	dot_dev = open(DOT_DEVICE, O_WRONLY);
@@ -100,11 +100,11 @@ int main(void) {
 		if (target_num[0] == answer_num[0]) led_data += 128;
 		if (led_data == 240) status = 0;
 
-		assert(LED_MIN <= led_data && led_data <= LED_MAX, "Invalid parameter range");
+		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
 
 
 		ret = write(led_dev, &led_data, 1);
-		assert2(ret >= 0, "Device write error", LED_DEVICE);
+		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 		usleep(100000);
 	}
 
