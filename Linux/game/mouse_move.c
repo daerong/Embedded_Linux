@@ -33,6 +33,7 @@ void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPL
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 
 int main(int argc, char** argv) {
 	int ret;
@@ -141,7 +142,7 @@ int main(int argc, char** argv) {
 			if(cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 		else {
-			draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+			erase_cursor(&fvs, pfbdata, past_x, past_y, background_color);
 			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 			past_x = cur.x;
 			past_y = cur.y;
@@ -236,6 +237,28 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				if (xpos + j < PALETTE_X_END) pfbdata[offset] = pixel;
 				else pfbdata[offset] = menubox_color;
+			}
+		}
+	}
+}
+
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
+	int i, j;
+	for (i = 0; i < 10; i++) {
+		for (j = 0; j < 10; j++) {
+			if (j + i <= 10) {
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
+				int offset = (ypos + i) * fvs->xres + (xpos + j);
+				pfbdata[offset] = pixel;
+			}
+		}
+	}
+	for (i = 5; i < 15; i++) {
+		for (j = i; j < i + 3; j++) {
+			{
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
+				int offset = (ypos + i) * fvs->xres + (xpos + j);
+				pfbdata[offset] = pixel;
 			}
 		}
 	}
