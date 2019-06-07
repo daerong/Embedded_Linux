@@ -166,7 +166,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	for (i = 0; i < 30; i++) {
 		for (j = 0; j < 30; j++) {
 			if (j >= i) {
-				int offset = ypos * fvs->xres + xpos;
+				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
 			}
 		}
