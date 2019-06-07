@@ -73,26 +73,26 @@ int main(int argc, char** argv) {
 				if (ev.code == 272) {
 					pixel = makepixel(255, 255, 255);		
 					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
-					printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+					//printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 
 					draw_display(&fvs, pfbdata, display);
 				}
 				else if (ev.code == 273) {
 					pixel = makepixel(0, 0, 0);									// black color
 					reset_display(display, pixel);
-					printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+					//printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				}
 			}
 		}
 		else if (ev.type == 2) {
 			if (ev.code == 1) {
 				ypos = ev.value;
-				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				//printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.y += ypos;
 			}
 			else if (ev.code == 0) {
 				xpos = ev.value;
-				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				//printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.x += xpos;
 			}
 
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
 			else drag = 1;
 		}
 		else {
-			printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+			//printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 		}
 
 
