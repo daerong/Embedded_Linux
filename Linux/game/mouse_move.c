@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 	struct input_event ev;
 
 	MOUSE_CURSOR cur;
+	char drag = 0;
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
 	pixel = makepixel(0, 0, 0);									// black color
 	reset_display(display, pixel);
@@ -70,7 +71,7 @@ int main(int argc, char** argv) {
 		if (ev.type == 1) {
 			if (ev.value == 1) {
 				if (ev.code == 272) {
-					pixel = makepixel(255, 255, 255);									// black color
+					pixel = makepixel(255, 255, 255);		
 					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
 					printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 
@@ -88,14 +89,26 @@ int main(int argc, char** argv) {
 				ypos = ev.value;
 				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.y += ypos;
+				if (drag) {
+					pixel = makepixel(255, 255, 255);								
+					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
+				}
 			}
 			else if (ev.code == 0) {
 				xpos = ev.value;
 				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.x += xpos;
+				if (drag) {
+					pixel = makepixel(255, 255, 255);
+					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
+				}
 			}
 
 			draw_display(&fvs, pfbdata, display);
+		}
+		else if (ev.type == 4) {
+			if (drag) drag = 0;
+			else drag = 1;
 		}
 		else {
 			printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
