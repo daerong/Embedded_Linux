@@ -19,8 +19,7 @@ typedef struct MOUSE_CURSOR {
 U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT one, POINT two, unsigned short pixel);
-
-
+void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 
 int main(int argc, char** argv) {
 	int ret;
@@ -93,7 +92,7 @@ int main(int argc, char** argv) {
 		}
 
 
-		printf("x : %d \t\t y : %d/n", cur.x, cur.y);
+		//printf("x : %d \t\t y : %d/n", cur.x, cur.y);
 
 		pixel = makepixel(255, 255, 255);
 		if (cur.x < 0) {
@@ -110,7 +109,7 @@ int main(int argc, char** argv) {
 			cur.y = SCREEN_Y_MAX - 1;
 		}
 
-		put_pixel(&fvs, pfbdata, cur.x, cur.y, pixel);
+		draw_cursor(&fvs, pfbdata, cur.x, cur.y, pixel);
 	}
 
 
@@ -158,6 +157,18 @@ void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT on
 	for (y_let = y_start; y_let <= y_end; y_let++) {
 		for (x_let = x_start; x_let <= x_end; x_let++) {
 			put_pixel(fvs, pfbdata, x_let, y_let, pixel);
+		}
+	}
+}
+
+void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
+	int i, j;
+	for (i = 0; i < 30; i++) {
+		for (j = 0; j < 30; j++) {
+			if (j >= i) {
+				int offset = ypos * fvs->xres + xpos;
+				pfbdata[offset] = pixel;
+			}
 		}
 	}
 }
