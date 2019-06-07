@@ -97,6 +97,9 @@ int main(int argc, char** argv) {
 
 			draw_display(&fvs, pfbdata, display);
 		}
+		else {
+			printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+		}
 
 
 		//printf("x : %d \t\t y : %d/n", cur.x, cur.y);
