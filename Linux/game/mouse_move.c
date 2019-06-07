@@ -34,9 +34,9 @@ int main(int argc, char** argv) {
 	struct input_event ev;
 
 	MOUSE_CURSOR cur;
-	DISPLAY display[SCREEN_X_MAX, SCREEN_Y_MAX];
-
-	memset(display, 0, sizeof(struct DISPLAY));    // p1을 구조체 크기만큼 0으로 설정
+	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
+	pixel = makepixel(0, 0, 0);									// black color
+	reset_display(&fvs, pfbdata, display, pixel);
 
 	cur.x = fvs.xres / 2;
 	cur.y = fvs.yres / 2;
