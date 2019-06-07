@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
 	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
 
-	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(pixel), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
+	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	while (1) {
