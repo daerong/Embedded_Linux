@@ -75,12 +75,12 @@ int main(int argc, char** argv) {
 		else if (ev.type == 2) {
 			if (ev.code == 1) {
 				ypos = ev.value;
-				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				//printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.y += ypos;
 			}
 			else if (ev.code == 0) {
 				xpos = ev.value;
-				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				//printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.x += xpos;
 			}
 		}
