@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	pixel = makepixel(0, 0, 0);									// black color
-	fill_pixel(&fvs, frame_fd, start, end, pixel)
+	fill_pixel(&fvs, pfbdata, start, end, pixel)
 
 
 
