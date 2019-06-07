@@ -4,10 +4,11 @@ typedef unsigned int U32;
 typedef short U16;
 typedef int S32;
 
-#define SCREEN_X_MAX 900
+#define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
-#define TOOLBAR_START 901
-#define TOOLBAR_END 1024
+#define PALETTE_X_END 900
+#define TOOLBAR_X_START 901
+#define TOOLBAR_X_END 1024
 
 typedef struct DISPLAY {
 	int xpos;
@@ -43,21 +44,21 @@ int main(int argc, char** argv) {
 	struct input_event ev;
 	LOCATE start;
 	LOCATE end;
-	start.xpos = TOOLBAR_START;
+	start.xpos = TOOLBAR_X_START;
 	start.ypos = 0;
-	end.xpos = TOOLBAR_END;
+	end.xpos = TOOLBAR_X_END;
 	end.ypos = SCREEN_Y_MAX;
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
-	DISPLAY display[TOOLBAR_END * SCREEN_Y_MAX];
+	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
 	foreground_color = makepixel(255, 255, 255);							// white color
 	background_color = makepixel(0, 0, 0);									// black color
 	menubox_color = makepixel(100, 100, 100);
 	reset_display(&fvs, pfbdata, display, background_color);
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
 
-	cur.x = TOOLBAR_END / 2;
+	cur.x = PALETTE_X_END / 2;
 	cur.y = SCREEN_Y_MAX / 2;
 	int past_x = cur.x;
 	int past_y = cur.y;
@@ -119,8 +120,8 @@ int main(int argc, char** argv) {
 		if (cur.x < 0) {
 			cur.x = 0;
 		}
-		else if (cur.x > TOOLBAR_END - 1) {
-			cur.x = TOOLBAR_END - 1;
+		else if (cur.x > SCREEN_X_MAX - 1) {
+			cur.x = SCREEN_X_MAX - 1;
 		}
 
 		if (cur.y < 0) {
@@ -164,15 +165,15 @@ void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos,
 }
 
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
-	if (xpos > SCREEN_X_MAX) return;
-	target[ypos*TOOLBAR_END + xpos].color = pixel;
+	if (xpos > PALETTE_X_END) return;
+	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
 void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel) {
 	int x_temp, y_temp;
 
 	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
-		for (x_temp = 0; x_temp < SCREEN_X_MAX; x_temp++) {
+		for (x_temp = 0; x_temp < PALETTE_X_END; x_temp++) {
 			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
 		}
 	}
@@ -192,8 +193,8 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 	int x_temp, y_temp;
 
 	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
-		for (x_temp = 0; x_temp < TOOLBAR_END; x_temp++) {
-			put_pixel(fvs, pfbdata, x_temp, y_temp, target[y_temp*TOOLBAR_END + x_temp].color);
+		for (x_temp = 0; x_temp < SCREEN_X_MAX; x_temp++) {
+			put_pixel(fvs, pfbdata, x_temp, y_temp, target[y_temp*SCREEN_X_MAX + x_temp].color);
 		}
 	}
 }
@@ -203,7 +204,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
 			if (j + i <= 10) {
-				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > TOOLBAR_END - 1) continue;
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
 			}
@@ -212,7 +213,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	for (i = 5; i < 15; i++) {
 		for (j = i; j < i + 3; j++) {
 			{
-				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > TOOLBAR_END - 1) continue;
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
 			}
