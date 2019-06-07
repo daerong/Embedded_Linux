@@ -7,6 +7,7 @@ typedef int S32;
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
 
+U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsigned short pixel);
 
 typedef struct MOUSE_CURSOR{
@@ -87,4 +88,12 @@ void put_pixel(struct fb_var_screeninfo *fvs, int fd, int xpos, int ypos, unsign
 	int offset = ypos * fvs->xres * sizeof(pixel) + xpos * sizeof(pixel);	// (xpos, ypos) À§Ä¡
 	assert(lseek(fd, offset, SEEK_SET) >= 0, "LSeek Error.\n");
 	write(fd, &pixel, fvs->bits_per_pixel / (sizeof(pixel)));			// write 2Byte(16bit)
+}
+
+U16 makepixel(U32  r, U32 g, U32 b) {
+	U16 x = (U16)(r >> 3);
+	U16 y = (U16)(g >> 2);
+	U16 z = (U16)(b >> 3);
+
+	return (z | (x << 11) | (y << 5));
 }
