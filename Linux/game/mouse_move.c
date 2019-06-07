@@ -74,7 +74,10 @@ int main(int argc, char** argv) {
 			if (ev.value == 1) {
 				if (ev.code == 272) {
 					if (draw_mode) draw_mode = 0;
-					else draw_mode = 1;
+					else {
+						draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+						draw_mode = 1;
+					}
 				}
 				else if (ev.code == 273) {
 					reset_display(display, background_color);
