@@ -20,7 +20,7 @@ typedef struct MOUSE_CURSOR {
 U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel);
-void reset_display(DISPLAY *target, unsigned short pixel);
+void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
 	foreground_color = makepixel(255, 255, 255);							// white color
 	background_color = makepixel(0, 0, 0);									// black color
-	reset_display(display, background_color);
+	reset_display(&fvs, pfbdata, display, background_color);
 
 	cur.x = SCREEN_X_MAX / 2;
 	cur.y = SCREEN_Y_MAX / 2;
@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
 					}
 				}
 				else if (ev.code == 273) {
-					reset_display(display, background_color);
+					reset_display(&fvs, pfbdata, display, background_color);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}
@@ -151,12 +151,12 @@ void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
-void reset_display(DISPLAY *target, unsigned short pixel){
+void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel) {
 	int x_temp, y_temp;
-	
+
 	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
 		for (x_temp = 0; x_temp < SCREEN_X_MAX; x_temp++) {
-			target[y_temp*SCREEN_X_MAX + x_temp].color == pixel;
+			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
 		}
 	}
 }
@@ -183,7 +183,8 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 		}
 	}
 	for (i = 5; i < 15; i++) {
-		for (j = i; j < i+3 ; j++) {{
+		for (j = i; j < i + 3; j++) {
+			{
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
