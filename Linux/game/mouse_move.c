@@ -35,10 +35,8 @@ int main(int argc, char** argv) {
 
 	MOUSE_CURSOR cur;
 	DISPLAY display[SCREEN_X_MAX, SCREEN_Y_MAX];
-	start.xpos = 0;
-	start.ypos = 0;
-	end.xpos = SCREEN_X_MAX - 1;
-	end.ypos = SCREEN_Y_MAX - 1;
+
+	memset(display, 0, sizeof(struct DISPLAY));    // p1을 구조체 크기만큼 0으로 설정
 
 	cur.x = fvs.xres / 2;
 	cur.y = fvs.yres / 2;
@@ -143,7 +141,7 @@ void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos,
 }
 
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
-	target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
+	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
 void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel){
