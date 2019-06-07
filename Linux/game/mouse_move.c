@@ -41,8 +41,10 @@ int main(int argc, char** argv) {
 	background_color = makepixel(0, 0, 0);									// black color
 	reset_display(display, background_color);
 
-	cur.x = fvs.xres / 2;
-	cur.y = fvs.yres / 2;
+	cur.x = SCREEN_X_MAX / 2;
+	cur.y = SCREEN_Y_MAX / 2;
+	int past_x = cur.x;
+	int past_y = cur.y;
 
 	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
 	assert2(frame_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
@@ -113,7 +115,10 @@ int main(int argc, char** argv) {
 			put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 		else {
+			draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
 			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
+			past_x = cur.x;
+			past_y = cur.y;
 		}
 	}
 
