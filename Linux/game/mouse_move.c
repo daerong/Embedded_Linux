@@ -89,19 +89,11 @@ int main(int argc, char** argv) {
 				ypos = ev.value;
 				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.y += ypos;
-				if (drag) {
-					pixel = makepixel(255, 255, 255);								
-					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
-				}
 			}
 			else if (ev.code == 0) {
 				xpos = ev.value;
 				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				cur.x += xpos;
-				if (drag) {
-					pixel = makepixel(255, 255, 255);
-					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
-				}
 			}
 
 			draw_display(&fvs, pfbdata, display);
@@ -131,8 +123,14 @@ int main(int argc, char** argv) {
 			cur.y = SCREEN_Y_MAX - 1;
 		}
 
-		pixel = makepixel(255, 255, 255);
-		draw_cursor(&fvs, pfbdata, cur.x, cur.y, pixel);
+		if (drag) {
+			pixel = makepixel(255, 255, 255);
+			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
+		}
+		else {
+			pixel = makepixel(255, 255, 255);
+			draw_cursor(&fvs, pfbdata, cur.x, cur.y, pixel);
+		}
 	}
 
 
