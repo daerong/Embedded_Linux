@@ -44,10 +44,10 @@ int main(int argc, char** argv) {
 	struct input_event ev;
 	LOCATE start;
 	LOCATE end;
-	start.xpos = TOOLBAR_X_START;
+	start.xpos = TOOLBAR_X_START -1;
 	start.ypos = 0;
-	end.xpos = TOOLBAR_X_END;
-	end.ypos = SCREEN_Y_MAX;
+	end.xpos = TOOLBAR_X_END -1;
+	end.ypos = SCREEN_Y_MAX -1;
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
@@ -162,7 +162,7 @@ U16 makepixel(U32  r, U32 g, U32 b) {
 }
 
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
-	if (xpos > PALETTE_X_END) return;
+	if (xpos >= PALETTE_X_END) return;
 	int offset = ypos * fvs->xres + xpos;
 	pfbdata[offset] = pixel;
 }
