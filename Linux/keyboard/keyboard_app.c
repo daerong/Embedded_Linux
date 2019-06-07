@@ -24,21 +24,7 @@ int main(int argc, char** argv) {
 			break;
 		}
 
-		if (EV_KEY != ev.type)
-			continue;
-
-		switch (ev.code)
-		{
-			if (1 == ev.value)
-			{
-				printf("down");
-			}
-			else
-			{
-				printf("up");
-			}
-		}
-		printf(".");
+		printf("%d\n", ev.code);
 	}
 
 	close(fd);
