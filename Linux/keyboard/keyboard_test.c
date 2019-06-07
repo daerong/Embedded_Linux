@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 			break;
 		}
 
-		if (ev.type == 1) {
+		if (ev.type == 1 && ev.value) {
 
 			switch (ev.code) {
 			case 2:
@@ -172,9 +172,9 @@ int main(int argc, char** argv) {
 			}
 
 		}
-		printf("%c\n", pnt);
+		printf("%c", pnt);
 
-		printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+		//printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 
 	}
 
