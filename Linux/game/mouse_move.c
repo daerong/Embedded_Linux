@@ -10,6 +10,8 @@ typedef int S32;
 #define TOOLBAR_X_START 901
 #define TOOLBAR_X_END 1024
 
+U16 menubox_color;
+
 typedef struct DISPLAY {
 	int xpos;
 	int ypos;
@@ -38,7 +40,6 @@ int main(int argc, char** argv) {
 	int mouse_fd;
 	U16 foreground_color;			// U16은 short 즉, 16비트.
 	U16 background_color;			// U16은 short 즉, 16비트.
-	U16 menubox_color;
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
 	struct input_event ev;
@@ -221,18 +222,20 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
 			if (j + i <= 10) {
-				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > PALETTE_X_END - 1) continue;
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
-				pfbdata[offset] = pixel;
+				if(xpos + j < PALETTE_X_END) pfbdata[offset] = pixel;
+				else pfbdata[offset] = menubox_color;
 			}
 		}
 	}
 	for (i = 5; i < 15; i++) {
 		for (j = i; j < i + 3; j++) {
 			{
-				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > PALETTE_X_END - 1) continue;
+				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
-				pfbdata[offset] = pixel;
+				if (xpos + j < PALETTE_X_END) pfbdata[offset] = pixel;
+				else pfbdata[offset] = menubox_color;
 			}
 		}
 	}
