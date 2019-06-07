@@ -64,8 +64,8 @@ int main(int argc, char** argv) {
 	background_color = makepixel(0, 0, 0);									// black color
 	menubox_color = makepixel(50, 150, 150);
 	reset_display(&fvs, pfbdata, display, background_color);
-
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
+	draw_display(&fvs, pfbdata, display);
 
 	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
 	assert2(frame_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
@@ -140,7 +140,8 @@ int main(int argc, char** argv) {
 			if(cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 		else {
-			draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+			if (cur.x < PALETTE_X_END)draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+			else draw_cursor(&fvs, pfbdata, past_x, past_y, menubox_color);
 			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 			past_x = cur.x;
 			past_y = cur.y;
