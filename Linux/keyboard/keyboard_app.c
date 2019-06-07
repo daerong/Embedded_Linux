@@ -6,6 +6,9 @@
 #include <fcntl.h>
 #include <linux/input.h>
 
+typedef unsigned int U32;
+typedef short U16;
+
 int main(int argc, char** argv) {
 	uint8_t keys[128];
 	int fd;
@@ -24,7 +27,7 @@ int main(int argc, char** argv) {
 			break;
 		}
 
-		printf("%d\n", ev.code);
+		printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 	}
 
 	close(fd);
