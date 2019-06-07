@@ -10,9 +10,9 @@
 #include <string.h>
 #include <signal.h>
 
-#define LED_DEVICE "/dev/fpga_led"
-#define LED_MIN 0
-#define LED_MAX 255
+#define LEDS_DEVICE "/dev/fpga_led"
+#define LEDS_MIN 0
+#define LEDS_MAX 255
 
 #define FND_DEVICE "/dev/fpga_fnd"
 #define FND_MAX_DIGIT 4
