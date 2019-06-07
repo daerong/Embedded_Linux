@@ -241,8 +241,9 @@ int main(int argc, char** argv) {
 	int frame_fd;
 	int mouse_fd;
 
-	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
-	text_lcd_locate = 0;
+	//text_lcd_dev = 0;
+	//memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
+	//text_lcd_locate = 0;
 
 	U16 foreground_color;			// U16은 short 즉, 16비트.
 	U16 background_color;			// U16은 short 즉, 16비트.
@@ -277,8 +278,8 @@ int main(int argc, char** argv) {
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
 	//draw_display(&fvs, pfbdata, display);
 
-	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
-	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
+	//text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
+	//assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 
 	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
 	assert2(mouse_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
@@ -372,6 +373,7 @@ int main(int argc, char** argv) {
 
 
 	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
+	//close(text_lcd_dev);
 	close(frame_fd);
 	close(mouse_fd);
 
