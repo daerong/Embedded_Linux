@@ -35,7 +35,11 @@ int main(int argc, char** argv) {
 		}
 		else if (ev.type == 2) {
 			if (ev.code == 1) {
-				printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+			}
+			else if (ev.code == 0) {
+				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+
 			}
 		}
 	}
