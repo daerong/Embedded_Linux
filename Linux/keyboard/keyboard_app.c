@@ -27,7 +27,14 @@ int main(int argc, char** argv) {
 		//event_type = 0;
 		//event_code = 0;
 		//event_value = 0;
-		status = read(fd, &ev, sizeof(struct input_event));
+		if (read(fd, &ev, sizeof(struct input_event)) < 0)
+		{
+			printf("check\n");
+			if (errno == EINTR)
+				continue;
+
+			break;
+		}
 		// 에러제어 패스
 		//event_type = ev.type;
 		//event_code = ev.code;
