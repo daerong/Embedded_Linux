@@ -15,6 +15,10 @@ typedef struct DISPLAY {
 	int ypos;
 	U16 color;
 } DISPLAY;
+typedef struct LOCATE {
+	int xpos;
+	int ypos;
+} LOCATE;
 typedef struct MOUSE_CURSOR {
 	int x;
 	int y;
@@ -24,6 +28,7 @@ U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel);
 void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel);
+void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 
@@ -40,14 +45,26 @@ int main(int argc, char** argv) {
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
-	foreground_color = makepixel(255, 255, 255);							// white color
-	background_color = makepixel(0, 0, 0);									// black color
-	reset_display(&fvs, pfbdata, display, background_color);
+
+
+	LOCATE start;
+	LOCATE end;
+	start.xpos = TOOLBAR_X_START;
+	start.ypos = 0;
+	end.xpos = TOOLBAR_X_END;
+	end.ypos = SCREEN_Y_MAX;
 
 	cur.x = SCREEN_X_MAX / 2;
 	cur.y = SCREEN_Y_MAX / 2;
 	int past_x = cur.x;
 	int past_y = cur.y;
+
+	foreground_color = makepixel(255, 255, 255);							// white color
+	background_color = makepixel(0, 0, 0);									// black color
+	menubox_color = makepixel(50, 150, 150);
+	reset_display(&fvs, pfbdata, display, background_color);
+
+	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
 
 	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
 	assert2(frame_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
@@ -160,6 +177,30 @@ void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPL
 	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
 		for (x_temp = 0; x_temp < PALETTE_X_END; x_temp++) {
 			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
+		}
+	}
+}
+
+void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel) {
+	int x_start, y_start, x_end, y_end;
+	int x_temp, y_temp;
+
+	if (start.xpos < 0) x_start = 0;
+	else x_start = start.xpos;
+
+	if (start.ypos < 0) y_start = 0;
+	else y_start = start.ypos;
+
+	if (end.xpos > SCREEN_X_MAX - 1) x_end = SCREEN_X_MAX - 1;
+	else x_end = end.xpos;
+
+	if (end.ypos > SCREEN_Y_MAX - 1) y_end = SCREEN_Y_MAX - 1;
+	else y_end = end.ypos;
+
+	for (y_temp = y_start; y_temp < y_end; y_temp++) {
+		for (x_temp = x_start; x_temp < x_end; x_temp++) {
+			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
+			//target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
 		}
 	}
 }
