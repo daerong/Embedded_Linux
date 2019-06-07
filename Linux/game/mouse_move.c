@@ -28,16 +28,18 @@ int main(int argc, char** argv) {
 	int ret;
 	int frame_fd;
 	int mouse_fd;
-	U16 pixel;			// U16은 short 즉, 16비트.
+	U16 foreground_color;			// U16은 short 즉, 16비트.
+	U16 background_color;			// U16은 short 즉, 16비트.
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
 	struct input_event ev;
 
 	MOUSE_CURSOR cur;
-	char drag = 0;
+	char draw_mode = 0;
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
-	pixel = makepixel(0, 0, 0);									// black color
-	reset_display(display, pixel);
+	foreground_color = makepixel(255, 255, 255);							// white color
+	background_color = makepixel(0, 0, 0);									// black color
+	reset_display(display, background_color);
 
 	cur.x = fvs.xres / 2;
 	cur.y = fvs.yres / 2;
@@ -58,8 +60,6 @@ int main(int argc, char** argv) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	while (1) {
-		int xpos, ypos;
-
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR)
@@ -71,36 +71,21 @@ int main(int argc, char** argv) {
 		if (ev.type == 1) {
 			if (ev.value == 1) {
 				if (ev.code == 272) {
-					pixel = makepixel(255, 255, 255);		
-					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
-					//printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-
-					draw_display(&fvs, pfbdata, display);
+					if (draw_mode) draw_mode = 0;
+					else draw_mode = 1;
 				}
 				else if (ev.code == 273) {
-					pixel = makepixel(0, 0, 0);									// black color
-					reset_display(display, pixel);
-					//printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+					reset_display(display, background_color);
 				}
 			}
 		}
 		else if (ev.type == 2) {
 			if (ev.code == 1) {
-				ypos = ev.value;
-				//printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-				cur.y += ypos;
+				cur.y += ev.value;
 			}
 			else if (ev.code == 0) {
-				xpos = ev.value;
-				//printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-				cur.x += xpos;
+				cur.x += ev.value;
 			}
-
-			draw_display(&fvs, pfbdata, display);
-		}
-		else if (ev.type == 4) {
-			if (drag) drag = 0;
-			else drag = 1;
 		}
 		else {
 			//printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
@@ -123,13 +108,12 @@ int main(int argc, char** argv) {
 			cur.y = SCREEN_Y_MAX - 1;
 		}
 
-		if (drag) {
-			pixel = makepixel(255, 255, 255);
-			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
+		if (draw_mode) {
+			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
+			put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 		else {
-			pixel = makepixel(255, 255, 255);
-			draw_cursor(&fvs, pfbdata, cur.x, cur.y, pixel);
+			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 	}
 
