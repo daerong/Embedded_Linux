@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 	MOUSE_CURSOR cur;
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
 	pixel = makepixel(0, 0, 0);									// black color
-	reset_display(&fvs, pfbdata, display, pixel);
+	reset_display(display, pixel);
 
 	cur.x = fvs.xres / 2;
 	cur.y = fvs.yres / 2;
@@ -74,11 +74,11 @@ int main(int argc, char** argv) {
 					set_pixel(&fvs, pfbdata, display, cur.x, cur.y, pixel);
 					printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 
-					draw_display(&fvs, pfbdata, display, pixel);
+					draw_display(&fvs, pfbdata, display);
 				}
 				else if (ev.code == 273) {
 					pixel = makepixel(0, 0, 0);									// black color
-					reset_display(&fvs, pfbdata, display, pixel);
+					reset_display(display, pixel);
 					printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				}
 			}
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
 				cur.x += xpos;
 			}
 
-			draw_display(&fvs, pfbdata, display, pixel);
+			draw_display(&fvs, pfbdata, display);
 		}
 
 
