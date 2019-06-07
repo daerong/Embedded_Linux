@@ -40,6 +40,18 @@ int main(int argc, char** argv) {
 	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
 	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
 
+	pixel = makepixel(255, 0, 0);									// red color
+	put_pixel(&fvs, frame_fd, 80, 100, pixel);
+
+	pixel = makepixel(0, 255, 0);									// green color
+	put_pixel(&fvs, frame_fd, 100, 80, pixel);
+
+	pixel = makepixel(0, 0, 255);									// blue color
+	put_pixel(&fvs, frame_fd, 120, 100, pixel);
+
+	pixel = makepixel(255, 255, 255);								// white color
+	put_pixel(&fvs, frame_fd, 100, 120, pixel);
+
 
 
 	while (1) {
