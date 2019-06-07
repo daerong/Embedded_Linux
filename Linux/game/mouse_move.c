@@ -56,13 +56,11 @@ int main(int argc, char** argv) {
 	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(pixel), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
-	pixel = makepixel(0, 0, 0);									// black color
-	fill_pixel(&fvs, pfbdata, start, end, pixel);
-
-
-
 	while (1) {
 		int xpos, ypos;
+
+		pixel = makepixel(0, 0, 0);									// black color
+		fill_pixel(&fvs, pfbdata, start, end, pixel);
 
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
@@ -163,9 +161,9 @@ void fill_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, POINT on
 
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
 	int i, j;
-	for (i = 0; i < 30; i++) {
-		for (j = 0; j < 30; j++) {
-			if (j >= i) {
+	for (i = 0; i < 15; i++) {
+		for (j = 0; j < 15; j++) {
+			if (j <= i) {
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
