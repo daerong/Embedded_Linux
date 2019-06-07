@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 			break;
 		}
 
-		if (ev.type == 1 && ev.value) {
+		if (ev.value == 1) {
 
 			switch (ev.code) {
 			case 2:
