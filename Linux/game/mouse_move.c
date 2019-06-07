@@ -20,8 +20,8 @@ typedef struct MOUSE_CURSOR {
 U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel);
-void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel);
-void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel);
+void reset_display(DISPLAY *target, unsigned short pixel);
+void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 
 int main(int argc, char** argv) {
@@ -144,21 +144,21 @@ void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
-void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel){
+void reset_display(DISPLAY *target, unsigned short pixel){
 	int x_temp, y_temp;
 	
-	for (y_temp = 0; y_temp <= SCREEN_Y_MAX; y_temp++) {
-		for (x_temp = 0; x_temp <= SCREEN_X_MAX; x_temp++) {
+	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
+		for (x_temp = 0; x_temp < SCREEN_X_MAX; x_temp++) {
 			target[y_temp*SCREEN_X_MAX + x_temp].color == pixel;
 		}
 	}
 }
 
-void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, unsigned short pixel) {
+void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target) {
 	int x_temp, y_temp;
 
-	for (y_temp = 0; y_temp <= SCREEN_Y_MAX; y_temp++) {
-		for (x_temp = 0; x_temp <= SCREEN_X_MAX; x_temp++) {
+	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
+		for (x_temp = 0; x_temp < SCREEN_X_MAX; x_temp++) {
 			put_pixel(fvs, pfbdata, x_temp, y_temp, target[y_temp*SCREEN_X_MAX + x_temp].color);
 		}
 	}
