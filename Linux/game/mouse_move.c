@@ -6,7 +6,9 @@ typedef int S32;
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
-#define TOOLBAR_START 900
+#define PALETTE_X_END 900
+#define TOOLBAR_X_START 901
+#define TOOLBAR_X_END 1024
 
 typedef struct DISPLAY {
 	int xpos;
@@ -117,7 +119,7 @@ int main(int argc, char** argv) {
 
 		if (draw_mode) {
 			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
-			put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
+			if(cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 		}
 		else {
 			draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
@@ -156,7 +158,7 @@ void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPL
 	int x_temp, y_temp;
 
 	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
-		for (x_temp = 0; x_temp < SCREEN_X_MAX; x_temp++) {
+		for (x_temp = 0; x_temp < PALETTE_X_END; x_temp++) {
 			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
 		}
 	}
