@@ -218,7 +218,7 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 	}
 }
 
-void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
 	int i, j;
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
@@ -242,7 +242,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	}
 }
 
-void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
+void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
 	int i, j;
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
