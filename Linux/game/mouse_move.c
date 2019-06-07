@@ -57,8 +57,6 @@ int main(int argc, char** argv) {
 	while (1) {
 		int xpos, ypos;
 
-		pixel = makepixel(255, 255, 255);
-
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0)
 		{
 			printf("check\n");
@@ -77,16 +75,19 @@ int main(int argc, char** argv) {
 		else if (ev.type == 2) {
 			if (ev.code == 1) {
 				ypos = ev.value;
-				printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				//printf("vertical \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				if (cur.y > 0 && cur.y < SCREEN_Y_MAX - 1) cur.y += ypos;
 			}
 			else if (ev.code == 0) {
 				xpos = ev.value;
-				printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				//printf("horizon \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 				if (cur.x > 0 && cur.x < SCREEN_X_MAX - 1) cur.x += xpos;
 			}
 		}
 
+		printf("x : %d \t\t y : %d/n", cur.x, cur.y);
+
+		pixel = makepixel(255, 255, 255);
 		put_pixel(&fvs, frame_fd, cur.x, cur.y, pixel);
 	}
 
