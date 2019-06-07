@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
 	}
 
 
-	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(pixel));
+	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
 	close(frame_fd);
 	close(mouse_fd);
 
