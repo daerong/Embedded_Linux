@@ -6,6 +6,8 @@ typedef unsigned int U32;
 typedef short U16;
 typedef int S32;
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;	// 쓰레드 초기화
+
 char keyboard_thread[] = "keyboard thread";
 
 int text_lcd_dev;
@@ -46,6 +48,7 @@ void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xp
 void* keyboard_ev_func(void *data) {
 	int keyboard_fd;
 	char pnt;						// 키보드 값
+	char buffer[TEXT_LCD_LINE_BUF];
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
 	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
@@ -148,7 +151,6 @@ void* keyboard_ev_func(void *data) {
 					pnt = ']';
 					break;
 				case 28:
-					unsigned char buffer[TEXT_LCD_LINE_BUF];
 					memset(buffer, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(buffer, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
 					memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
