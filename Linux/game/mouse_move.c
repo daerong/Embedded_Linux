@@ -78,6 +78,7 @@ int main(int argc, char** argv) {
 				}
 				else if (ev.code == 273) {
 					reset_display(display, background_color);
+					draw_display(&fvs, pfbdata, display);
 				}
 			}
 		}
