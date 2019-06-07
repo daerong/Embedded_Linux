@@ -59,9 +59,6 @@ int main(int argc, char** argv) {
 	while (1) {
 		int xpos, ypos;
 
-		pixel = makepixel(0, 0, 0);									// black color
-		fill_pixel(&fvs, pfbdata, start, end, pixel);
-
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR)
@@ -73,7 +70,11 @@ int main(int argc, char** argv) {
 		if (ev.type == 1) {
 			if (ev.value == 1) {
 				if (ev.code == 272) printf("left btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-				else if (ev.code == 273) printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				else if (ev.code == 273) {
+					pixel = makepixel(0, 0, 0);									// black color
+					fill_pixel(&fvs, pfbdata, start, end, pixel);
+					printf("right btn \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+				}
 			}
 		}
 		else if (ev.type == 2) {
@@ -163,7 +164,7 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	int i, j;
 	for (i = 0; i < 15; i++) {
 		for (j = 0; j < 15; j++) {
-			if (j >= -i) {
+			if (j + i <= xpos + ypos) {
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
