@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
 	foreground_color = makepixel(255, 255, 255);							// white color
 	background_color = makepixel(0, 0, 0);									// black color
-	menubox_color = makepixel(100, 100, 100);
+	menubox_color = makepixel(50, 150, 150);
 	reset_display(&fvs, pfbdata, display, background_color);
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
 
