@@ -20,11 +20,19 @@
 #include <sys/mman.h>
 /* framebuffer */
 
+/* mouse */
+#include <errno.h>
+#include <stdint.h>
+/* mouse */
+
 //touch screen device path
 #define TOUCHSCREEN_DEVICE "/dev/input/event1"
 
 //framebuffer
 #define LCD_DEVICE "/dev/fb0"
+
+// mouse event
+#define MOUSE_EVENT "/dev/input/event9"
 
 void assert(int cond, char *msg) {
 	if (!cond) {
