@@ -184,7 +184,7 @@ void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *t
 
 	for (y_temp = start.ypos; y_temp < end.ypos; y_temp++) {
 		for (x_temp = start.xpos; x_temp < end.xpos; x_temp++) {
-			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
+			target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
 		}
 	}
 }
