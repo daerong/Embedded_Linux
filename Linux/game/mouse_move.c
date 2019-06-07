@@ -1,8 +1,16 @@
 #include "../include/fpga_frame_buffer.h"
+#include "../include/fpga_test.h"
+#include "../include/fpga_dot_font.h"
 
 typedef unsigned int U32;
 typedef short U16;
 typedef int S32;
+
+char keyboard_thread[] = "keyboard thread";
+
+int text_lcd_dev;
+unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
+int text_lcd_locate;
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
@@ -35,20 +43,218 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 
+void* keyboard_ev_func(void *data) {
+	int keyboard_fd;
+	char pnt;						// 키보드 값
+
+	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
+	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
+
+	//pthread_mutex_lock(&mutex); // 잠금을 생성한다.
+
+	while (1) {
+		struct input_event keyboard_ev;
+
+		if (read(keyboard_fd, &keyboard_ev, sizeof(struct input_event)) < 0)
+		{
+			printf("check\n");
+			if (errno == EINTR)
+				continue;
+
+			break;
+		}
+		if (keyboard_ev.value == 1) {
+			if (keyboard_ev.type == 1) {
+				switch (keyboard_ev.code) {
+				case 1:
+					close(keyboard_fd);
+					return;
+				case 2:
+					pnt = '1';
+					break;
+				case 3:
+					pnt = '2';
+					break;
+				case 4:
+					pnt = '3';
+					break;
+				case 5:
+					pnt = '4';
+					break;
+				case 6:
+					pnt = '5';
+					break;
+				case 7:
+					pnt = '6';
+					break;
+				case 8:
+					pnt = '7';
+					break;
+				case 9:
+					pnt = '8';
+					break;
+				case 10:
+					pnt = '9';
+					break;
+				case 11:
+					pnt = '0';
+					break;
+				case 12:
+					pnt = '-';
+					break;
+				case 13:
+					pnt = '=';
+					break;
+				case 14:
+					pnt = '\b';
+					break;
+				case 15:
+					pnt = '\t';
+					break;
+				case 16:
+					pnt = 'q';
+					break;
+				case 17:
+					pnt = 'w';
+					break;
+				case 18:
+					pnt = 'e';
+					break;
+				case 19:
+					pnt = 'r';
+					break;
+				case 20:
+					pnt = 't';
+					break;
+				case 21:
+					pnt = 'y';
+					break;
+				case 22:
+					pnt = 'u';
+					break;
+				case 23:
+					pnt = 'i';
+					break;
+				case 24:
+					pnt = 'o';
+					break;
+				case 25:
+					pnt = 'p';
+					break;
+				case 26:
+					pnt = '[';
+					break;
+				case 27:
+					pnt = ']';
+					break;
+				case 28:
+					unsigned char buffer[TEXT_LCD_LINE_BUF];
+					memset(buffer, ' ', TEXT_LCD_LINE_BUF);
+					memcpy(buffer, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
+					memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
+					memcpy(text_lcd_buf, buffer, TEXT_LCD_LINE_BUF);
+					text_lcd_locate = 0;
+					break;
+				case 30:
+					pnt = 'a';
+					break;
+				case 31:
+					pnt = 's';
+					break;
+				case 32:
+					pnt = 'd';
+					break;
+				case 33:
+					pnt = 'f';
+					break;
+				case 34:
+					pnt = 'g';
+					break;
+				case 35:
+					pnt = 'h';
+					break;
+				case 36:
+					pnt = 'j';
+					break;
+				case 37:
+					pnt = 'k';
+					break;
+				case 38:
+					pnt = 'l';
+					break;
+				case 44:
+					pnt = 'z';
+					break;
+				case 45:
+					pnt = 'x';
+					break;
+				case 46:
+					pnt = 'c';
+					break;
+				case 47:
+					pnt = 'v';
+					break;
+				case 48:
+					pnt = 'b';
+					break;
+				case 49:
+					pnt = 'n';
+					break;
+				case 50:
+					pnt = 'm';
+					break;
+				case 51:
+					pnt = ',';
+					break;
+				case 52:
+					pnt = '.';
+					break;
+				case 53:
+					pnt = '/';
+					break;
+				}
+
+			}
+
+			/*memcpy(text_lcd_buf, "Successful", 10);*/
+			if (text_lcd_locate < TEXT_LCD_LINE_BUF) {
+				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt, 1);
+				text_lcd_locate++;
+			}
+
+			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
+
+			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", pnt, keyboard_ev.type, keyboard_ev.code, keyboard_ev.value);
+
+		}
+	}
+
+	//pthread_mutex_unlock(&mutex); // 잠금을 해제한다.
+
+	close(keyboard_fd);
+}
+
 int main(int argc, char** argv) {
 	int ret;
 	int frame_fd;
 	int mouse_fd;
+
+	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
+	text_lcd_locate = 0;
+
 	U16 foreground_color;			// U16은 short 즉, 16비트.
 	U16 background_color;			// U16은 short 즉, 16비트.
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
-	struct input_event ev;
+	struct input_event mouse_ev;
+	pthread_t keyboard_ev_thread;		// pthread
+	int thread_id;						// pthread ID
+	void *thread_result;				// pthread return
+	int status;							// mutex result
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
-
 
 	LOCATE start;
 	LOCATE end;
@@ -69,8 +275,11 @@ int main(int argc, char** argv) {
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
 	//draw_display(&fvs, pfbdata, display);
 
+	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
+	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
+
 	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
-	assert2(frame_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
+	assert2(mouse_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
 
 	frame_fd = open(LCD_DEVICE, O_RDWR);
 	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
@@ -84,8 +293,11 @@ int main(int argc, char** argv) {
 	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
+	status = pthread_mutex_init(&mutex, NULL);
+	assert(status == 0, "Mutex init error.\n");
+
 	while (1) {
-		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
+		if (read(mouse_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR)
 				continue;
@@ -93,27 +305,34 @@ int main(int argc, char** argv) {
 			break;
 		}
 
-		if (ev.type == 1) {
-			if (ev.value == 1) {
-				if (ev.code == 272) {
-					if (draw_mode) draw_mode = 0;
-					else {
-						draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
-						draw_mode = 1;
+		if (mouse_ev.type == 1) {
+			if (mouse_ev.value == 1) {
+				if (mouse_ev.code == 272) {
+					if (cur.x < PALETTE_X_END) {
+						if (draw_mode) draw_mode = 0;
+						else {
+							draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+							draw_mode = 1;
+						}
 					}
+					else {
+						thread_id = pthread_create(&keyboard_ev_thread, NULL, keyboard_ev_func, (void *)&keyboard_thread);
+						pthread_join(keyboard_ev_thread, (void *)&thread_result);
+					}
+					
 				}
-				else if (ev.code == 273) {
+				else if (mouse_ev.code == 273) {
 					reset_display(&fvs, pfbdata, display, background_color);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}
 		}
-		else if (ev.type == 2) {
-			if (ev.code == 1) {
-				cur.y += ev.value;
+		else if (mouse_ev.type == 2) {
+			if (mouse_ev.code == 1) {
+				cur.y += mouse_ev.value;
 			}
-			else if (ev.code == 0) {
-				cur.x += ev.value;
+			else if (mouse_ev.code == 0) {
+				cur.x += mouse_ev.value;
 			}
 		}
 		else {
