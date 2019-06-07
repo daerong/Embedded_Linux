@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
 	int mouse_fd;
 	U16 foreground_color;			// U16은 short 즉, 16비트.
 	U16 background_color;			// U16은 short 즉, 16비트.
+	U16 menubox_color;
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
 	struct input_event ev;
