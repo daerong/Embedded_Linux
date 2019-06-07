@@ -27,11 +27,11 @@ int main(int argc, char** argv) {
 			break;
 		}
 
-		if (ev.value == 1) {
-			if (ev.type == 1) {
+		//if (ev.type == 2) {
+		//	if (ev.type == 1) {
 				printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-			}
-		}
+		//	}
+		//}
 	}
 
 	close(fd);
