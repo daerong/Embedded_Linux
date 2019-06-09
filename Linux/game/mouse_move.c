@@ -206,10 +206,11 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	fread(info, sizeof(unsigned char), 54, fp);
 
+	int width = *(int*)&info[18];
+	int height = *(int*)&info[22];
 	int size = 3 * width*height; // for RGB
 
 	unsigned char data[size];
-
 	fread(data, sizeof(unsigned char), size, fp);
 
 	int locate = 0;
