@@ -6,6 +6,7 @@ typedef int S32;
 
 char mouse_thread[] = "mouse thread";
 char keyboard_thread[] = "keyboard thread";
+char lenna_img[] = "lenna.bmp";
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
@@ -41,6 +42,7 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
+void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
 void* mouse_ev_func(void *data);
 void* keyboard_ev_func(void *data);
 
@@ -61,7 +63,6 @@ int main(int argc, char** argv) {
 
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
-
 
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
@@ -193,6 +194,37 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 	(*locate)++;
 }
 
+void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
+	FILE *fp;
+	unsigned char info[54];
+
+	fp = fopen(file_name, "rb");
+	if (fp == NULL) {
+		perror("File open error: ");
+		exit(0);
+	}
+
+	fread(info, sizeof(unsigned char), 54, fp);
+
+	int size = 3 * width*height; // for RGB
+
+	unsigned char data[size];
+
+	fread(data, sizeof(unsigned char), size, fp);
+
+	int locate = 0;
+	int vertical = 0;
+	int horizon = 0;
+
+	for (vertical = 0; vertical < height; vertical++) {
+		for (horizon = 0; horizon < width; horizon++) {
+			locate = (width * height - vertical * width + horizon) * 3;
+			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
+			pfbdata[offset] = pixel;
+		}
+	}
+}
+
 void* mouse_ev_func(void *data) {
 	int ret;
 	int mouse_fd;
@@ -240,7 +272,8 @@ void* mouse_ev_func(void *data) {
 
 	reset_display(&fvs, pfbdata, display, background_color);
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
-	//draw_display(&fvs, pfbdata, display);
+	set_image(&fvs, pfbdata, display, 0, 0, lenna_img);
+	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
@@ -349,7 +382,8 @@ void* keyboard_ev_func(void *data) {
 				case 1:		// ESC
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
-					close(keyboard_fd);
+					text_buf_index = 0;
+					text_lcd_mode = 0;
 					return;
 				case 2:
 					insert_text_buf(inner_text, &text_buf_index, '1');
