@@ -218,10 +218,12 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	int locate = 0;
 	int vertical = 0;
 	int horizon = 0;
+	int offset = 0;
 
 	for (vertical = 0; vertical < height; vertical++) {
 		for (horizon = 0; horizon < width; horizon++) {
-			locate = (width * height - vertical * width + horizon) * 3;
+			offset = width * height - vertical * width + horizon;
+			locate = offset * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
 			pfbdata[offset] = pixel;
 		}
