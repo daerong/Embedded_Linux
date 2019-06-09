@@ -35,7 +35,7 @@ typedef struct MOUSE_CURSOR {
 U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel);
-void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, DISPLAY *background);
+void reset_display(DISPLAY *target, DISPLAY *background);
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
@@ -275,7 +275,7 @@ void* mouse_ev_func(void *data) {
 	set_image(&fvs, pfbdata, background, 0, 0, "lenna.bmp");
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
 
-	reset_display(&fvs, pfbdata, display, background);
+	reset_display(display, background);
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
@@ -303,7 +303,7 @@ void* mouse_ev_func(void *data) {
 					}
 				}
 				else if (ev.code == 273) {
-					reset_display(&fvs, pfbdata, display, background);
+					reset_display(display, background);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}
