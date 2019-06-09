@@ -65,12 +65,7 @@ int main(int argc, char** argv) {
 	foreground_color = makepixel(255, 255, 255);							// white color
 	background_color = makepixel(0, 0, 0);									// black color
 	menubox_color = makepixel(50, 150, 150);
-	reset_display(&fvs, pfbdata, display, background_color);
-	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
-	//draw_display(&fvs, pfbdata, display);
 
-	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
-	assert2(frame_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
 
 	frame_fd = open(LCD_DEVICE, O_RDWR);
 	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
@@ -122,75 +117,11 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	while (1) {
-		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
-			printf("check\n");
-			if (errno == EINTR)
-				continue;
-
-			break;
-		}
-
-		if (ev.type == 1) {
-			if (ev.value == 1) {
-				if (ev.code == 272) {
-					if (draw_mode) draw_mode = 0;
-					else {
-						draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
-						draw_mode = 1;
-					}
-				}
-				else if (ev.code == 273) {
-					reset_display(&fvs, pfbdata, display, background_color);
-					draw_display(&fvs, pfbdata, display);
-				}
-			}
-		}
-		else if (ev.type == 2) {
-			if (ev.code == 1) {
-				cur.y += ev.value;
-			}
-			else if (ev.code == 0) {
-				cur.x += ev.value;
-			}
-		}
-		else {
-			//printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-		}
-
-
-		//printf("x : %d \t\t y : %d/n", cur.x, cur.y);
-
-		if (cur.x < 0) {
-			cur.x = 0;
-		}
-		else if (cur.x > SCREEN_X_MAX - 1) {
-			cur.x = SCREEN_X_MAX - 1;
-		}
-
-		if (cur.y < 0) {
-			cur.y = 0;
-		}
-		else if (cur.y > SCREEN_Y_MAX - 1) {
-			cur.y = SCREEN_Y_MAX - 1;
-		}
-
-		if (draw_mode) {
-			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
-			if (cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
-		}
-		else {
-			erase_cursor(&fvs, pfbdata, past_x, past_y, background_color);
-			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
-			past_x = cur.x;
-			past_y = cur.y;
-		}
-	}
-
+	reset_display(&fvs, pfbdata, display, background_color);
+	draw_display(&fvs, pfbdata, display);
 
 	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
 	close(frame_fd);
-	close(mouse_fd);
 	fclose(fp);
 
 	return 0;
