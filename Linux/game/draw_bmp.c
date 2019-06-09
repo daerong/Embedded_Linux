@@ -50,20 +50,18 @@ int main(int argc, char** argv) {
 
 	fread(data, sizeof(unsigned char), size, fp);
 
-	int i;
+	int locate = 0;
 	int vertical = 0;
 	int horizon = 0;
 
-	for (i = 0; i < size; i += 3) {
-		pixel = makepixel(data[i + 2], data[i], data[i + 1]);
-		put_pixel(&fvs, frame_fd, horizon, vertical, pixel);
-		if (horizon < width) horizon++;
-		else {
-			horizon = 0;
-			vertical++;
+
+	for (vertical = 0; vertical < height; vertical++) {
+		for (horizon = 0; horizon < width; horizon++) {
+			locate = (vertical * width + horizon) * 3;
+			pixel = makepixel(data[locate + 2], data[locate], data[locate + 1]);
+			put_pixel(&fvs, frame_fd, horizon, vertical, pixel);
 		}
 	}
-
 
 	printf("%d\n", sizeof(pixel));
 	close(frame_fd);
