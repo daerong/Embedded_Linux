@@ -19,12 +19,9 @@ int main(int argc, char** argv) {
 	while (1) {
 		struct input_event ev;
 
-		if (read(fd, &ev, sizeof(struct input_event)) < 0)
-		{
+		if (read(fd, &ev, sizeof(struct input_event)) < 0){
 			printf("check\n");
-			if (errno == EINTR)
-				continue;
-
+			if (errno == EINTR) continue;
 			break;
 		}
 		if (ev.value == 1) {
