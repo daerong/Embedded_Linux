@@ -197,6 +197,8 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
 	FILE *fp;
 	unsigned char info[54];
+	U16 pixel;			// U16은 short 즉, 16비트. 
+	int width, height, size;
 
 	fp = fopen(file_name, "rb");
 	if (fp == NULL) {
@@ -206,9 +208,9 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	fread(info, sizeof(unsigned char), 54, fp);
 
-	int width = *(int*)&info[18];
-	int height = *(int*)&info[22];
-	int size = 3 * width*height; // for RGB
+	width = *(int*)&info[18];
+	height = *(int*)&info[22];
+	size = 3 * width*height; // for RGB
 
 	unsigned char data[size];
 	fread(data, sizeof(unsigned char), size, fp);
