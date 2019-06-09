@@ -39,7 +39,7 @@ void reset_display(DISPLAY *target, DISPLAY *background);
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *background);
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *background);
 void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
 void* mouse_ev_func(void *data);
@@ -347,7 +347,7 @@ void* mouse_ev_func(void *data) {
 			}
 		}
 		else {
-			erase_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+			erase_cursor(&fvs, pfbdata, past_x, past_y, display, background);
 			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 			past_x = cur.x;
 			past_y = cur.y;
