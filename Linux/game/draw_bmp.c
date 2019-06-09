@@ -55,8 +55,8 @@ int main(int argc, char** argv) {
 	int horizon = 0;
 
 
-	for (vertical = height - 1; vertical >= 0; vertical--) {
-		for (horizon = width - 1; horizon >= 0; horizon--) {
+	for (vertical = height - 1; vertical >= 0; vertical) {
+		for (horizon = 0; horizon < width; horizon++) {
 			locate = (vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
 			put_pixel(&fvs, frame_fd, horizon, vertical, pixel);
