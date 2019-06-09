@@ -39,7 +39,7 @@ void reset_display(DISPLAY *target, DISPLAY *background);
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *background);
 void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
 void* mouse_ev_func(void *data);
@@ -138,15 +138,17 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 	}
 }
 
-void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *background) {
+	U16 pixel;
 	int i, j;
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
 			if (j + i <= 10) {
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
+				pixel = background[offset].color;
 				if (xpos + j < PALETTE_X_END) pfbdata[offset] = pixel;
-				else pfbdata[offset] = menubox_color;
+				else pfbdata[offset] = pixel;
 			}
 		}
 	}
@@ -155,8 +157,9 @@ void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xp
 			{
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
+				pixel = background[offset].color;
 				if (xpos + j < PALETTE_X_END) pfbdata[offset] = pixel;
-				else pfbdata[offset] = menubox_color;
+				else pfbdata[offset] = pixel;
 			}
 		}
 	}
