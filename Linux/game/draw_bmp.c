@@ -88,15 +88,16 @@ int main(int argc, char** argv) {
 
 
 
-	int fd;
+	FILE *fp;
 	unsigned char info[54];
 
-	fd = fopen("lenna.bmp", "rb");
-	if (fd < 0) {
-		perror("open");
-		exit(1);
+	fp = fopen("lenna.bmp", "rb");
+	if (fp == NULL){
+		perror("File open error: ");
+		exit(0);
 	}
-	fread(info, sizeof(unsigned char), 54, fd);
+
+	fread(info, sizeof(unsigned char), 54, fp);
 
 	int width = *(int*)&info[18];
 	int height = *(int*)&info[22];
@@ -105,7 +106,7 @@ int main(int argc, char** argv) {
 
 	unsigned char *data = new unsigned char[size];
 
-	fread(data, sizeof(unsigned char), size, fd);
+	fread(data, sizeof(unsigned char), size, fp);
 
 	int i;
 	U16 pixel_color;
@@ -190,7 +191,7 @@ int main(int argc, char** argv) {
 	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
 	close(frame_fd);
 	close(mouse_fd);
-	fclose(fd);
+	fclose(fp);
 
 	return 0;
 }
