@@ -95,7 +95,6 @@ void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos,
 }
 
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
-	if (xpos >= TOOLBAR_X_START) return;
 	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
@@ -303,8 +302,10 @@ void* mouse_ev_func(void *data) {
 		}
 
 		if (draw_mode) {
-			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
-			if (cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
+			if (cur.x < PALETTE_X_END) {
+				set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
+				put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
+			}
 		}
 		else {
 			erase_cursor(&fvs, pfbdata, past_x, past_y, background_color);
