@@ -281,7 +281,7 @@ void* mouse_ev_func(void *data) {
 	reset_display(&fvs, pfbdata, window, background_color);
 	fill_box(&fvs, pfbdata, window, start, end, menubox_color);
 	set_image(&fvs, pfbdata, window, 0, 0, "lenna.bmp");
-	memcpy(display, window sizeof(DISPLAY)*SCREEN_X_MAX*SCREEN_Y_MAX);
+	memcpy(display, window, sizeof(DISPLAY)*SCREEN_X_MAX*SCREEN_Y_MAX);
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
