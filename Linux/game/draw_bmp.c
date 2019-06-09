@@ -1,16 +1,4 @@
-#include "../include/fpga_frame_buffer.h"
-
-/*
-3번 예제 : 16 bpp 점(pixel) 찍기, write
-
-각 픽셀은 각각의 RGB 값을 가진다. | R(5bit) | G(6bit) | B(5bit) | Red와 Blue는 각각 5비트씩이고 G는 6비트 정보를 가지게 됩니다.
-그리고 MSB(Most Significant Bit)에서 LSB(Least Significant Bit)쪽으로 R, G, B 순으로 저장됩니다.
-
-16bpp가 아니면 실행이 되지 않도록 체크 코드가 들어 있습니다.
-
-한 가지 기억해 둘 것은 한 개의 점을 원하는 위치에 찍기 위해서 두 개의 시스템 호출(lseek, write)을 해야 한다는 것입니다.
-이것이 원초적이고 무식한(?) 이유입니다. 나중에 배울 새로운 점 찍기 루틴을 보고, 성능 비교를 해보면 왜 무식한지 알 수 있을 겁니다.
-*/
+#include "../include/fpga_test.h"
 
 typedef unsigned int U32;
 typedef short U16;
