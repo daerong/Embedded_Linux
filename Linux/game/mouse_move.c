@@ -4,6 +4,8 @@ typedef unsigned int U32;
 typedef short U16;
 typedef int S32;
 
+char keyboard_thread[] = "touch thread";
+
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
 #define PALETTE_X_END 900
@@ -32,6 +34,7 @@ void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *t
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
+void* keyboard_ev_func(void *data);
 
 U16 menubox_color;
 
@@ -49,6 +52,10 @@ int main(int argc, char** argv) {
 	char draw_mode = 0;
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
 
+	pthread_t keyboard_ev_thread;
+	int keyboard_thread_id;						// pthread ID
+	void *thread_result;				// pthread return
+	int status;							// mutex result
 
 	LOCATE start;
 	LOCATE end;
@@ -83,6 +90,9 @@ int main(int argc, char** argv) {
 
 	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
+
+	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, keyboard_ev_func, (void *)&keyboard_thread);
+	pthread_join(keyboard_ev_thread, (void *)&thread_result);
 
 	while (1) {
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
@@ -262,4 +272,176 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 			}
 		}
 	}
+}
+
+void* keyboard_ev_func(void *data) {
+	uint8_t keys[128];
+	int fd;
+	char pnt;
+
+	fd = open(KEYBOARD_EVENT, O_RDONLY);
+
+	while (1) {
+		struct input_event ev;
+
+		if (read(fd, &ev, sizeof(struct input_event)) < 0) {
+			printf("check\n");
+			if (errno == EINTR) continue;
+			break;
+		}
+		if (ev.value == 1) {
+			if (ev.type == 1) {
+				switch (ev.code) {
+				case 2:
+					pnt = '1';
+					break;
+				case 3:
+					pnt = '2';
+					break;
+				case 4:
+					pnt = '3';
+					break;
+				case 5:
+					pnt = '4';
+					break;
+				case 6:
+					pnt = '5';
+					break;
+				case 7:
+					pnt = '6';
+					break;
+				case 8:
+					pnt = '7';
+					break;
+				case 9:
+					pnt = '8';
+					break;
+				case 10:
+					pnt = '9';
+					break;
+				case 11:
+					pnt = '0';
+					break;
+				case 12:
+					pnt = '-';
+					break;
+				case 13:
+					pnt = '=';
+					break;
+				case 14:
+					pnt = '\b';
+					break;
+				case 15:
+					pnt = '\t';
+					break;
+				case 16:
+					pnt = 'q';
+					break;
+				case 17:
+					pnt = 'w';
+					break;
+				case 18:
+					pnt = 'e';
+					break;
+				case 19:
+					pnt = 'r';
+					break;
+				case 20:
+					pnt = 't';
+					break;
+				case 21:
+					pnt = 'y';
+					break;
+				case 22:
+					pnt = 'u';
+					break;
+				case 23:
+					pnt = 'i';
+					break;
+				case 24:
+					pnt = 'o';
+					break;
+				case 25:
+					pnt = 'p';
+					break;
+				case 26:
+					pnt = '[';
+					break;
+				case 27:
+					pnt = ']';
+					break;
+				case 28:
+					pnt = '\n';
+					break;
+				case 30:
+					pnt = 'a';
+					break;
+				case 31:
+					pnt = 's';
+					break;
+				case 32:
+					pnt = 'd';
+					break;
+				case 33:
+					pnt = 'f';
+					break;
+				case 34:
+					pnt = 'g';
+					break;
+				case 35:
+					pnt = 'h';
+					break;
+				case 36:
+					pnt = 'j';
+					break;
+				case 37:
+					pnt = 'k';
+					break;
+				case 38:
+					pnt = 'l';
+					break;
+				case 44:
+					pnt = 'z';
+					break;
+				case 45:
+					pnt = 'x';
+					break;
+				case 46:
+					pnt = 'c';
+					break;
+				case 47:
+					pnt = 'v';
+					break;
+				case 48:
+					pnt = 'b';
+					break;
+				case 49:
+					pnt = 'n';
+					break;
+				case 50:
+					pnt = 'm';
+					break;
+				case 51:
+					pnt = ',';
+					break;
+				case 52:
+					pnt = '.';
+					break;
+				case 53:
+					pnt = '/';
+					break;
+				}
+
+			}
+
+			//printf("%c", pnt);
+
+			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", pnt, ev.type, ev.code, ev.value);
+
+		}
+	}
+
+	close(fd);
+
+	return 0;
 }
