@@ -226,7 +226,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 		for (horizon = 0; horizon < width; horizon++) {
 			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
-			put_pixel(&fvs, pfbdata, horizon, vertical, pixel);
+			put_pixel(fvs, pfbdata, horizon, vertical, pixel);
 		}
 	}
 
