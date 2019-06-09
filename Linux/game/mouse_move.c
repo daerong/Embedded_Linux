@@ -32,7 +32,6 @@ typedef struct MOUSE_CURSOR {
 	int y;
 } MOUSE_CURSOR;
 
-void memory_expand(int stack_size_mb);
 U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void set_pixel(DISPLAY *target, int xpos, int ypos, unsigned short pixel);
@@ -81,17 +80,6 @@ int main(int argc, char** argv) {
 	pthread_join(keyboard_ev_thread, (void *)&thread_result);
 
 	return 0;
-}
-
-void memory_expand(int stack_size_mb) {
-	struct rlimit rlim;
-
-	getrlimit(RLIMIT_STACK, &rlim);
-	printf("Current Stack Size : [%d] Max Current Stack Size : [%d]\n, rlim.rlim_cur, rlim.rlim_max");
-	rlim.rlim_cur = (1024 * 1024 * stack_size_mb);
-	rlim.rlim_max = (1024 * 1024 * stack_size_mb);
-	setrlimit(RLIMIT_STACK, &rlim);
-	printf("Current Stack Size : [%d] Max Current Stack Size : [%d]\n, rlim.rlim_cur, rlim.rlim_max");
 }
 
 U16 makepixel(U32  r, U32 g, U32 b) {
@@ -207,8 +195,6 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 }
 
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name){
-	memory_expand(12);
-	
 	U16 pixel;			// U16은 short 즉, 16비트. 
 	FILE *fp;
 	unsigned char info[54];
@@ -258,8 +244,8 @@ void* mouse_ev_func(void *data) {
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
-	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
-	DISPLAY background_display[SCREEN_X_MAX * SCREEN_Y_MAX];
+	DISPLAY *display = new DISPLAY[SCREEN_X_MAX * SCREEN_Y_MAX];
+	DISPLAY *background = new DISPLAY[SCREEN_X_MAX * SCREEN_Y_MAX];
 
 	LOCATE start;
 	LOCATE end;
@@ -373,6 +359,9 @@ void* mouse_ev_func(void *data) {
 	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
 	close(frame_fd);
 	close(mouse_fd);
+
+	delete[] display;
+	delete[] background;
 
 	return 0;
 }
