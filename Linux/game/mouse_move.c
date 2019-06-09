@@ -328,6 +328,8 @@ void* keyboard_ev_func(void *data) {
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
 	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
 
+	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
+
 	while (1) {
 		struct input_event ev;
 
@@ -380,8 +382,10 @@ void* keyboard_ev_func(void *data) {
 				case 13:
 					insert_text_buf(inner_text, &text_buf_index, '=');
 					break;
-				case 14:	// SPACE
+				case 14:	// BACKSPACE
+					text_buf_index--;
 					insert_text_buf(inner_text, &text_buf_index, ' ');
+					text_buf_index--;
 					break;
 				case 15:	// TAP
 					insert_text_buf(inner_text, &text_buf_index, ' ');
@@ -487,6 +491,9 @@ void* keyboard_ev_func(void *data) {
 					break;
 				case 53:
 					insert_text_buf(inner_text, &text_buf_index, '/');
+					break;
+				case 57:
+					insert_text_buf(inner_text, &text_buf_index, ' ');
 					break;
 				case 103: //up
 					text_buf_index++;
