@@ -14,6 +14,7 @@ char keyboard_thread[] = "keyboard thread";
 #define TOOLBAR_X_END 1024
 
 U16 menubox_color;
+char text_lcd_mode;	// on = 1, off = 0
 
 unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
 
@@ -52,6 +53,7 @@ int main(int argc, char** argv) {
 	void *thread_result;				// pthread return
 	int status;							// mutex result
 
+	text_lcd_mode = 0;
 
 
 	int text_lcd_dev;
@@ -66,7 +68,10 @@ int main(int argc, char** argv) {
 	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, keyboard_ev_func, (void *)&keyboard_thread);
 
 	while (1) {
-		write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
+		if (text_lcd_mode) {
+			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
+		}
+
 		sleep(1);
 	}
 
@@ -249,10 +254,16 @@ void* mouse_ev_func(void *data) {
 		if (ev.type == 1) {
 			if (ev.value == 1) {
 				if (ev.code == 272) {
-					if (draw_mode) draw_mode = 0;
+					if (cur.x > TOOLBAR_X_START) {
+						if(text_lcd_mode) text_lcd_mode = 0;
+						else text_lcd_mode = 1;
+					}
 					else {
-						draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
-						draw_mode = 1;
+						if (draw_mode) draw_mode = 0;
+						else {
+							draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+							draw_mode = 1;
+						}
 					}
 				}
 				else if (ev.code == 273) {
@@ -329,7 +340,8 @@ void* keyboard_ev_func(void *data) {
 			if (ev.type == 1) {
 				switch (ev.code) {
 				case 1:		// ESC
-					memset(inner_text, ' ', TEXT_LCD_MAX_BUF);
+					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
+					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					close(keyboard_fd);
 					return;
 				case 2:
@@ -368,11 +380,14 @@ void* keyboard_ev_func(void *data) {
 				case 13:
 					insert_text_buf(inner_text, &text_buf_index, '=');
 					break;
-				case 14:
+				case 14:	// SPACE
 					insert_text_buf(inner_text, &text_buf_index, ' ');
 					break;
 				case 15:	// TAP
-					/*pnt[0] = '\t';*/
+					insert_text_buf(inner_text, &text_buf_index, ' ');
+					insert_text_buf(inner_text, &text_buf_index, ' ');
+					insert_text_buf(inner_text, &text_buf_index, ' ');
+					insert_text_buf(inner_text, &text_buf_index, ' ');
 					break;
 				case 16:
 					insert_text_buf(inner_text, &text_buf_index, 'q');
@@ -411,11 +426,10 @@ void* keyboard_ev_func(void *data) {
 					insert_text_buf(inner_text, &text_buf_index, ']');
 					break;
 				case 28:	// ENTER
-					//memset(buffer, ' ', TEXT_LCD_LINE_BUF);
-					//memcpy(buffer, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
-					//memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
-					//memcpy(text_lcd_buf, buffer, TEXT_LCD_LINE_BUF);
-					//text_lcd_locate = 0;
+					memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
+					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
+					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
+					text_lcd_locate = 0;
 					break;
 				case 30:
 					insert_text_buf(inner_text, &text_buf_index, 'a');
@@ -487,8 +501,6 @@ void* keyboard_ev_func(void *data) {
 				}
 				// 키보드 left 고장
 
-
-				memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
 				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 			}
 
