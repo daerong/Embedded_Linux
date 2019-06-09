@@ -95,6 +95,7 @@ void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos,
 }
 
 void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
+	if (xpos >= TOOLBAR_X_START) return;
 	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
@@ -338,7 +339,10 @@ void* keyboard_ev_func(void *data) {
 			if (errno == EINTR) continue;
 			break;
 		}
-		if (ev.value == 1) {
+		if (!text_lcd_mode) {
+
+		}
+		else if (ev.value == 1) {
 			if (ev.type == 1) {
 				switch (ev.code) {
 				case 1:		// ESC
