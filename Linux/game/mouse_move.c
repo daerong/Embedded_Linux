@@ -296,7 +296,7 @@ void* keyboard_ev_func(void *data) {
 	while (1) {
 		struct input_event ev;
 
-		if (read(fd, &ev, sizeof(struct input_event)) < 0) {
+		if (read(keyboard_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR) continue;
 			break;
@@ -453,7 +453,7 @@ void* keyboard_ev_func(void *data) {
 		}
 	}
 
-	close(fd);
+	close(keyboard_fd);
 
 	return 0;
 }
