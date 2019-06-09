@@ -4,13 +4,16 @@ typedef unsigned int U32;
 typedef short U16;
 typedef int S32;
 
-char keyboard_thread[] = "touch thread";
+char mouse_thread[] = "mouse thread";
+char keyboard_thread[] = "keyboard thread";
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
 #define PALETTE_X_END 900
 #define TOOLBAR_X_START 901
 #define TOOLBAR_X_END 1024
+
+U16 menubox_color;
 
 typedef struct DISPLAY {
 	int xpos;
@@ -34,135 +37,23 @@ void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *t
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
+void* mouse_ev_func(void *data);
 void* keyboard_ev_func(void *data);
 
-U16 menubox_color;
-
 int main(int argc, char** argv) {
-	int ret;
-	int frame_fd;
-	int mouse_fd;
-	U16 foreground_color;
-	U16 background_color;
-	struct fb_var_screeninfo fvs;
-	unsigned short *pfbdata;
-	struct input_event ev;
 
-	MOUSE_CURSOR cur;
-	char draw_mode = 0;
-	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
-
+	pthread_t mouse_ev_thread;
+	int mouse_thread_id;						// pthread ID
 	pthread_t keyboard_ev_thread;
 	int keyboard_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
 	int status;							// mutex result
 
-	LOCATE start;
-	LOCATE end;
-	start.xpos = TOOLBAR_X_START;
-	start.ypos = 0;
-	end.xpos = TOOLBAR_X_END;
-	end.ypos = SCREEN_Y_MAX;
-
-	cur.x = SCREEN_X_MAX / 2;
-	cur.y = SCREEN_Y_MAX / 2;
-	int past_x = cur.x;
-	int past_y = cur.y;
-
-	foreground_color = makepixel(255, 255, 255);							// white color
-	background_color = makepixel(0, 0, 0);									// black color
-	menubox_color = makepixel(50, 150, 150);
-	reset_display(&fvs, pfbdata, display, background_color);
-	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
-	//draw_display(&fvs, pfbdata, display);
-
-	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
-	assert2(frame_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
-
-	frame_fd = open(LCD_DEVICE, O_RDWR);
-	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
-
-	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
-	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
-
-	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
-	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
-
-	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
-	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
+	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
+	pthread_join(mouse_ev_thread, (void *)&thread_result);
 
 	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, keyboard_ev_func, (void *)&keyboard_thread);
 	pthread_join(keyboard_ev_thread, (void *)&thread_result);
-
-	while (1) {
-		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
-			printf("check\n");
-			if (errno == EINTR)
-				continue;
-
-			break;
-		}
-
-		if (ev.type == 1) {
-			if (ev.value == 1) {
-				if (ev.code == 272) {
-					if (draw_mode) draw_mode = 0;
-					else {
-						draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
-						draw_mode = 1;
-					}
-				}
-				else if (ev.code == 273) {
-					reset_display(&fvs, pfbdata, display, background_color);
-					draw_display(&fvs, pfbdata, display);
-				}
-			}
-		}
-		else if (ev.type == 2) {
-			if (ev.code == 1) {
-				cur.y += ev.value;
-			}
-			else if (ev.code == 0) {
-				cur.x += ev.value;
-			}
-		}
-		else {
-			//printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
-		}
-
-
-		//printf("x : %d \t\t y : %d/n", cur.x, cur.y);
-
-		if (cur.x < 0) {
-			cur.x = 0;
-		}
-		else if (cur.x > SCREEN_X_MAX - 1) {
-			cur.x = SCREEN_X_MAX - 1;
-		}
-
-		if (cur.y < 0) {
-			cur.y = 0;
-		}
-		else if (cur.y > SCREEN_Y_MAX - 1) {
-			cur.y = SCREEN_Y_MAX - 1;
-		}
-
-		if (draw_mode) {
-			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
-			if (cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
-		}
-		else {
-			erase_cursor(&fvs, pfbdata, past_x, past_y, background_color);
-			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
-			past_x = cur.x;
-			past_y = cur.y;
-		}
-	}
-
-
-	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
-	close(frame_fd);
-	close(mouse_fd);
 
 	return 0;
 }
@@ -274,12 +165,133 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 	}
 }
 
+void* mouse_ev_func(void *data) {
+	int ret;
+	int mouse_fd;
+	int frame_fd;
+	U16 foreground_color;
+	U16 background_color;
+	struct fb_var_screeninfo fvs;
+	unsigned short *pfbdata;
+	struct input_event ev;
+
+	MOUSE_CURSOR cur;
+	char draw_mode = 0;
+	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
+
+	LOCATE start;
+	LOCATE end;
+	start.xpos = TOOLBAR_X_START;
+	start.ypos = 0;
+	end.xpos = TOOLBAR_X_END;
+	end.ypos = SCREEN_Y_MAX;
+
+	cur.x = SCREEN_X_MAX / 2;
+	cur.y = SCREEN_Y_MAX / 2;
+	int past_x = cur.x;
+	int past_y = cur.y;
+
+	foreground_color = makepixel(255, 255, 255);							// white color
+	background_color = makepixel(0, 0, 0);									// black color
+	menubox_color = makepixel(50, 150, 150);
+
+	mouse_fd = open(MOUSE_EVENT, O_RDONLY);
+	assert2(mouse_fd >= 0, "Mouse Event Open Error!", MOUSE_EVENT);
+
+	frame_fd = open(LCD_DEVICE, O_RDWR);
+	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
+
+	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
+	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
+
+	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
+	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
+
+	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
+	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
+
+	reset_display(&fvs, pfbdata, display, background_color);
+	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
+	//draw_display(&fvs, pfbdata, display);
+
+	while (1) {
+		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
+			printf("check\n");
+			if (errno == EINTR)
+				continue;
+
+			break;
+		}
+
+		if (ev.type == 1) {
+			if (ev.value == 1) {
+				if (ev.code == 272) {
+					if (draw_mode) draw_mode = 0;
+					else {
+						draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+						draw_mode = 1;
+					}
+				}
+				else if (ev.code == 273) {
+					reset_display(&fvs, pfbdata, display, background_color);
+					draw_display(&fvs, pfbdata, display);
+				}
+			}
+		}
+		else if (ev.type == 2) {
+			if (ev.code == 1) {
+				cur.y += ev.value;
+			}
+			else if (ev.code == 0) {
+				cur.x += ev.value;
+			}
+		}
+		else {
+			//printf("none \t\t type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+		}
+
+
+		//printf("x : %d \t\t y : %d/n", cur.x, cur.y);
+
+		if (cur.x < 0) {
+			cur.x = 0;
+		}
+		else if (cur.x > SCREEN_X_MAX - 1) {
+			cur.x = SCREEN_X_MAX - 1;
+		}
+
+		if (cur.y < 0) {
+			cur.y = 0;
+		}
+		else if (cur.y > SCREEN_Y_MAX - 1) {
+			cur.y = SCREEN_Y_MAX - 1;
+		}
+
+		if (draw_mode) {
+			set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
+			if (cur.x < PALETTE_X_END) put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
+		}
+		else {
+			erase_cursor(&fvs, pfbdata, past_x, past_y, background_color);
+			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
+			past_x = cur.x;
+			past_y = cur.y;
+		}
+	}
+
+	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
+	close(frame_fd);
+	close(mouse_fd);
+
+	return 0;
+}
+
 void* keyboard_ev_func(void *data) {
-	uint8_t keys[128];
-	int fd;
+	int keyboard_fd;
 	char pnt;
 
-	fd = open(KEYBOARD_EVENT, O_RDONLY);
+	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
+	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
 
 	while (1) {
 		struct input_event ev;
