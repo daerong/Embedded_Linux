@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
 
 	int size = 3 * width*height; // for RGB
 
-	unsigned char *data = new unsigned char[size];
+	unsigned char data[size];
 
 	fread(data, sizeof(unsigned char), size, fp);
 
