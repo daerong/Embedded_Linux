@@ -429,7 +429,7 @@ void* keyboard_ev_func(void *data) {
 					memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
-					text_lcd_locate = 0;
+					text_buf_index = 0;
 					break;
 				case 30:
 					insert_text_buf(inner_text, &text_buf_index, 'a');
