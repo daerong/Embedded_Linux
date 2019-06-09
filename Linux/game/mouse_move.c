@@ -50,9 +50,13 @@ int main(int argc, char** argv) {
 	int status;							// mutex result
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
-	pthread_join(mouse_ev_thread, (void *)&thread_result);
-
 	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, keyboard_ev_func, (void *)&keyboard_thread);
+
+	while (1) {
+
+	}
+
+	pthread_join(mouse_ev_thread, (void *)&thread_result);
 	pthread_join(keyboard_ev_thread, (void *)&thread_result);
 
 	return 0;
