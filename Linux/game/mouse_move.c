@@ -327,7 +327,7 @@ void* keyboard_ev_func(void *data) {
 		}
 		if (ev.value == 1) {
 			if (ev.type == 1) {
-				switch (keyboard_input_ev.code) {
+				switch (ev.code) {
 				case 1:		// ESC
 					memset(inner_text, ' ', TEXT_LCD_MAX_BUF);
 					close(keyboard_fd);
