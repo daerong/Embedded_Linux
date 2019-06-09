@@ -1,4 +1,4 @@
-#include "../include/fpga_frame_buffer.h"
+#include "../include/fpga_test.h"
 
 typedef unsigned int U32;
 typedef short U16;
