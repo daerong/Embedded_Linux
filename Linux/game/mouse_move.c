@@ -244,8 +244,8 @@ void* mouse_ev_func(void *data) {
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
-	DISPLAY *display = new DISPLAY[SCREEN_X_MAX * SCREEN_Y_MAX];
-	DISPLAY *background = new DISPLAY[SCREEN_X_MAX * SCREEN_Y_MAX];
+	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	DISPLAY *background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
 
 	LOCATE start;
 	LOCATE end;
@@ -360,8 +360,8 @@ void* mouse_ev_func(void *data) {
 	close(frame_fd);
 	close(mouse_fd);
 
-	delete[] display;
-	delete[] background;
+	free(display);
+	free(background);
 
 	return 0;
 }
