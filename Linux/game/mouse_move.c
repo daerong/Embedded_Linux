@@ -1,4 +1,4 @@
-#include "../include/fpga_test.h"
+#include "../include/fpga_frame_buffer.h"
 
 typedef unsigned int U32;
 typedef short U16;
@@ -32,10 +32,6 @@ void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *t
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
-void* keyboard_ev_func(void *data);
-
-char keyboard_thread[] = "touch thread";
 
 U16 menubox_color;
 
@@ -47,19 +43,15 @@ int main(int argc, char** argv) {
 	U16 background_color;
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
-	struct input_event mouse_input_ev;
+	struct input_event ev;
+
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
+
+
 	LOCATE start;
-	LOCATE end;	
-	pthread_t keyboard_ev_thread;
-	int keyboard_thread_id;						// pthread ID
-	void *thread_result;				// pthread return
-	int status;							// mutex result
-
-
-
+	LOCATE end;
 	start.xpos = TOOLBAR_X_START;
 	start.ypos = 0;
 	end.xpos = TOOLBAR_X_END;
@@ -92,39 +84,36 @@ int main(int argc, char** argv) {
 	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
-	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, keyboard_ev_func, (void *)&keyboard_thread);
-	pthread_join(keyboard_ev_thread, (void *)&thread_result);
-	
-
-
 	while (1) {
-		if (read(mouse_fd, &mouse_input_ev, sizeof(struct input_event)) < 0) {
+		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
-			if (errno == EINTR) continue;
+			if (errno == EINTR)
+				continue;
+
 			break;
 		}
 
-		if (mouse_input_ev.type == 1) {
-			if (mouse_input_ev.value == 1) {
-				if (mouse_input_ev.code == 272) {
+		if (ev.type == 1) {
+			if (ev.value == 1) {
+				if (ev.code == 272) {
 					if (draw_mode) draw_mode = 0;
 					else {
 						draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
 						draw_mode = 1;
 					}
 				}
-				else if (mouse_input_ev.code == 273) {
+				else if (ev.code == 273) {
 					reset_display(&fvs, pfbdata, display, background_color);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}
 		}
-		else if (mouse_input_ev.type == 2) {
-			if (mouse_input_ev.code == 1) {
-				cur.y += mouse_input_ev.value;
+		else if (ev.type == 2) {
+			if (ev.code == 1) {
+				cur.y += ev.value;
 			}
-			else if (mouse_input_ev.code == 0) {
-				cur.x += mouse_input_ev.value;
+			else if (ev.code == 0) {
+				cur.x += ev.value;
 			}
 		}
 		else {
@@ -271,196 +260,6 @@ void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpo
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
 				pfbdata[offset] = pixel;
 			}
-		}
-	}
-}
-
-void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text) {
-	target_buf[*locate] = insert_text;
-	(*locate)++;
-}
-
-void* keyboard_ev_func(void *data) {
-	int keyboard_fd;
-	unsigned char text_lcd_buf[TEXT_LCD_LINE_BUF];
-	int text_buf_index = 0;
-
-	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
-	assert2(keyboard_fd >= 0, "Mouse Event Open Error!", KEYBOARD_EVENT);
-
-	while(1) {
-		struct input_event keyboard_input_ev;
-
-		if (read(keyboard_fd, &keyboard_input_ev, sizeof(struct input_event)) < 0){
-			printf("check\n");
-			if (errno == EINTR) continue;
-			break;
-		}
-
-		if (keyboard_input_ev.value == 1) {
-			if (keyboard_input_ev.type == 1) {
-				switch (keyboard_input_ev.code) {
-				case 1:		// ESC
-					memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
-					close(keyboard_fd);
-					return;
-				case 2:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '1');
-					break;
-				case 3:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '2');
-					break;
-				case 4:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '3');
-					break;
-				case 5:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '4');
-					break;
-				case 6:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '5');
-					break;
-				case 7:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '6');
-					break;
-				case 8:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '7');
-					break;
-				case 9:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '8');
-					break;
-				case 10:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '9');
-					break;
-				case 11:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '0');
-					break;
-				case 12:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '-');
-					break;
-				case 13:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '=');
-					break;
-				case 14:
-					insert_text_buf(text_lcd_buf, &text_buf_index, ' ');
-					break;
-				case 15:	// TAP
-					/*pnt[0] = '\t';*/
-					break;
-				case 16:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'q');
-					break;
-				case 17:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'w');
-					break;
-				case 18:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'e');
-					break;
-				case 19:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'r');
-					break;
-				case 20:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 't');
-					break;
-				case 21:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'y');
-					break;
-				case 22:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'u');
-					break;
-				case 23:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'i');
-					break;
-				case 24:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'o');
-					break;
-				case 25:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'p');
-					break;
-				case 26:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '[');
-					break;
-				case 27:
-					insert_text_buf(text_lcd_buf, &text_buf_index, ']');
-					break;
-				case 28:	// ENTER
-					//memset(buffer, ' ', TEXT_LCD_LINE_BUF);
-					//memcpy(buffer, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
-					//memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
-					//memcpy(text_lcd_buf, buffer, TEXT_LCD_LINE_BUF);
-					//text_lcd_locate = 0;
-					break;
-				case 30:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'a');
-					break;
-				case 31:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 's');
-					break;
-				case 32:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'd');
-					break;
-				case 33:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'f');
-					break;
-				case 34:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'g');
-					break;
-				case 35:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'h');
-					break;
-				case 36:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'j');
-					break;
-				case 37:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'k');
-					break;
-				case 38:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'l');
-					break;
-				case 44:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'z');
-					break;
-				case 45:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'x');
-					break;
-				case 46:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'c');
-					break;
-				case 47:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'v');
-					break;
-				case 48:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'b');
-					break;
-				case 49:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'n');
-					break;
-				case 50:
-					insert_text_buf(text_lcd_buf, &text_buf_index, 'm');
-					break;
-				case 51:
-					insert_text_buf(text_lcd_buf, &text_buf_index, ',');
-					break;
-				case 52:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '.');
-					break;
-				case 53:
-					insert_text_buf(text_lcd_buf, &text_buf_index, '/');
-					break;
-				}
-				// 방향키 이벤트 추가하기
-
-			}
-			//
-			///*memcpy(text_lcd_buf, "Successful", 10);*/
-			//if (text_lcd_locate < TEXT_LCD_LINE_BUF) {
-			//	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF + text_lcd_locate, pnt, 1);
-			//	text_lcd_locate++;
-			//}
-
-			//write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
-
-			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", text_buf_index[text_buf_index], keyboard_input_ev.type, keyboard_input_ev.code, keyboard_input_ev.value);
-
 		}
 	}
 }
