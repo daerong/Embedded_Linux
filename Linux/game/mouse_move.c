@@ -34,8 +34,8 @@ typedef struct MOUSE_CURSOR {
 
 U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void set_pixel(DISPLAY *target, int xpos, int ypos, unsigned short pixel);
-void reset_display(DISPLAY *target, DISPLAY *background);
+void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel);
+void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, DISPLAY *background, unsigned short pixel);
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
@@ -95,12 +95,18 @@ void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos,
 	pfbdata[offset] = pixel;
 }
 
-void set_pixel(DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
+void set_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, unsigned short pixel) {
 	target[ypos*SCREEN_X_MAX + xpos].color = pixel;
 }
 
-void reset_display(DISPLAY *target, DISPLAY *background) {
-	memcpy(target, background, sizeof(DISPLAY)*SCREEN_X_MAX*SCREEN_Y_MAX);
+void reset_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, DISPLAY *background, unsigned short pixel) {
+	int x_temp, y_temp;
+
+	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
+		for (x_temp = 0; x_temp < PALETTE_X_END; x_temp++) {
+			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
+		}
+	}
 }
 
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel) {
@@ -121,7 +127,7 @@ void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *t
 
 	for (y_temp = y_start; y_temp < y_end; y_temp++) {
 		for (x_temp = x_start; x_temp < x_end; x_temp++) {
-			set_pixel(target, x_temp, y_temp, pixel);
+			set_pixel(fvs, pfbdata, target, x_temp, y_temp, pixel);
 			//target[y_temp*SCREEN_X_MAX + x_temp].color = pixel;
 		}
 	}
@@ -219,7 +225,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 		for (horizon = 0; horizon < width; horizon++) {
 			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
-			set_pixel(target, horizon, vertical, pixel);
+			set_pixel(fvs, pfbdata, horizon, vertical, pixel);
 		}
 	}
 
@@ -275,7 +281,7 @@ void* mouse_ev_func(void *data) {
 	set_image(&fvs, pfbdata, background, 0, 0, "lenna.bmp");
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
 
-	reset_display(display, background);
+	reset_display(&fvs, pfbdata, display, background, background_color);
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
@@ -303,7 +309,7 @@ void* mouse_ev_func(void *data) {
 					}
 				}
 				else if (ev.code == 273) {
-					reset_display(display, background);
+					reset_display(&fvs, pfbdata, display, background_color);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}
@@ -339,7 +345,7 @@ void* mouse_ev_func(void *data) {
 
 		if (draw_mode) {
 			if (cur.x < PALETTE_X_END) {
-				set_pixel(display, cur.x, cur.y, foreground_color);
+				set_pixel(&fvs, pfbdata, display, cur.x, cur.y, foreground_color);
 				put_pixel(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 			}
 		}
