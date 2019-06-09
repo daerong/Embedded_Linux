@@ -16,7 +16,7 @@ char keyboard_thread[] = "keyboard thread";
 U16 menubox_color;
 char text_lcd_mode;	// on = 1, off = 0
 
-unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
+unsigned char *text_lcd_buf;
 
 typedef struct DISPLAY {
 	int xpos;
@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
 
 
 	int text_lcd_dev;
+	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
@@ -371,7 +372,7 @@ void* mouse_ev_func(void *data) {
 
 void* keyboard_ev_func(void *data) {
 	int keyboard_fd;
-	char inner_text[TEXT_LCD_LINE_BUF];
+	char *inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
 	int text_buf_index;
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
@@ -571,6 +572,7 @@ void* keyboard_ev_func(void *data) {
 		}
 	}
 
+	free(inner_text);
 	close(keyboard_fd);
 
 	return 0;
