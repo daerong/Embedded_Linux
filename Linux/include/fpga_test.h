@@ -11,6 +11,11 @@
 #include <signal.h>
 #include <pthread.h>
 
+/* memory stack size */
+#include <sys/time.h>
+#include <sys/resource.h>
+/* memory stack size */
+
 /* main_lcd */
 #include <linux/input.h>
 /* main_lcd */
