@@ -341,11 +341,10 @@ void* keyboard_ev_func(void *data) {
 					insert_text_buf(text_lcd_buf, &text_buf_index, '=');
 					break;
 				case 14:
-					text_buf_index--;
-					pnt[text_buf_index] = ' ';
+					insert_text_buf(text_lcd_buf, &text_buf_index, ' ');
 					break;
 				case 15:	// TAP
-					pnt[0] = '\t';
+					/*pnt[0] = '\t';*/
 					break;
 				case 16:
 					insert_text_buf(text_lcd_buf, &text_buf_index, 'q');
@@ -460,7 +459,7 @@ void* keyboard_ev_func(void *data) {
 
 			//write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 
-			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", pnt[0], keyboard_ev.type, keyboard_ev.code, keyboard_ev.value);
+			printf("text : %c \t\t type : %hu, code : %hu, value : %d\n", text_buf_index[text_buf_index], keyboard_input_ev.type, keyboard_input_ev.code, keyboard_input_ev.value);
 
 		}
 	}
