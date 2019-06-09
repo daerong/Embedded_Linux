@@ -244,8 +244,8 @@ void* mouse_ev_func(void *data) {
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
-	DISPLAY background[SCREEN_X_MAX * SCREEN_Y_MAX];
 	DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
+	DISPLAY background[SCREEN_X_MAX * SCREEN_Y_MAX];
 
 	LOCATE start;
 	LOCATE end;
@@ -278,13 +278,10 @@ void* mouse_ev_func(void *data) {
 	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
-	reset_display(&fvs, pfbdata, background, background_color);
-	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
-	set_image(&fvs, pfbdata, background, 0, 0, "lenna.bmp");
-	draw_display(&fvs, pfbdata, display);
-
 	reset_display(&fvs, pfbdata, display, background_color);
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
+	set_image(&fvs, pfbdata, display, 0, 0, "lenna.bmp");
+	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
