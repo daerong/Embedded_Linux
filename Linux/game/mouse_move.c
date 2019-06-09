@@ -6,7 +6,6 @@ typedef int S32;
 
 char mouse_thread[] = "mouse thread";
 char keyboard_thread[] = "keyboard thread";
-char lenna_img[] = "lenna.bmp";
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
@@ -63,6 +62,7 @@ int main(int argc, char** argv) {
 
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
+
 
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
@@ -194,40 +194,43 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 	(*locate)++;
 }
 
-void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
+void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name){
+	U16 pixel;			// U16은 short 즉, 16비트. 
 	FILE *fp;
 	unsigned char info[54];
-	U16 pixel;			// U16은 short 즉, 16비트. 
-	int width, height, size;
 
-	fp = fopen(file_name, "rb");
+	fp = fopen("lenna.bmp", "rb");
 	if (fp == NULL) {
+		printf("File open error: ");
 		perror("File open error: ");
 		exit(0);
 	}
 
 	fread(info, sizeof(unsigned char), 54, fp);
 
-	width = *(int*)&info[18];
-	height = *(int*)&info[22];
-	size = 3 * width*height; // for RGB
+	int width = *(int*)&info[18];
+	int height = *(int*)&info[22];
+
+	int size = 3 * width*height; // for RGB
 
 	unsigned char data[size];
+
 	fread(data, sizeof(unsigned char), size, fp);
 
 	int locate = 0;
 	int vertical = 0;
 	int horizon = 0;
-	int offset = 0;
+
 
 	for (vertical = 0; vertical < height; vertical++) {
 		for (horizon = 0; horizon < width; horizon++) {
-			offset = width * height - vertical * width + horizon;
-			locate = offset * 3;
+			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
-			pfbdata[offset] = pixel;
+			put_pixel(&fvs, pfbdata, horizon, vertical, pixel);
 		}
 	}
+
+	fclose(fp);
 }
 
 void* mouse_ev_func(void *data) {
@@ -277,7 +280,7 @@ void* mouse_ev_func(void *data) {
 
 	reset_display(&fvs, pfbdata, display, background_color);
 	fill_box(&fvs, pfbdata, display, start, end, menubox_color);
-	set_image(&fvs, pfbdata, display, 0, 0, lenna_img);
+	set_image(&fvs, pfbdata, display, 0, 0, "lenna.bmp");
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
