@@ -57,7 +57,7 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *background);
 void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
-void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name, char read_type);
+void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
 void* mouse_ev_func(void *data);
 void* keyboard_ev_func(void *data);
 
@@ -210,14 +210,14 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 	(*locate)++;
 }
 
-void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name, char read_type) {
+void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
 	U16 pixel;			// U16은 short 즉, 16비트. 
 	FILE *fp;
 
 	int width = 0;
 	int height = 0;
 
-	unsigned char info[54];
+	unsigned char info [54];
 
 	fp = fopen(file_name, "rb");
 	if (fp == NULL) {
@@ -299,11 +299,11 @@ void* mouse_ev_func(void *data) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
-	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp", 1);
+	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
 	reset_display(proc_display, background);
 
-	set_image(&fvs, pfbdata, proc_display, 0, 0, "icon_4.bmp" ,1);
-	set_image(&fvs, pfbdata, proc_display, 100, 100, "icon_4_on.bmp");
+	set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
+	set_image(&fvs, pfbdata, proc_display, 100, 100, "icon_1.bmp");
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
