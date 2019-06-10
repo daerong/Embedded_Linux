@@ -440,12 +440,12 @@ void* mouse_ev_func(void *data) {
 							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
 								if (lenna_img_mode) {
 									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4.bmp");
-									erase_image(&fvs, pfbdata, proc_display, background, 100, 100, "lenna.bmp");
+									erase_image(&fvs, pfbdata, proc_display, background, 0, 0, "lenna.bmp");
 									lenna_img_mode = 0;
 								}
 								else {
 									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4on.bmp");
-									set_image(&fvs, pfbdata, proc_display, 100, 100, "lenna.bmp");
+									set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
 									lenna_img_mode = 1;
 								}
 							}
