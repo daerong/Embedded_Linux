@@ -63,13 +63,6 @@ void* keyboard_ev_func(void *data);
 
 int main(int argc, char** argv) {
 
-	struct rlimit rlim;
-
-	getrlimit(RLIMIT_STACK, &rlim);
-	rlim.rlim_cur = (1024 * 1024 * 12);
-	rlim.rlim_max = (1024 * 1024 * 12);
-	setrlimit(RLIMIT_STACK, &rlim);
-
 	pthread_t mouse_ev_thread;
 	int mouse_thread_id;						// pthread ID
 	pthread_t keyboard_ev_thread;
@@ -109,22 +102,11 @@ int main(int argc, char** argv) {
 }
 
 U16 makepixel(U32  r, U32 g, U32 b) {
-	U16 *x = (U16 *)malloc(sizeof(U16));
-	U16 *y = (U16 *)malloc(sizeof(U16));
-	U16 *z = (U16 *)malloc(sizeof(U16));
-	U16 result;
-	x = NULL;
-	y = NULL;
-	z = NULL;
-	*x = (U16)(r >> 3);
-	*y = (U16)(g >> 2);
-	*z = (U16)(b >> 3);
-	result = (*z | (*x << 11) | (*y << 5));
-	free(x);
-	free(y);
-	free(z);
+	U16 x = (U16)(r >> 3);
+	U16 y = (U16)(g >> 2);
+	U16 z = (U16)(b >> 3);
 
-	return result;
+	return (z | (x << 11) | (y << 5));
 }
 
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
@@ -231,7 +213,7 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
 	U16 *pixel = (U16 *)malloc(sizeof(U16));
 	FILE *fp = (FILE *)malloc(sizeof(FILE));
-	pixel = NULL;
+	pixel = NULL:
 	fp = NULL;
 	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
 	info = NULL;
