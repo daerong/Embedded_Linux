@@ -117,7 +117,7 @@ U16 makepixel(U32  r, U32 g, U32 b) {
 	free(y);
 	free(z);
 
-	return result
+	return result;
 }
 
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
@@ -224,7 +224,7 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
 	U16 *pixel = (U16 *)malloc(sizeof(U16));
 	FILE *fp = (FILE *)malloc(sizeof(FILE));
-	pixel = NULL:
+	pixel = NULL;
 	fp = NULL;
 	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
 	info = NULL;
