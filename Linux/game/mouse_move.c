@@ -261,7 +261,7 @@ void* mouse_ev_func(void *data) {
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
 	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);			// 그리기 포인터가 포함됨
-	DISPLAY *proc_display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);		// 아이콘 상태나 프로세스 이미지 존재
+	//DISPLAY *proc_display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);		// 아이콘 상태나 프로세스 이미지 존재
 	DISPLAY *background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);			// 순수한 배경 이미지
 
 	LOCATE start;
@@ -297,19 +297,33 @@ void* mouse_ev_func(void *data) {
 
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
 	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
-	reset_display(proc_display, background);
+	//reset_display(proc_display, background);
 
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon_defalut.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icon_defalut.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icon_defalut.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icon_defalut.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icon_defalut.bmp");
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
-	reset_display(display, proc_display);
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon_1.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon_2.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon_3.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon_4.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_5_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_6_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_7_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_8_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_9_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, background, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
+
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon_defalut.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icon_defalut.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icon_defalut.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icon_defalut.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icon_defalut.bmp");
+	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
+	//reset_display(display, proc_display);
+
+	reset_display(display, background);
+
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
@@ -328,41 +342,41 @@ void* mouse_ev_func(void *data) {
 						if (cur.x >= ICON_START && cur.x < ICON_END) {
 							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// 채팅
 								if (text_lcd_mode) {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon_1.bmp");
 									text_lcd_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1_on.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon_1_on.bmp");
 									text_lcd_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_2_Y_START && cur.y < ICON_2_Y_START + ICON_WIDTH) {	// 카메라
 								if (camera_mode) {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon_2.bmp");
 									camera_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2_on.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon_2_on.bmp");
 									camera_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_3_Y_START && cur.y < ICON_3_Y_START + ICON_WIDTH) {	// 숫자야구
 								if (num_baseball_mode) {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon_3.bmp");
 									num_baseball_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3_on.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon_3_on.bmp");
 									num_baseball_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
 								if (lenna_img_mode) {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon_4.bmp");
 									lenna_img_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4_on.bmp");
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon_4_on.bmp");
 									lenna_img_mode = 1;
 								}
 							}
@@ -395,7 +409,7 @@ void* mouse_ev_func(void *data) {
 					}
 				}
 				else if (ev.code == 273) {
-					reset_display(display, proc_display);
+					reset_display(display, background);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}

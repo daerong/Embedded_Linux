@@ -8,7 +8,7 @@ PWD := $(shell pwd)
 all: $(APP)
 
 $(APP): $(TARGET)
-	$(CC) -o $(APP) $(TARGET)
+	$(CC) -pthread -o $(APP) $(TARGET)
 
 install:
 	cp -a $(APP) $(TFTPDIR)
