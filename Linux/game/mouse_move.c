@@ -484,6 +484,7 @@ void* mouse_ev_func(void *data) {
 									menu_update(&fvs, pfbdata, display);
 									set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
 									set_image(&fvs, pfbdata, display, 0, 0, "lenna.bmp");
+									draw_display(&fvs, pfbdata, display);
 									lenna_img_mode = 1;
 								}
 							}
