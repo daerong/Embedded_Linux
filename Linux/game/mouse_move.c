@@ -63,6 +63,15 @@ void* keyboard_ev_func(void *data);
 
 int main(int argc, char** argv) {
 
+	struct rlimit rlim;
+
+	getrlimit(RLIMIT_STACK, &rlim);
+	printf("Current Stack Size : [%d] Max Current Stack Size : [%d]\n", rlim.rlim_cur, rlim.rlim_max);
+	rlim.rlim_cur = (1024 * 1024 * 12);
+	rlim.rlim_max = (1024 * 1024 * 12);
+	setrlimit(RLIMIT_STACK, &rlim);
+	printf("Current Stack Size : [%d] Max Current Stack Size : [%d]\n", rlim.rlim_cur, rlim.rlim_max);
+
 	pthread_t mouse_ev_thread;
 	int mouse_thread_id;						// pthread ID
 	pthread_t keyboard_ev_thread;
