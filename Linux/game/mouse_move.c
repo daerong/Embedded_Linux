@@ -227,6 +227,8 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	int width = *(int*)&info[18];
 	int height = *(int*)&info[22];
 
+	free(info);
+
 	int size = 3 * width*height; // for RGB
 
 	unsigned char *data = (unsigned char *)malloc(sizeof(char) * size);
@@ -247,7 +249,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 		}
 	}
 
-
+	free(data);
 }
 
 void* mouse_ev_func(void *data) {
@@ -428,7 +430,7 @@ void* keyboard_ev_func(void *data) {
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
 					text_lcd_mode = 0;
-					return;
+					break;
 				case 2:
 					insert_text_buf(inner_text, &text_buf_index, '1');
 					break;
