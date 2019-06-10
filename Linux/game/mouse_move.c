@@ -217,7 +217,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	int width = 0;
 	int height = 0;
 
-	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
+	unsigned char info [54];
 
 	fp = fopen(file_name, "r");
 	if (fp == NULL) {
@@ -234,7 +234,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	int size = 3 * width*height; // for RGB
 
-	unsigned char *data = (unsigned char *)malloc(sizeof(char) * size);
+	unsigned char data[size];
 
 	fread(data, sizeof(unsigned char), size, fp);
 	fclose(fp);
@@ -303,7 +303,7 @@ void* mouse_ev_func(void *data) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
-	set_image(&fvs, pfbdata, background, 0, 0, "icon_1.bmp");
+	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
 	reset_display(proc_display, background);
 
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
