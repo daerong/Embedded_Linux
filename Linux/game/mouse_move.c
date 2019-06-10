@@ -230,8 +230,6 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	width = *(int*)&info[18];
 	height = *(int*)&info[22];
 
-	free(info);
-
 	int size = 3 * width*height; // for RGB
 
 	unsigned char data[size];
@@ -251,8 +249,6 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 			set_pixel(target, horizon + xpos, vertical + ypos, pixel);
 		}
 	}
-
-	free(data);
 }
 
 void* mouse_ev_func(void *data) {
