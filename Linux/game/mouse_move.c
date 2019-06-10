@@ -211,8 +211,8 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 }
 
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
-	U16 pixel;			// U16은 short 즉, 16비트. 
-	FILE *fp;
+	U16 *pixel = (U16 *)malloc(sizeof(U16));
+	FILE *fp = (FILE *)malloc(sizeof(FILE));
 
 	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
 
@@ -241,13 +241,13 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	int horizon = 0;
 
 
-	//for (vertical = 0; vertical < height; vertical++) {
-	//	for (horizon = 0; horizon < width; horizon++) {
-	//		locate = (width * height - vertical * width + horizon) * 3;
-	//		pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
-	//		set_pixel(target, horizon, vertical, pixel);
-	//	}
-	//}
+	for (vertical = 0; vertical < height; vertical++) {
+		for (horizon = 0; horizon < width; horizon++) {
+			locate = (width * height - vertical * width + horizon) * 3;
+			*pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
+			set_pixel(target, horizon, vertical, *pixel);
+		}
+	}
 
 	free(data);
 }
