@@ -216,7 +216,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
 
-	fp = fopen("background.bmp", "r");
+	fp = fopen("lenna.bmp", "rb");
 	if (fp == NULL) {
 		perror("File open error: ");
 		exit(0);
