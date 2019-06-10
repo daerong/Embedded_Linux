@@ -322,7 +322,7 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 	for (vertical = 0; vertical < height; vertical++) {
 		for (horizon = 0; horizon < width; horizon++) {
 			locate = (width * height - vertical * width + horizon) * 3;
-			set_pixel(target, horizon + xpos, vertical + ypos, background[locate].color);
+			set_pixel(proc_display, horizon + xpos, vertical + ypos, background[locate].color);
 		}
 	}
 }
