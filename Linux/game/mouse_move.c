@@ -28,6 +28,9 @@ char keyboard_thread[] = "keyboard thread";
 
 U16 menubox_color;
 char text_lcd_mode;	// on = 1, off = 0
+char camera_mode;
+char num_baseball_mode;
+char lenna_img_mode;
 
 unsigned char *text_lcd_buf;
 
@@ -68,6 +71,9 @@ int main(int argc, char** argv) {
 	int status;							// mutex result
 
 	text_lcd_mode = 0;
+	camera_mode = 0;
+	num_baseball_mode = 0;
+	lenna_img_mode = 0;
 
 
 	int text_lcd_dev;
