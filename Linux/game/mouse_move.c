@@ -214,6 +214,9 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	U16 pixel;			// U16은 short 즉, 16비트. 
 	FILE *fp;
 
+	int width = 0;
+	int height = 0;
+
 	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
 
 	fp = fopen(file_name, "rb");
@@ -224,8 +227,8 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	fread(info, sizeof(unsigned char), 54, fp);
 
-	int width = *(int*)&info[18];
-	int height = *(int*)&info[22];
+	width = *(int*)&info[18];
+	height = *(int*)&info[22];
 
 	free(info);
 
