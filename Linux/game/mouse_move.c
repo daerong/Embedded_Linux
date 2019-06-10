@@ -52,8 +52,10 @@ U16 makepixel(U32  r, U32 g, U32 b);
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void set_pixel(DISPLAY *target, int xpos, int ypos, unsigned short pixel);
 void reset_display(DISPLAY *target, DISPLAY *background);
+void menu_copy(DISPLAY *target, DISPLAY *background);
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
+void menu_update(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
 void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *proc_display);
 void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
@@ -124,6 +126,16 @@ void reset_display(DISPLAY *target, DISPLAY *background) {
 	memcpy(target, background, sizeof(DISPLAY)*SCREEN_X_MAX*SCREEN_Y_MAX);
 }
 
+void menu_copy(DISPLAY *target, DISPLAY *background) {
+	int x_temp, y_temp;
+
+	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
+		for (x_temp = TOOLBAR_X_START; x_temp < SCREEN_X_MAX; x_temp++) {
+			target[y_temp*SCREEN_X_MAX + x_temp].color = background[y_temp*SCREEN_X_MAX + x_temp].color;
+		}
+	}
+}
+
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel) {
 	int x_start, y_start, x_end, y_end;
 	int x_temp, y_temp;
@@ -153,6 +165,16 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 
 	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
 		for (x_temp = 0; x_temp < SCREEN_X_MAX; x_temp++) {
+			put_pixel(fvs, pfbdata, x_temp, y_temp, target[y_temp*SCREEN_X_MAX + x_temp].color);
+		}
+	}
+}
+
+void menu_update(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target) {
+	int x_temp, y_temp;
+
+	for (y_temp = 0; y_temp < SCREEN_Y_MAX; y_temp++) {
+		for (x_temp = TOOLBAR_X_START; x_temp < SCREEN_X_MAX; x_temp++) {
 			put_pixel(fvs, pfbdata, x_temp, y_temp, target[y_temp*SCREEN_X_MAX + x_temp].color);
 		}
 	}
@@ -390,8 +412,7 @@ void* mouse_ev_func(void *data) {
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icondefalut.bmp");
 	reset_display(display, proc_display);
 
-
-	draw_display(&fvs, pfbdata, proc_display);
+	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
@@ -410,41 +431,57 @@ void* mouse_ev_func(void *data) {
 							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// 채팅
 								if (text_lcd_mode) {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									text_lcd_mode = 0;
 								}
 								else {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1on.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									text_lcd_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_2_Y_START && cur.y < ICON_2_Y_START + ICON_WIDTH) {	// 카메라
 								if (camera_mode) {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									camera_mode = 0;
 								}
 								else {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2on.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									camera_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_3_Y_START && cur.y < ICON_3_Y_START + ICON_WIDTH) {	// 숫자야구
 								if (num_baseball_mode) {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									num_baseball_mode = 0;
 								}
 								else {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3on.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									num_baseball_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
 								if (lenna_img_mode) {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									//erase_image(&fvs, pfbdata, proc_display, background, 0, 0, "lenna.bmp");
 									lenna_img_mode = 0;
 								}
 								else {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4on.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									//set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
 									lenna_img_mode = 1;
 								}
