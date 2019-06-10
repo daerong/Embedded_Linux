@@ -395,7 +395,7 @@ void* mouse_ev_func(void *data) {
 					}
 				}
 				else if (ev.code == 273) {
-					reset_display(display, background);
+					reset_display(display, proc_display);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}

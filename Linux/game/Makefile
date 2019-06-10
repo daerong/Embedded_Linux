@@ -1,5 +1,5 @@
-DEV := game
-APP := fpga_$(DEV)_test
+APP := move
+TARGET := mouse_move.c
 TFTPDIR := /tftpboot
 CC = arm-none-linux-gnueabi-gcc
 KDIR := /root/work/achroimx6q/kernel
@@ -7,8 +7,8 @@ PWD := $(shell pwd)
 
 all: $(APP)
 
-$(APP): $(APP).c
-	$(CC) -o $(APP) $(APP).c
+$(APP): $(TARGET)
+	$(CC) -o $(APP) $(TARGET)
 
 install:
 	cp -a $(APP) $(TFTPDIR)
