@@ -244,8 +244,8 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	int horizon = 0;
 
 
-	for (vertical = 0; vertical < height; vertical++) {
-		for (horizon = 0; horizon < width; horizon++) {
+	for (vertical = ypos; vertical < height + ypos; vertical++) {
+		for (horizon = xpos; horizon < width + xpos; horizon++) {
 			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
 			set_pixel(target, horizon, vertical, pixel);
@@ -306,16 +306,16 @@ void* mouse_ev_func(void *data) {
 	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
 	reset_display(proc_display, background);
 
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
-	set_image(&fvs, pfbdata, proc_display, 100, 100, "icon_4.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon_defalut.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icon_defalut.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icon_defalut.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icon_defalut.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icon_defalut.bmp");
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
 	reset_display(display, proc_display);
 
 
