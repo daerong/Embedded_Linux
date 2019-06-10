@@ -248,7 +248,8 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 			set_pixel(target, horizon, vertical, *pixel);
 		}
 	}
-
+	free(pixel);
+	free(fp);
 	free(data);
 }
 
