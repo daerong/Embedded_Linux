@@ -335,11 +335,6 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 	width = *(int*)&info[18];
 	height = *(int*)&info[22];
 
-	int size = 3 * width*height; // for RGB
-
-	unsigned char data[size];
-
-	fread(data, sizeof(unsigned char), size, fp);
 	fclose(fp);
 
 	int locate = 0;
@@ -349,8 +344,8 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 
 	for (vertical = 0; vertical < height; vertical++) {
 		for (horizon = 0; horizon < width; horizon++) {
-			locate = (width * height - vertical * width + horizon) * 3;
-			proc_display[locate].color = background[locate].color;
+			locate = width * height - vertical * width + horizon;
+			set_pixel(proc_display, horizon + xpos, vertical + ypos, background[locate].color);
 		}
 	}
 }
