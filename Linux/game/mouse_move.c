@@ -235,19 +235,19 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	fread(data, sizeof(unsigned char), size, fp);
 	fclose(fp);
-/*
+
 	int locate = 0;
 	int vertical = 0;
 	int horizon = 0;
 
 
-	for (vertical = 0; vertical < height; vertical++) {
-		for (horizon = 0; horizon < width; horizon++) {
-			locate = (width * height - vertical * width + horizon) * 3;
-			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
-			set_pixel(target, horizon, vertical, pixel);
-		}
-	}*/
+	//for (vertical = 0; vertical < height; vertical++) {
+	//	for (horizon = 0; horizon < width; horizon++) {
+	//		locate = (width * height - vertical * width + horizon) * 3;
+	//		pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
+	//		set_pixel(target, horizon, vertical, pixel);
+	//	}
+	//}
 
 	free(data);
 }
