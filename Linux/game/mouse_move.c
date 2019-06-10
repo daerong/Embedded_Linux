@@ -59,6 +59,7 @@ void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xp
 void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
 void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
+void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *proc_display, DISPLAY *background, int xpos, int ypos, char *file_name);
 void* mouse_ev_func(void *data);
 void* keyboard_ev_func(void *data);
 
@@ -293,6 +294,39 @@ void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DIS
 	}
 }
 
+void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *proc_display, DISPLAY *background, int xpos, int ypos, char *file_name) {
+	FILE *fp;
+
+	int width = 0;
+	int height = 0;
+
+	unsigned char info[54];
+
+	fp = fopen(file_name, "rb");
+	if (fp == NULL) {
+		perror("File open error: ");
+		exit(0);
+	}
+
+	fread(info, sizeof(unsigned char), 54, fp);
+
+	width = *(int*)&info[18];
+	height = *(int*)&info[22];
+	fclose(fp);
+
+	int locate = 0;
+	int vertical = 0;
+	int horizon = 0;
+
+
+	for (vertical = 0; vertical < height; vertical++) {
+		for (horizon = 0; horizon < width; horizon++) {
+			locate = (width * height - vertical * width + horizon) * 3;
+			set_pixel(target, horizon + xpos, vertical + ypos, background[locate].color);
+		}
+	}
+}
+
 void* mouse_ev_func(void *data) {
 	int ret;
 	int mouse_fd;
@@ -343,8 +377,6 @@ void* mouse_ev_func(void *data) {
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
 	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
 	reset_display(proc_display, background);
-
-	set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
 
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
@@ -408,10 +440,12 @@ void* mouse_ev_func(void *data) {
 							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
 								if (lenna_img_mode) {
 									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4.bmp");
+									erase_image(&fvs, pfbdata, proc_display, background, 100, 100, "lenna.bmp");
 									lenna_img_mode = 0;
 								}
 								else {
 									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4on.bmp");
+									set_image(&fvs, pfbdata, proc_display, 100, 100, "lenna.bmp");
 									lenna_img_mode = 1;
 								}
 							}
