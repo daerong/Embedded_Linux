@@ -231,8 +231,8 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	height = *(int*)&info[22];
 
 	if (read_type == 2) {
-		unsigned char garbage[9];
-		fread(garbage, sizeof(unsigned char), 9, fp);
+		unsigned char garbage[10];
+		fread(garbage, sizeof(unsigned char), 10, fp);
 	}
 
 
