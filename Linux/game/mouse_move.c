@@ -248,7 +248,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 		pallet_vol = *(int*)&info[46];
 		critical_color = *(int*)&info[50];
 
-		printf("1 : %d, %d\n", header_size, offset);
+		printf("1 : %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", header_size, offset, header_size, width, height, color_set, tar_type, image_size, horizon_pixel, vertical_pixel, pallet_vol, critical_color);
 
 	}
 	else if (read_type == 2) {
@@ -264,7 +264,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 		vertical_pixel = *(int*)&info[42];
 		pallet_vol = *(int*)&info[46];
 		critical_color = *(int*)&info[50];
-		printf("2 : %d, %d\n", header_size, offset);
+		printf("2 : %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", header_size, offset, header_size, width, height, color_set, tar_type, image_size, horizon_pixel, vertical_pixel, pallet_vol, critical_color);
 	}
 
 
