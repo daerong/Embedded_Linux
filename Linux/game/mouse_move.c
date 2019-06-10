@@ -319,7 +319,7 @@ void* mouse_ev_func(void *data) {
 	reset_display(display, proc_display);
 
 
-	draw_display(&fvs, pfbdata, display);
+	draw_display(&fvs, pfbdata, proc_display);
 
 	while (1) {
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
