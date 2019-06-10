@@ -285,7 +285,7 @@ void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DIS
 
 
 	for (vertical = 0; vertical < height; vertical += 4) {
-		for (horizon = 0; horizon < width; vertical += 4) {
+		for (horizon = 0; horizon < width; horizon += 4) {
 			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
 			set_pixel(target, horizon/4 + xpos, vertical/4 + ypos, pixel);
