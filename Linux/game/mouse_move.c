@@ -303,7 +303,7 @@ void* mouse_ev_func(void *data) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
-	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
+	set_image(&fvs, pfbdata, background, 0, 0, "icon_1.bmp");
 	reset_display(proc_display, background);
 
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
