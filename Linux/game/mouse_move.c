@@ -233,7 +233,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	if (read_type == 2) {
 		printf("check ");
 		unsigned char garbage[20];
-		fread(garbage, sizeof(unsigned char), 70, fp);
+		fread(garbage, sizeof(unsigned char), 78, fp);
 	}
 
 
