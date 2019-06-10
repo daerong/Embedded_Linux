@@ -231,8 +231,8 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	height = *(int*)&info[22];
 
 	if (read_type == 2) {
-		unsigned char garbage[8];
-		fread(garbage, sizeof(unsigned char), 8, fp);
+		unsigned char garbage[16];
+		fread(garbage, sizeof(unsigned char), 16, fp);
 	}
 
 
@@ -309,7 +309,7 @@ void* mouse_ev_func(void *data) {
 	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp", 1);
 	reset_display(proc_display, background);
 
-	set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp", 1);
 
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp", 2);
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp", 2);
