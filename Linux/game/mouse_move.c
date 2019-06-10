@@ -34,9 +34,9 @@ char lenna_img_mode;
 
 unsigned char *text_lcd_buf;
 
-DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
-DISPLAY *proc_display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
-DISPLAY *background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+DISPLAY display[SCREEN_X_MAX * SCREEN_Y_MAX];
+DISPLAY proc_display[SCREEN_X_MAX * SCREEN_Y_MAX];
+DISPLAY background[SCREEN_X_MAX * SCREEN_Y_MAX];
 
 typedef struct DISPLAY {
 	int xpos;
@@ -398,9 +398,9 @@ void* mouse_ev_func(void *data) {
 	close(frame_fd);
 	close(mouse_fd);
 
-	free(display);
-	free(proc_display);
-	free(background);
+	//free(display);
+	//free(proc_display);
+	//free(background);
 
 	return 0;
 }
