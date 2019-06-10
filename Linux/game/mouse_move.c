@@ -219,7 +219,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	unsigned char info [54];
 
-	fp = fopen(file_name, "r");
+	fp = fopen(file_name, "rb");
 	if (fp == NULL) {
 		perror("File open error: ");
 		exit(0);
