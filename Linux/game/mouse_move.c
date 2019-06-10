@@ -285,6 +285,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
 			set_pixel(target, horizon + xpos, vertical + ypos, pixel);
+			if (vertical == 0 && horizon == 0) printf("%c", pixel);
 		}
 	}
 }
