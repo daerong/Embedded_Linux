@@ -315,6 +315,7 @@ void* mouse_ev_func(void *data) {
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
 	reset_display(display, proc_display);
 
+
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
