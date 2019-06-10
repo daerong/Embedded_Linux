@@ -102,11 +102,22 @@ int main(int argc, char** argv) {
 }
 
 U16 makepixel(U32  r, U32 g, U32 b) {
-	U16 x = (U16)(r >> 3);
-	U16 y = (U16)(g >> 2);
-	U16 z = (U16)(b >> 3);
+	U16 *x = (U16 *)malloc(sizeof(U16));
+	U16 *y = (U16 *)malloc(sizeof(U16));
+	U16 *z = (U16 *)malloc(sizeof(U16));
+	U16 result;
+	x = NULL;
+	y = NULL;
+	z = NULL;
+	*x = (U16)(r >> 3);
+	*y = (U16)(g >> 2);
+	*z = (U16)(b >> 3);
+	result = (*z | (*x << 11) | (*y << 5));
+	free(x);
+	free(y);
+	free(z);
 
-	return (z | (x << 11) | (y << 5));
+	return result
 }
 
 void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel) {
@@ -213,8 +224,10 @@ void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char inser
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name) {
 	U16 *pixel = (U16 *)malloc(sizeof(U16));
 	FILE *fp = (FILE *)malloc(sizeof(FILE));
-
+	pixel = NULL:
+	fp = NULL;
 	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
+	info = NULL;
 
 	fp = fopen("background.bmp", "rb");
 	if (fp == NULL) {
@@ -232,6 +245,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	int size = 3 * width*height; // for RGB
 
 	unsigned char *data = (unsigned char *)malloc(sizeof(char) * size);
+	data = NULL;
 
 	fread(data, sizeof(unsigned char), size, fp);
 	fclose(fp);
