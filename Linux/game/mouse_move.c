@@ -166,7 +166,7 @@ void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xp
 			if (j + i <= 10) {
 				if (ypos + i > SCREEN_Y_MAX - 1 || xpos + j > SCREEN_X_MAX - 1) continue;
 				int offset = (ypos + i) * fvs->xres + (xpos + j);
-				pixel = background[offset].color;
+				pixel = proc_display[offset].color;
 				if (xpos + j < PALETTE_X_END) pfbdata[offset] = pixel;
 				else pfbdata[offset] = pixel;
 			}
