@@ -482,7 +482,7 @@ void* mouse_ev_func(void *data) {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4on.bmp");
 									menu_copy(display, proc_display);
 									menu_update(&fvs, pfbdata, display);
-									//set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
+									set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
 									lenna_img_mode = 1;
 								}
 							}
