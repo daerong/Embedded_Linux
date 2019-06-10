@@ -9,12 +9,28 @@ char keyboard_thread[] = "keyboard thread";
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
-#define PALETTE_X_END 900
-#define TOOLBAR_X_START 901
+#define PALETTE_X_END 949
+#define TOOLBAR_X_START 950
 #define TOOLBAR_X_END 1024
+#define ICON_WIDTH 50
+#define ICON_START TOOLBAR_X_START + 12
+#define ICON_END ICON_START + ICON_WIDTH
+#define ICON_1_Y_START 8
+#define ICON_2_Y_START 66
+#define ICON_3_Y_START 124
+#define ICON_4_Y_START 182
+#define ICON_5_Y_START 240
+#define ICON_6_Y_START 298
+#define ICON_7_Y_START 356
+#define ICON_8_Y_START 414
+#define ICON_9_Y_START 472
+#define ICON_10_Y_START 530
 
 U16 menubox_color;
 char text_lcd_mode;	// on = 1, off = 0
+char camera_mode;
+char num_baseball_mode;
+char lenna_img_mode;
 
 unsigned char *text_lcd_buf;
 
@@ -55,7 +71,9 @@ int main(int argc, char** argv) {
 	int status;							// mutex result
 
 	text_lcd_mode = 0;
-
+	camera_mode = 0;
+	num_baseball_mode = 0;
+	lenna_img_mode = 0;
 
 	int text_lcd_dev;
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
@@ -197,7 +215,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	FILE *fp;
 	unsigned char info[54];
 
-	fp = fopen("lenna.bmp", "rb");
+	fp = fopen(file_name, "rb");
 	if (fp == NULL) {
 		perror("File open error: ");
 		exit(0);
@@ -242,8 +260,9 @@ void* mouse_ev_func(void *data) {
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
-	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
-	DISPLAY *background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);			// 그리기 포인터가 포함됨
+	DISPLAY *proc_display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);		// 아이콘 상태나 프로세스 이미지 존재
+	DISPLAY *background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);			// 순수한 배경 이미지
 
 	LOCATE start;
 	LOCATE end;
@@ -277,8 +296,20 @@ void* mouse_ev_func(void *data) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
-	set_image(&fvs, pfbdata, background, 0, 0, "lenna.bmp");
-	reset_display(display, background);
+	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
+	reset_display(proc_display, background);
+
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
+	reset_display(display, proc_display);
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
@@ -294,8 +325,66 @@ void* mouse_ev_func(void *data) {
 			if (ev.value == 1) {
 				if (ev.code == 272) {
 					if (cur.x > TOOLBAR_X_START) {
-						if(text_lcd_mode) text_lcd_mode = 0;
-						else text_lcd_mode = 1;
+						if (cur.x >= ICON_START && cur.x < ICON_END) {
+							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// 채팅
+								if (text_lcd_mode) {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
+									text_lcd_mode = 0;
+								}
+								else {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1_on.bmp");
+									text_lcd_mode = 1;
+								}
+							}
+							else if (cur.y >= ICON_2_Y_START && cur.y < ICON_2_Y_START + ICON_WIDTH) {	// 카메라
+								if (camera_mode) {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
+									camera_mode = 0;
+								}
+								else {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2_on.bmp");
+									camera_mode = 1;
+								}
+							}
+							else if (cur.y >= ICON_3_Y_START && cur.y < ICON_3_Y_START + ICON_WIDTH) {	// 숫자야구
+								if (num_baseball_mode) {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
+									num_baseball_mode = 0;
+								}
+								else {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3_on.bmp");
+									num_baseball_mode = 1;
+								}
+							}
+							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
+								if (lenna_img_mode) {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp");
+									lenna_img_mode = 0;
+								}
+								else {
+									set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4_on.bmp");
+									lenna_img_mode = 1;
+								}
+							}
+							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {
+
+							}
+							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
+
+							}
+							else if (cur.y >= ICON_7_Y_START && cur.y < ICON_7_Y_START + ICON_WIDTH) {
+
+							}
+							else if (cur.y >= ICON_8_Y_START && cur.y < ICON_8_Y_START + ICON_WIDTH) {
+
+							}
+							else if (cur.y >= ICON_9_Y_START && cur.y < ICON_9_Y_START + ICON_WIDTH) {
+
+							}
+							else if (cur.y >= ICON_10_Y_START && cur.y < ICON_10_Y_START + ICON_WIDTH) {
+
+							}
+						}
 					}
 					else {
 						if (draw_mode) draw_mode = 0;
