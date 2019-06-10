@@ -344,7 +344,7 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 
 	for (vertical = ypos; vertical < ypos + height; vertical++) {
 		for (horizon = xpos; horizon < xpos + width; horizon++) {
-			locate = vertical * SCREEN_X_MAX - horizon;
+			locate = vertical * SCREEN_X_MAX + horizon;
 			set_pixel(proc_display, horizon, vertical, background[locate].color);
 		}
 	}
