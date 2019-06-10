@@ -216,7 +216,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	unsigned char *info = (unsigned char *)malloc(sizeof(char) * 54);
 
-	fp = fopen("lenna.bmp", "rb");
+	fp = fopen("background.bmp", "rb");
 	if (fp == NULL) {
 		perror("File open error: ");
 		exit(0);
@@ -235,7 +235,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	fread(data, sizeof(unsigned char), size, fp);
 	fclose(fp);
-
+/*
 	int locate = 0;
 	int vertical = 0;
 	int horizon = 0;
@@ -247,7 +247,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
 			set_pixel(target, horizon, vertical, pixel);
 		}
-	}
+	}*/
 
 	free(data);
 }
