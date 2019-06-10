@@ -509,7 +509,6 @@ void* mouse_ev_func(void *data) {
 					else {
 						if (draw_mode) {
 							draw_mode = 0;
-							erase_cursor(&fvs, pfbdata, past_x, past_y, display, proc_display);
 						}
 						else {
 							draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
@@ -560,7 +559,6 @@ void* mouse_ev_func(void *data) {
 		}
 		else {
 			erase_cursor(&fvs, pfbdata, past_x, past_y, display, proc_display);
-			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 			past_x = cur.x;
 			past_y = cur.y;
 		}
