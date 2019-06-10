@@ -6,6 +6,7 @@ typedef int S32;
 
 char mouse_thread[] = "mouse thread";
 char keyboard_thread[] = "keyboard thread";
+int test_int;
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
@@ -62,7 +63,7 @@ void* mouse_ev_func(void *data);
 void* keyboard_ev_func(void *data);
 
 int main(int argc, char** argv) {
-
+	test_int = atoi(argv[1]);
 	pthread_t mouse_ev_thread;
 	int mouse_thread_id;						// pthread ID
 	pthread_t keyboard_ev_thread;
@@ -233,7 +234,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	if (read_type == 2) {
 		printf("check ");
 		unsigned char garbage[20];
-		fread(garbage, sizeof(unsigned char), atoi(argv[1]), fp);
+		fread(garbage, sizeof(unsigned char), test_int, fp);
 	}
 
 
