@@ -55,7 +55,7 @@ void reset_display(DISPLAY *target, DISPLAY *background);
 void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
 void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
 void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *background);
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *proc_display);
 void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
 void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
 void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
@@ -158,7 +158,7 @@ void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLA
 	}
 }
 
-void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *background) {
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *proc_display) {
 	U16 pixel;
 	int i, j;
 	for (i = 0; i < 10; i++) {
@@ -409,43 +409,43 @@ void* mouse_ev_func(void *data) {
 						if (cur.x >= ICON_START && cur.x < ICON_END) {
 							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// 채팅
 								if (text_lcd_mode) {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon1.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
 									text_lcd_mode = 0;
 								}
 								else {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon1on.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1on.bmp");
 									text_lcd_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_2_Y_START && cur.y < ICON_2_Y_START + ICON_WIDTH) {	// 카메라
 								if (camera_mode) {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon2.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
 									camera_mode = 0;
 								}
 								else {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon2on.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2on.bmp");
 									camera_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_3_Y_START && cur.y < ICON_3_Y_START + ICON_WIDTH) {	// 숫자야구
 								if (num_baseball_mode) {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon3.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp");
 									num_baseball_mode = 0;
 								}
 								else {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon3on.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3on.bmp");
 									num_baseball_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
 								if (lenna_img_mode) {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4.bmp");
-									erase_image(&fvs, pfbdata, proc_display, background, 0, 0, "lenna.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp");
+									//erase_image(&fvs, pfbdata, proc_display, background, 0, 0, "lenna.bmp");
 									lenna_img_mode = 0;
 								}
 								else {
-									set_small_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4on.bmp");
-									set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4on.bmp");
+									//set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp");
 									lenna_img_mode = 1;
 								}
 							}
@@ -519,7 +519,7 @@ void* mouse_ev_func(void *data) {
 			}
 		}
 		else {
-			erase_cursor(&fvs, pfbdata, past_x, past_y, display, background);
+			erase_cursor(&fvs, pfbdata, past_x, past_y, display, proc_display);
 			draw_cursor(&fvs, pfbdata, cur.x, cur.y, foreground_color);
 			past_x = cur.x;
 			past_y = cur.y;
