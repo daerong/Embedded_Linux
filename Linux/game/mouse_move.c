@@ -341,18 +341,17 @@ void* mouse_ev_func(void *data) {
 	reset_display(proc_display, background);
 
 	set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, 0, 0, "icon_1.bmp", 2);
 
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon_defalut.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icon_defalut.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icon_defalut.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icon_defalut.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icon_defalut.bmp", 2);
-	//set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icondefalut.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icondefalut.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icondefalut.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icondefalut.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icondefalut.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icondefalut.bmp", 2);
 	reset_display(display, proc_display);
 
 
@@ -374,41 +373,41 @@ void* mouse_ev_func(void *data) {
 						if (cur.x >= ICON_START && cur.x < ICON_END) {
 							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// 채팅
 								if (text_lcd_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon_1.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon1.bmp", 2);
 									text_lcd_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon_1_on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon1on.bmp", 2);
 									text_lcd_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_2_Y_START && cur.y < ICON_2_Y_START + ICON_WIDTH) {	// 카메라
 								if (camera_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon_2.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon2.bmp", 2);
 									camera_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon_2_on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon2on.bmp", 2);
 									camera_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_3_Y_START && cur.y < ICON_3_Y_START + ICON_WIDTH) {	// 숫자야구
 								if (num_baseball_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon_3.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon3.bmp", 2);
 									num_baseball_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon_3_on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon3on.bmp", 2);
 									num_baseball_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
 								if (lenna_img_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon_4.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4.bmp", 2);
 									lenna_img_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon_4_on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4on.bmp", 2);
 									lenna_img_mode = 1;
 								}
 							}
