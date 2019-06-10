@@ -216,6 +216,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 
 	int width = 0;
 	int height = 0;
+	int header_size = 0;
 
 	unsigned char info[54];
 
@@ -226,13 +227,15 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	}
 	if (read_type == 1) {
 		fread(info, sizeof(unsigned char), 54, fp);
-
+		header_size = *(int*)&info[14];
+		printf("1 : %d\n", header_size);
 		width = *(int*)&info[18];
 		height = *(int*)&info[22];
 	}
 	else if (read_type == 2) {
-		fread(info, sizeof(unsigned char), 40, fp);
-
+		fread(info, sizeof(unsigned char), 54, fp);
+		header_size = *(int*)&info[14];
+		printf("1 : %d\n", header_size);
 		width = *(int*)&info[18];
 		height = *(int*)&info[22];
 	}
