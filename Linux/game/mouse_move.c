@@ -235,7 +235,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	else if (read_type == 2) {
 		fread(info, sizeof(unsigned char), 54, fp);
 		header_size = *(int*)&info[14];
-		printf("1 : %d\n", header_size);
+		printf("2 : %d\n", header_size);
 		width = *(int*)&info[18];
 		height = *(int*)&info[22];
 	}
