@@ -215,7 +215,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	FILE *fp;
 	unsigned char info[54];
 
-	fp = fopen(file_name, "rb");
+	fp = fopen("background.bmp", "rb");
 	if (fp == NULL) {
 		perror("File open error: ");
 		exit(0);
