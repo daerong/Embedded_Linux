@@ -214,10 +214,18 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	U16 pixel;			// U16은 short 즉, 16비트. 
 	FILE *fp;
 
+	int offset = 0;
+	int header_size = 0;
 	int width = 0;
 	int height = 0;
-	int header_size = 0;
-	int offset = 0;
+	int color_set = 0;
+	int tar_type = 0;
+	int image_size = 0;
+	int horizon_pixel = 0;
+	int vertical_pixel = 0;
+	int pallet_vol = 0;
+	int critical_color = 0;
+
 
 	unsigned char info[54];
 
@@ -228,19 +236,35 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	}
 	if (read_type == 1) {
 		fread(info, sizeof(unsigned char), 54, fp);
-		header_size = *(int*)&info[14];
 		offset = *(int*)&info[10];
-		printf("1 : %d, %d\n", header_size, offset);
+		header_size = *(int*)&info[14];
 		width = *(int*)&info[18];
 		height = *(int*)&info[22];
+		color_set = *(int*)&info[26];
+		tar_type = *(int*)&info[30];
+		image_size = *(int*)&info[34];
+		horizon_pixel = *(int*)&info[38];
+		vertical_pixel = *(int*)&info[42];
+		pallet_vol = *(int*)&info[46];
+		critical_color = *(int*)&info[50];
+
+		printf("1 : %d, %d\n", header_size, offset);
+
 	}
 	else if (read_type == 2) {
 		fread(info, sizeof(unsigned char), 54, fp);
-		header_size = *(int*)&info[14];
 		offset = *(int*)&info[10];
-		printf("2 : %d, %d\n", header_size, offset);
+		header_size = *(int*)&info[14];
 		width = *(int*)&info[18];
 		height = *(int*)&info[22];
+		color_set = *(int*)&info[26];
+		tar_type = *(int*)&info[30];
+		image_size = *(int*)&info[34];
+		horizon_pixel = *(int*)&info[38];
+		vertical_pixel = *(int*)&info[42];
+		pallet_vol = *(int*)&info[46];
+		critical_color = *(int*)&info[50];
+		printf("2 : %d, %d\n", header_size, offset);
 	}
 
 
