@@ -6,7 +6,6 @@ typedef int S32;
 
 char mouse_thread[] = "mouse thread";
 char keyboard_thread[] = "keyboard thread";
-int test_int;
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
@@ -63,7 +62,7 @@ void* mouse_ev_func(void *data);
 void* keyboard_ev_func(void *data);
 
 int main(int argc, char** argv) {
-	test_int = atoi(argv[1]);
+
 	pthread_t mouse_ev_thread;
 	int mouse_thread_id;						// pthread ID
 	pthread_t keyboard_ev_thread;
@@ -231,13 +230,6 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	width = *(int*)&info[18];
 	height = *(int*)&info[22];
 
-	if (read_type == 2) {
-		printf("check ");
-		unsigned char garbage[20];
-		fread(garbage, sizeof(unsigned char), test_int, fp);
-	}
-
-
 	int size = 3 * width*height; // for RGB
 
 	unsigned char data[size];
@@ -255,7 +247,6 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
 			set_pixel(target, horizon + xpos, vertical + ypos, pixel);
-			if (vertical == 0 && horizon == 0) printf("%hu\n", pixel);
 		}
 	}
 }
@@ -311,18 +302,18 @@ void* mouse_ev_func(void *data) {
 	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp", 1);
 	reset_display(proc_display, background);
 
-	set_image(&fvs, pfbdata, proc_display, 0, 0, "lenna.bmp", 1);
-
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icondefalut.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icondefalut.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icondefalut.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icondefalut.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icondefalut.bmp", 2);
-	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icondefalut.bmp", 2);
+	set_image(&fvs, pfbdata, proc_display, 0, 0, "icon_4.bmp" ,1);
+	set_image(&fvs, pfbdata, proc_display, 100, 100, "icon_4_on.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon_4.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icon_defalut.bmp");
+	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icon_defalut.bmp");
 	reset_display(display, proc_display);
 
 
@@ -344,41 +335,41 @@ void* mouse_ev_func(void *data) {
 						if (cur.x >= ICON_START && cur.x < ICON_END) {
 							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// 채팅
 								if (text_lcd_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon1.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon_1.bmp");
 									text_lcd_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon1on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_1_Y_START, "icon_1_on.bmp");
 									text_lcd_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_2_Y_START && cur.y < ICON_2_Y_START + ICON_WIDTH) {	// 카메라
 								if (camera_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon2.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon_2.bmp");
 									camera_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon2on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_2_Y_START, "icon_2_on.bmp");
 									camera_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_3_Y_START && cur.y < ICON_3_Y_START + ICON_WIDTH) {	// 숫자야구
 								if (num_baseball_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon3.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon_3.bmp");
 									num_baseball_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon3on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_3_Y_START, "icon_3_on.bmp");
 									num_baseball_mode = 1;
 								}
 							}
 							else if (cur.y >= ICON_4_Y_START && cur.y < ICON_4_Y_START + ICON_WIDTH) {	// lenna image
 								if (lenna_img_mode) {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon_4.bmp");
 									lenna_img_mode = 0;
 								}
 								else {
-									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon4on.bmp", 2);
+									set_image(&fvs, pfbdata, background, ICON_START, ICON_4_Y_START, "icon_4_on.bmp");
 									lenna_img_mode = 1;
 								}
 							}
