@@ -392,6 +392,7 @@ void* mouse_ev_func(void *data) {
 	close(mouse_fd);
 
 	free(display);
+	free(proc_display);
 	free(background);
 
 	return 0;
