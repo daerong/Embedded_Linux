@@ -231,6 +231,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	unsigned char data[size];
 
 	fread(data, sizeof(unsigned char), size, fp);
+	fclose(fp);
 
 	int locate = 0;
 	int vertical = 0;
@@ -245,7 +246,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 		}
 	}
 
-	fclose(fp);
+
 }
 
 void* mouse_ev_func(void *data) {
