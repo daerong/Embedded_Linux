@@ -34,6 +34,10 @@ char lenna_img_mode;
 
 unsigned char *text_lcd_buf;
 
+DISPLAY *display;
+DISPLAY *proc_display;
+DISPLAY *background;
+
 typedef struct DISPLAY {
 	int xpos;
 	int ypos;
@@ -264,9 +268,9 @@ void* mouse_ev_func(void *data) {
 
 	MOUSE_CURSOR cur;
 	char draw_mode = 0;
-	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
-	DISPLAY *proc_display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
-	DISPLAY *background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	proc_display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
 
 	LOCATE start;
 	LOCATE end;
