@@ -302,7 +302,8 @@ void* mouse_ev_func(void *data) {
 	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
 	reset_display(proc_display, background);
 
-
+	set_image(&fvs, pfbdata, proc_display, 0, 0, "icon_4.bmp");
+	set_image(&fvs, pfbdata, proc_display, 100, 100, "icon_4_on.bmp");
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon_1.bmp");
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon_2.bmp");
 	set_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon_3.bmp");
