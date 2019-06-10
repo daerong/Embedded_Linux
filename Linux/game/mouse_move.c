@@ -9,9 +9,22 @@ char keyboard_thread[] = "keyboard thread";
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
-#define PALETTE_X_END 900
-#define TOOLBAR_X_START 901
+#define PALETTE_X_END 949
+#define TOOLBAR_X_START 950
 #define TOOLBAR_X_END 1024
+#define ICON_WIDTH 50
+#define ICON_START TOOLBAR_X_START + 12
+#define ICON_END ICON_START + ICON_WIDTH
+#define ICON_1_Y_START 8
+#define ICON_2_Y_START 66
+#define ICON_3_Y_START 124
+#define ICON_4_Y_START 182
+#define ICON_5_Y_START 240
+#define ICON_6_Y_START 298
+#define ICON_7_Y_START 356
+#define ICON_8_Y_START 414
+#define ICON_9_Y_START 472
+#define ICON_10_Y_START 530
 
 U16 menubox_color;
 char text_lcd_mode;	// on = 1, off = 0
