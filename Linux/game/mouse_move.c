@@ -477,6 +477,7 @@ void* mouse_ev_func(void *data) {
 									menu_copy(display, proc_display);
 									menu_update(&fvs, pfbdata, display);
 									erase_image(&fvs, pfbdata, proc_display, background, 0, 0, "lenna.bmp");
+									erase_image(&fvs, pfbdata, display, background, 0, 0, "lenna.bmp");
 									draw_display(&fvs, pfbdata, display);
 									lenna_img_mode = 0;
 								}
