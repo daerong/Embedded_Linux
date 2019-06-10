@@ -507,7 +507,10 @@ void* mouse_ev_func(void *data) {
 						}
 					}
 					else {
-						if (draw_mode) draw_mode = 0;
+						if (draw_mode) {
+							draw_mode = 0;
+							erase_cursor(&fvs, pfbdata, past_x, past_y, display, proc_display);
+						}
 						else {
 							draw_cursor(&fvs, pfbdata, past_x, past_y, background_color);
 							draw_mode = 1;
@@ -515,7 +518,7 @@ void* mouse_ev_func(void *data) {
 					}
 				}
 				else if (ev.code == 273) {
-					reset_display(display, background);
+					reset_display(display, proc_display);
 					draw_display(&fvs, pfbdata, display);
 				}
 			}
