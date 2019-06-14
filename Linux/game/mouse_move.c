@@ -893,20 +893,26 @@ void* recv_msg(void* arg)
 {
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
+	char clean_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
 	int show_len;
 	char *recv_trash;
 	char *recv_chat;
 
 	while (1){
-		memset(name_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
-		if (str_len == -1)
+		if (str_len == -1) {
 			return (void*)-1;
+		}
+		else {
+			memset(clean_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
+			memcpy(clean_msg, name_msg, str_len);
+		}
+
 		name_msg[str_len] = 0;
 		fputs(name_msg, stdout);
 
-		char *ptr = strtok(name_msg, "]");   // 공백 문자열을 기준으로 문자열을 자름
+		char *ptr = strtok(clean_msg, "]");   // 공백 문자열을 기준으로 문자열을 자름
 		recv_trash = ptr;
 		ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
 		recv_chat = ptr;
