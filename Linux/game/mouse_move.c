@@ -40,6 +40,7 @@ unsigned char *text_lcd_buf;
 char make_thread;
 char delete_thread;
 char icon_off;
+char send_msg_stat;
 
 typedef struct DISPLAY {
 	int xpos;
@@ -126,6 +127,7 @@ int main(int argc, char* argv[]){
 	make_thread = 0;
 	delete_thread = 0;
 	icon_off = 0;
+	send_msg_stat = 0;
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -820,9 +822,11 @@ void* chat_func(void *data) {
 					break;
 				case 'E':		// ENTER
 					memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
+					memcpy(msg, inner_text, TEXT_LCD_LINE_BUF);
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
+					send_msg_stat = 0;
 					break;
 				case 'U':		// Up
 					if(text_buf_index < TEXT_LCD_LINE_BUF - 1) text_buf_index++;
@@ -859,35 +863,22 @@ void* send_msg(void* arg){
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 
-	char* who = NULL;
-	char temp[MSG_BUF_SIZE];
+	//char* who = NULL;
+	//char temp[MSG_BUF_SIZE];
 
-	char myInfo[MSG_BUF_SIZE];
-	/** send join messge **/
-	printf(" >> join the chat !! \n");
-	sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
-	write(sock, myInfo, strlen(myInfo));
+	//char myInfo[MSG_BUF_SIZE];
+	///** send join messge **/
+	//printf(" >> join the chat !! \n");
+	//sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
+	//write(sock, myInfo, strlen(myInfo));
 
-	while (1)
-	{
-		fgets(msg, MSG_BUF_SIZE, stdin);
-
-		// menu_mode command -> !menu
-		if (!strcmp(msg, "!menu\n"))
-		{
-			menuOptions();
-			continue;
+	while (1){
+		if (send_msg_stat) {
+			
+			sprintf(name_msg, "%s %s", name, msg);
+			write(sock, name_msg, strlen(name_msg));
 		}
-
-		else if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n"))
-		{
-			close(sock);
-			exit(0);
-		}
-
-		// send message
-		sprintf(name_msg, "%s %s", name, msg);
-		write(sock, name_msg, strlen(name_msg));
+		
 	}
 	return NULL;
 }
