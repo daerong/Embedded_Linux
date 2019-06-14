@@ -917,7 +917,7 @@ void* recv_msg(void* arg)
 			}
 
 
-			printf("%d : %s\n", locate, name_msg);
+			printf("%d %d : %s\n", str_len, locate, name_msg);
 			strncpy(text_lcd_buf, name_msg + locate, TEXT_LCD_LINE_BUF);
 		}
 
