@@ -912,13 +912,12 @@ void* recv_msg(void* arg)
 		else {
 			char *ptr1;
 			ptr1 = strchr(name_msg, '[');
-			printf("strchrÀÇ °á°ú \n");
 			if (ptr1) {
 				locate = ptr1 - name_msg;
 			}
 
 
-			//printf("%d : %s\n", str_len, name_msg);
+			printf("%d : %s\n", locate, name_msg);
 			strncpy(text_lcd_buf, name_msg + locate, TEXT_LCD_LINE_BUF);
 		}
 
