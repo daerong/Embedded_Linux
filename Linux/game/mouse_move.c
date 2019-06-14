@@ -871,6 +871,7 @@ void* send_msg(void* arg){
 		if (send_msg_stat) {
 			memset(msg, ' ', MSG_BUF_SIZE);
 			memcpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
+			msg[MSG_BUF_SIZE - 1] = '0';
 			sprintf(name_msg, "%s %s", name, msg);
 			write(sock, name_msg, strlen(name_msg));
 			send_msg_stat = 0;
