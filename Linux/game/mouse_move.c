@@ -880,8 +880,7 @@ void* send_msg(void* arg){
 	return NULL;
 }
 
-void* recv_msg(void* arg)
-{
+void* recv_msg(void* arg){
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
@@ -897,8 +896,7 @@ void* recv_msg(void* arg)
 	return NULL;
 }
 
-void menu()
-{
+void menu(){
 	system("clear");
 	printf(" **** moon/sum chatting client ****\n");
 	printf(" server port : %s \n", serv_port);
@@ -907,8 +905,7 @@ void menu()
 	printf(" server time : %s \n", serv_time);
 }
 
-void error_handling(char* msg)
-{
+void error_handling(char* msg){
 	fputs(msg, stderr);
 	fputc('\n', stderr);
 	exit(1);
