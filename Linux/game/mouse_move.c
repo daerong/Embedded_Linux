@@ -897,11 +897,9 @@ void* recv_msg(void* arg)
 	int show_len;
 	char *recv_trash;
 	char *recv_chat;
-	char recv_data[TEXT_LCD_LINE_BUF];
-	int recv_index;
-
 
 	while (1){
+		memset(name_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
 		if (str_len == -1)
 			return (void*)-1;
@@ -913,17 +911,7 @@ void* recv_msg(void* arg)
 		ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
 		recv_chat = ptr;
 
-		memset(recv_data, ' ', TEXT_LCD_LINE_BUF);
-		recv_index = 0;
-
-		strncpy(recv_data, recv_chat, TEXT_LCD_LINE_BUF);
-		while (*ptr != '.') {
-			recv_data[recv_index] = *ptr;
-			ptr++;
-			recv_index++;
-		}
-
-		strncpy(text_lcd_buf, recv_data, TEXT_LCD_LINE_BUF);
+		strncpy(text_lcd_buf, recv_chat, TEXT_LCD_LINE_BUF);
 		recv_msg_stat = 1;
 	}
 	return NULL;
