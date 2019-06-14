@@ -34,6 +34,10 @@ char lenna_img_mode;
 
 unsigned char *text_lcd_buf;
 
+char make_thread;
+char delete_thread;
+char icon_off;
+
 typedef struct DISPLAY {
 	int xpos;
 	int ypos;
@@ -80,6 +84,10 @@ int main(int argc, char** argv) {
 	num_baseball_mode = 0;
 	lenna_img_mode = 0;
 
+	make_thread = 0;
+	delete_thread = 0;
+	icon_off = 0;
+
 	int text_lcd_dev;
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
@@ -87,21 +95,30 @@ int main(int argc, char** argv) {
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 
-
-
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
-	chat_thread_id = pthread_create(&chat_thread, NULL, chat_func, (void *)&chat_func_msg);
 
 	while (1) {
 		if (text_lcd_mode) {
 			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 		}
 
-		sleep(1);
+		switch (make_thread) {
+		case 1:
+			chat_thread_id = pthread_create(&chat_thread, NULL, chat_func, (void *)&chat_func_msg);
+			break;
+		}
+
+		switch (delete_thread) {
+		case 1:
+			pthread_join(chat_thread, (void *)&thread_result);
+			icon_off = 1;
+			break;
+		}
+
 	}
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
-	pthread_join(chat_thread, (void *)&thread_result);
+
 
 	return 0;
 }
@@ -527,6 +544,14 @@ void* mouse_ev_func(void *data) {
 	draw_display(&fvs, pfbdata, display);
 
 	while (1) {
+		switch (icon_off) {
+		case 1:
+			set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
+			menu_copy(display, proc_display);
+			menu_update(&fvs, pfbdata, display);
+			break;
+		}
+
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR)
@@ -541,16 +566,11 @@ void* mouse_ev_func(void *data) {
 					if (cur.x > TOOLBAR_X_START) {
 						if (cur.x >= ICON_START && cur.x < ICON_END) {
 							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// Ã¤ÆÃ
-								if (text_lcd_mode) {
-									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
-									menu_copy(display, proc_display);
-									menu_update(&fvs, pfbdata, display);
-									text_lcd_mode = 0;
-								}
-								else {
+								if (!text_lcd_mode){
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1on.bmp");
 									menu_copy(display, proc_display);
 									menu_update(&fvs, pfbdata, display);
+									make_thread = 1;
 									text_lcd_mode = 1;
 								}
 							}
@@ -712,6 +732,8 @@ void* chat_func(void *data) {
 			break;
 		}
 		if (!text_lcd_mode) {
+			delete_thread = 1;
+			pthread_exit((void*)&retval);
 			break;
 		}
 		else if (ev.value == 1) {
@@ -766,6 +788,7 @@ void* chat_func(void *data) {
 
 	free(inner_text);
 	close(keyboard_fd);
+	pthread_exit((void*)&retval);
 
 	return 0;
 }
