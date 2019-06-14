@@ -794,7 +794,7 @@ void* chat_func(void *data) {
 	delete_thread = 1;
 	free(inner_text);
 	close(keyboard_fd);
-	//pthread_exit((void*)&retval);
+	pthread_exit((void*)&retval);
 
 	return 0;
 }
