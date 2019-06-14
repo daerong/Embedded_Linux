@@ -71,7 +71,7 @@ void* mouse_ev_func(void *data);
 void* chat_func(void *data);
 
 int main(int argc, char** argv) {
-
+	int text_lcd_dev;
 	pthread_t mouse_ev_thread;
 	int mouse_thread_id;						// pthread ID
 	pthread_t chat_thread;
@@ -88,12 +88,19 @@ int main(int argc, char** argv) {
 	delete_thread = 0;
 	icon_off = 0;
 
+	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
+	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
+
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
 
+
 	while (1) {
+		if (text_lcd_mode) {
+			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
+		}
 
 		switch (make_thread) {
 		case 1:
@@ -116,6 +123,7 @@ int main(int argc, char** argv) {
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
 	free(text_lcd_buf);
+	close(text_lcd_dev);
 
 	return 0;
 }
@@ -712,7 +720,6 @@ void* mouse_ev_func(void *data) {
 
 void* chat_func(void *data) {
 	int keyboard_fd;
-	int text_lcd_dev;
 	char *inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
 	int text_buf_index;
 	char changed_char;
@@ -720,8 +727,6 @@ void* chat_func(void *data) {
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
 	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
-	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
-	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 
 	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
@@ -737,7 +742,6 @@ void* chat_func(void *data) {
 			delete_thread = 1;
 			free(inner_text);
 			close(keyboard_fd);
-			close(text_lcd_dev);
 			pthread_exit((void*)&retval);
 			break;
 		}
@@ -793,7 +797,6 @@ void* chat_func(void *data) {
 
 	free(inner_text);
 	close(keyboard_fd);
-	close(text_lcd_dev);
 	pthread_exit((void*)&retval);
 
 	return 0;
