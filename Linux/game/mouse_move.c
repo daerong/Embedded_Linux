@@ -898,6 +898,7 @@ void* recv_msg(void* arg)
 	char *recv_trash;
 	char *recv_chat;
 
+
 	while (1){
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
 		if (str_len == -1)
@@ -910,10 +911,9 @@ void* recv_msg(void* arg)
 		ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
 		recv_chat = ptr;
 
-		show_len = sizeof(recv_chat);
-		printf("%d\n", show_len);
+		printf("%c\n", *(recv_chat +10));
 		if (show_len <= TEXT_LCD_LINE_BUF) {
-			strncpy(text_lcd_buf, recv_chat, show_len);
+			strncpy(text_lcd_buf, recv_chat, TEXT_LCD_LINE_BUF);
 		}
 		else {
 			strncpy(text_lcd_buf, recv_chat, TEXT_LCD_LINE_BUF);
