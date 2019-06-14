@@ -703,12 +703,15 @@ void* keyboard_ev_func(void *data) {
 
 	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
-	while (text_lcd_mode) {
+	while (1) {
 		struct input_event ev;
 
 		if (read(keyboard_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR) continue;
+			break;
+		}
+		if (!text_lcd_mode) {
 			break;
 		}
 		else if (ev.value == 1) {
