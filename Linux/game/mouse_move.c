@@ -894,8 +894,8 @@ void* recv_msg(void* arg)
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
-	int recv_trash;
-	int recv_chat;
+	char *recv_trash;
+	char *recv_chat;
 
 	while (1){
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
