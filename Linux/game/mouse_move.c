@@ -827,6 +827,7 @@ void* chat_func(void *data) {
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
+					send_msg_stat = 1;
 					break;
 				case 'U':		// Up
 					if(text_buf_index < TEXT_LCD_LINE_BUF - 1) text_buf_index++;
@@ -887,8 +888,10 @@ void* recv_msg(void* arg){
 	while (1)
 	{
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
-		sprintf(name_msg, "%s %s", name, msg);
-		write(sock, name_msg, strlen(name_msg));
+		if (str_len == -1)
+			return (void*)-1;
+		name_msg[str_len] = 0;
+		fputs(name_msg, stdout);
 	}
 	return NULL;
 }
