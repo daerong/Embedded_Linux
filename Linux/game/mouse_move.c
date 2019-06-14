@@ -101,6 +101,9 @@ int main(int argc, char** argv) {
 		if (text_lcd_mode) {
 			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 		}
+		else {
+			write(text_lcd_dev, chat_func_msg, TEXT_LCD_MAX_BUF);
+		}
 
 		switch (make_thread) {
 		case 1:
