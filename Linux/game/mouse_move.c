@@ -869,11 +869,13 @@ void* send_msg(void* arg){
 
 	while (1){
 		if (send_msg_stat) {
+			fgets(msg, MSG_BUF_SIZE, stdin);
 			memcpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
 			sprintf(name_msg, "%s %s", name, msg);
 			write(sock, name_msg, strlen(name_msg));
 			send_msg_stat = 0;
 		}
+
 	}
 	return NULL;
 }
