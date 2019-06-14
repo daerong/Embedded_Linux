@@ -904,7 +904,7 @@ void* recv_msg(void* arg)
 		name_msg[str_len] = 0;
 
 		char *ptr = strtok(name_msg, "]");      // " " 공백 문자를 기준으로 문자열을 자름, 포인터 반환
-		if (ptr[0] == ''') {
+		if (ptr[0] == '\'') {
 			fputs(name_msg, stdout);
 		}
 		else if (ptr[0] == ' ') {
