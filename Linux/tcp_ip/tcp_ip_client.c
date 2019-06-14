@@ -1,97 +1,193 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <time.h>
+/**    chat_client **/
 
-#define TCP_IP_MAXLINE 1000
-#define TCP_IP_NAME_LEN 20
-#define TCP_IP_SERVER_ADDR "192.168.1.70"
-#define TCP_IP_SERVER_PORT 3400
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<arpa/inet.h>
+#include<sys/socket.h>
+#include<pthread.h>
+#include<time.h>
 
-char *socket_ext_msg = "exit";
-int tcp_connect(int af, char *servip, unsigned short port);
+#define BUF_SIZE 100
+#define NORMAL_SIZE 20
 
-int main(int argc, char *argv[]) {
-	char bufname[TCP_IP_NAME_LEN];	// 이름
-	char bufmsg[TCP_IP_MAXLINE];	// 메시지부분
-	char bufall[TCP_IP_MAXLINE + TCP_IP_NAME_LEN];
-	int maxfdp1;	// 최대 소켓 디스크립터
-	int s;		// 소켓
-	int namelen;	// 이름의 길이
-	fd_set read_fds;
-	time_t ct;
-	struct tm tm;
+void* send_msg(void* arg);
+void* recv_msg(void* arg);
+void error_handling(char* msg);
 
-	if (argc != 4) {
-		printf("사용법 : %s sever_ip  port name \n", argv[0]);
-		exit(0);
+void menu();
+void changeName();
+void menuOptions();
+
+char name[NORMAL_SIZE] = "[DEFALT]";     // name
+char msg_form[NORMAL_SIZE];            // msg form
+char serv_time[NORMAL_SIZE];        // server time
+char msg[BUF_SIZE];                    // msg
+char serv_port[NORMAL_SIZE];        // server port number
+char clnt_ip[NORMAL_SIZE];            // client ip address
+
+
+int main(int argc, char *argv[])
+{
+	int sock;
+	struct sockaddr_in serv_addr;
+	pthread_t snd_thread, rcv_thread;
+	void* thread_return;
+
+	if (argc != 4)
+	{
+		printf(" Usage : %s <ip> <port> <name>\n", argv[0]);
+		exit(1);
 	}
 
-	s = tcp_connect(AF_INET, TCP_IP_SERVER_ADDR, TCP_IP_SERVER_PORT);
-	if (s == -1)
-		errquit("tcp_connect fail");
+	/** local time **/
+	struct tm *t;
+	time_t timer = time(NULL);
+	t = localtime(&timer);
+	sprintf(serv_time, "%d-%d-%d %d:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour,
+		t->tm_min);
 
-	puts("서버에 접속되었습니다.");
-	maxfdp1 = s + 1;
-	FD_ZERO(&read_fds);
+	sprintf(name, "[%s]", argv[3]);
+	sprintf(clnt_ip, "%s", argv[1]);
+	sprintf(serv_port, "%s", argv[2]);
+	sock = socket(PF_INET, SOCK_STREAM, 0);
 
-	while (1) {
-		FD_SET(0, &read_fds);
-		FD_SET(s, &read_fds);
-		if (select(maxfdp1, &read_fds, NULL, NULL, NULL) < 0)
-			errquit("select fail");
-		if (FD_ISSET(s, &read_fds)) {
-			int nbyte;
-			if ((nbyte = recv(s, bufmsg, TCP_IP_MAXLINE, 0)) > 0) {
-				bufmsg[nbyte] = 0;
-				write(1, "\033[0G", 4);		//커서의 X좌표를 0으로 이동
-				printf("%s", bufmsg);		//메시지 출력
-				fprintf(stderr, "\033[1;32m");	//글자색을 녹색으로 변경
-				fprintf(stderr, "%s>", argv[3]);//내 닉네임 출력
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
+	serv_addr.sin_port = htons(atoi(argv[2]));
 
-			}
-		}
-		if (FD_ISSET(0, &read_fds)) {
-			if (fgets(bufmsg, TCP_IP_MAXLINE, stdin)) {
-				fprintf(stderr, "\033[1;33m"); //글자색을 노란색으로 변경
-				fprintf(stderr, "\033[1A"); //Y좌표를 현재 위치로부터 -1만큼 이동
-				ct = time(NULL);	//현재 시간을 받아옴
-				tm = *localtime(&ct);
-				sprintf(bufall, "[%02d:%02d:%02d]%s>%s", tm.tm_hour, tm.tm_min, tm.tm_sec, argv[3], bufmsg);//메시지에 현재시간 추가
-				if (send(s, bufall, strlen(bufall), 0) < 0)
-					puts("Error : Write error on socket.");
-				if (strstr(bufmsg, socket_ext_msg) != NULL) {
-					puts("Good bye.");
-					close(s);
-					exit(0);
-				}
-			}
-		}
-	} // end of while
+	if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1)
+		error_handling(" conncet() error");
+
+	/** call menu **/
+	menu();
+
+	pthread_create(&snd_thread, NULL, send_msg, (void*)&sock);
+	pthread_create(&rcv_thread, NULL, recv_msg, (void*)&sock);
+	pthread_join(snd_thread, &thread_return);
+	pthread_join(rcv_thread, &thread_return);
+	close(sock);
+	return 0;
 }
 
-int tcp_connect(int af, char *servip, unsigned short port) {
-	struct sockaddr_in servaddr;
-	int  s;
-	// 소켓 생성
-	if ((s = socket(af, SOCK_STREAM, 0)) < 0)
-		return -1;
-	// 채팅 서버의 소켓주소 구조체 servaddr 초기화
-	bzero((char *)&servaddr, sizeof(servaddr));
-	servaddr.sin_family = af;
-	inet_pton(AF_INET, servip, &servaddr.sin_addr);
-	servaddr.sin_port = htons(port);
+void* send_msg(void* arg)
+{
+	int sock = *((int*)arg);
+	char name_msg[NORMAL_SIZE + BUF_SIZE];
+	char myInfo[BUF_SIZE];
+	char* who = NULL;
+	char temp[BUF_SIZE];
 
-	// 연결요청
-	if (connect(s, (struct sockaddr *)&servaddr, sizeof(servaddr))
-		< 0)
-		return -1;
-	return s;
+	/** send join messge **/
+	printf(" >> join the chat !! \n");
+	sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
+	write(sock, myInfo, strlen(myInfo));
+
+	while (1)
+	{
+		fgets(msg, BUF_SIZE, stdin);
+
+		// menu_mode command -> !menu
+		if (!strcmp(msg, "!menu\n"))
+		{
+			menuOptions();
+			continue;
+		}
+
+		else if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n"))
+		{
+			close(sock);
+			exit(0);
+		}
+
+		// send message
+		sprintf(name_msg, "%s %s", name, msg);
+		write(sock, name_msg, strlen(name_msg));
+	}
+	return NULL;
+}
+
+void* recv_msg(void* arg)
+{
+	int sock = *((int*)arg);
+	char name_msg[NORMAL_SIZE + BUF_SIZE];
+	int str_len;
+
+	while (1)
+	{
+		str_len = read(sock, name_msg, NORMAL_SIZE + BUF_SIZE - 1);
+		if (str_len == -1)
+			return (void*)-1;
+		name_msg[str_len] = 0;
+		fputs(name_msg, stdout);
+	}
+	return NULL;
+}
+
+
+void menuOptions()
+{
+	int select;
+	// print menu
+	printf("\n\t**** menu mode ****\n");
+	printf("\t1. change name\n");
+	printf("\t2. clear/update\n\n");
+	printf("\tthe other key is cancel");
+	printf("\n\t*******************");
+	printf("\n\t>> ");
+	scanf("%d", &select);
+	getchar();
+	switch (select)
+	{
+		// change user name
+	case 1:
+		changeName();
+		break;
+
+		// console update(time, clear chatting log)
+	case 2:
+		menu();
+		break;
+
+		// menu error
+	default:
+		printf("\tcancel.");
+		break;
+	}
+}
+
+
+/** change user name **/
+void changeName()
+{
+	char nameTemp[100];
+	printf("\n\tInput new name -> ");
+	scanf("%s", nameTemp);
+	sprintf(name, "[%s]", nameTemp);
+	printf("\n\tComplete.\n\n");
+}
+
+void menu()
+{
+	system("clear");
+	printf(" **** moon/sum chatting client ****\n");
+	printf(" server port : %s \n", serv_port);
+	printf(" client IP   : %s \n", clnt_ip);
+	printf(" chat name   : %s \n", name);
+	printf(" server time : %s \n", serv_time);
+	printf(" ************* menu ***************\n");
+	printf(" if you want to select menu -> !menu\n");
+	printf(" 1. change name\n");
+	printf(" 2. clear/update\n");
+	printf(" **********************************\n");
+	printf(" Exit -> q & Q\n\n");
+}
+
+void error_handling(char* msg)
+{
+	fputs(msg, stderr);
+	fputc('\n', stderr);
+	exit(1);
 }
