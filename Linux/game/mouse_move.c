@@ -895,6 +895,7 @@ void* recv_msg(void* arg)
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
+	int locate = 0;;
 
 	while (1){
 		memset(name_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
@@ -909,8 +910,16 @@ void* recv_msg(void* arg)
 			strncpy(text_lcd_buf, name_msg, str_len - 1);
 		}
 		else {
-			printf("%d : %s\n", str_len, name_msg);
-			//strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
+			char *ptr1;
+			ptr1 = strchr(name_msg, '[');
+			printf("strchrÀÇ °á°ú \n");
+			if (ptr1) {
+				locate = ptr1 - name_msg;
+			}
+
+
+			//printf("%d : %s\n", str_len, name_msg);
+			strncpy(text_lcd_buf, name_msg + locate, TEXT_LCD_LINE_BUF);
 		}
 
 		recv_msg_stat = 1;
