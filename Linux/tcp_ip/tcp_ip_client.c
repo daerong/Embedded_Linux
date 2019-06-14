@@ -1,16 +1,4 @@
-/**    chat_client **/
-
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<string.h>
-#include<arpa/inet.h>
-#include<sys/socket.h>
-#include<pthread.h>
-#include<time.h>
-
-#define BUF_SIZE 100
-#define NORMAL_SIZE 20
+#include "../include/fpga_test.h"
 
 void* send_msg(void* arg);
 void* recv_msg(void* arg);
@@ -23,7 +11,7 @@ void menuOptions();
 char name[NORMAL_SIZE] = "[DEFALT]";     // name
 char msg_form[NORMAL_SIZE];            // msg form
 char serv_time[NORMAL_SIZE];        // server time
-char msg[BUF_SIZE];                    // msg
+char msg[MSG_BUF_SIZE];                    // msg
 char serv_port[NORMAL_SIZE];        // server port number
 char clnt_ip[NORMAL_SIZE];            // client ip address
 
@@ -48,9 +36,9 @@ int main(int argc, char *argv[])
 	sprintf(serv_time, "%d-%d-%d %d:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour,
 		t->tm_min);
 
-	sprintf(name, "[%s]", argv[3]);
+	sprintf(name, "[%s]", argv[2]);
 	sprintf(clnt_ip, "%s", argv[1]);
-	sprintf(serv_port, "%s", argv[2]);
+	sprintf(serv_port, "%s", argv[1]);
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
@@ -75,10 +63,10 @@ int main(int argc, char *argv[])
 void* send_msg(void* arg)
 {
 	int sock = *((int*)arg);
-	char name_msg[NORMAL_SIZE + BUF_SIZE];
-	char myInfo[BUF_SIZE];
+	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
+	char myInfo[MSG_BUF_SIZE];
 	char* who = NULL;
-	char temp[BUF_SIZE];
+	char temp[MSG_BUF_SIZE];
 
 	/** send join messge **/
 	printf(" >> join the chat !! \n");
@@ -87,7 +75,7 @@ void* send_msg(void* arg)
 
 	while (1)
 	{
-		fgets(msg, BUF_SIZE, stdin);
+		fgets(msg, MSG_BUF_SIZE, stdin);
 
 		// menu_mode command -> !menu
 		if (!strcmp(msg, "!menu\n"))
@@ -112,12 +100,12 @@ void* send_msg(void* arg)
 void* recv_msg(void* arg)
 {
 	int sock = *((int*)arg);
-	char name_msg[NORMAL_SIZE + BUF_SIZE];
+	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
 
 	while (1)
 	{
-		str_len = read(sock, name_msg, NORMAL_SIZE + BUF_SIZE - 1);
+		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
 		if (str_len == -1)
 			return (void*)-1;
 		name_msg[str_len] = 0;

@@ -1,16 +1,4 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<string.h>
-#include<arpa/inet.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<pthread.h>
-#include<time.h>
-
-#define BUF_SIZE 100
-#define MAX_CLNT 100
-#define MAX_IP 30
+#include "../include/fpga_test.h"
 
 void * handle_clnt(void *arg);
 void send_msg(char *msg, int len);
@@ -83,7 +71,7 @@ void *handle_clnt(void *arg)
 {
 	int clnt_sock = *((int*)arg);
 	int str_len = 0, i;
-	char msg[BUF_SIZE];
+	char msg[MSG_BUF_SIZE];
 
 	while ((str_len = read(clnt_sock, msg, sizeof(msg))) != 0)
 		send_msg(msg, str_len);

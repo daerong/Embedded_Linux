@@ -71,10 +71,10 @@
 #define KEYBOARD_EVENT "/dev/input/event6"
 
 // tcp-ip
-#define TCP_IP_MAXLINE 1000
-#define TCP_IP_NAME_LEN 20
-#define TCP_IP_SERVER_ADDR "192.168.1.70"
-#define TCP_IP_SERVER_PORT 3400
+#define MSG_BUF_SIZE 1000
+#define MAX_CLNT 10
+#define MAX_IP 30
+#define NORMAL_SIZE 20
 
 
 void assert(int cond, char *msg) {
