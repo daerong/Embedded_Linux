@@ -5,7 +5,7 @@ typedef short U16;
 typedef int S32;
 
 char mouse_thread[] = "mouse thread";
-char keyboard_thread[] = "keyboard thread";
+char chat_func_msg[] = "keyboard thread";
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
@@ -63,7 +63,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
 void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *proc_display, DISPLAY *background, int xpos, int ypos, char *file_name);
 void* mouse_ev_func(void *data);
-void* keyboard_ev_func(void *data);
+void* chat_func(void *data);
 
 int main(int argc, char** argv) {
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
-	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, keyboard_ev_func, (void *)&keyboard_thread);
+	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, chat_func, (void *)&chat_func_msg);
 
 	while (1) {
 		if (text_lcd_mode) {
@@ -581,7 +581,7 @@ void* mouse_ev_func(void *data) {
 	return 0;
 }
 
-void* keyboard_ev_func(void *data) {
+void* chat_func(void *data) {
 	int keyboard_fd;
 	char *inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
 	int text_buf_index;
@@ -776,9 +776,7 @@ void* keyboard_ev_func(void *data) {
 				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 			}
 
-			//printf("%c", pnt);
-
-			printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+			// printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 
 		}
 	}
