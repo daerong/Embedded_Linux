@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
 	}
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
-	free(text_lcd_buf);
+	//free(text_lcd_buf);
 	close(text_lcd_dev);
 
 	return 0;
