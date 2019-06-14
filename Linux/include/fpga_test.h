@@ -10,27 +10,20 @@
 #include <string.h>
 #include <signal.h>
 #include <pthread.h>
-
-/* memory stack size */
 #include <sys/time.h>
 #include <sys/resource.h>
-/* memory stack size */
-
-/* main_lcd */
 #include <linux/input.h>
-/* main_lcd */
-
-/* framebuffer */
 #include <sys/ioctl.h>		// ioctl() 시스템 콜
 #include <linux/fb.h>		// Frame Buffer API : fb_var_screeninfo 구조체, fb_fix_screeninfo 구조체, FBIOGET_VSCREENINFO, FBIOGET_FSCREENINFO
 #include <sys/types.h>
 #include <sys/mman.h>
-/* framebuffer */
-
-/* mouse */
 #include <errno.h>
 #include <stdint.h>
-/* mouse */
+#include <strings.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <time.h>
 
 #define LEDS_DEVICE "/dev/fpga_led"
 #define LEDS_MIN 0
@@ -74,8 +67,14 @@
 // mouse event
 #define MOUSE_EVENT "/dev/input/event9"
 
-// keuboard event
+// keyboard event
 #define KEYBOARD_EVENT "/dev/input/event6"
+
+// tcp-ip
+#define TCP_IP_MAXLINE 1000
+#define TCP_IP_NAME_LEN 20
+#define TCP_IP_SERVER_ADDR "192.168.1.70"
+#define TCP_IP_SERVER_PORT 3400
 
 
 void assert(int cond, char *msg) {

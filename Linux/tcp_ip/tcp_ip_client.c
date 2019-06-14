@@ -10,18 +10,18 @@
 #include <arpa/inet.h>
 #include <time.h>
 
-#define MAXLINE     1000
-#define NAME_LEN    20
+#define TCP_IP_MAXLINE 1000
+#define TCP_IP_NAME_LEN 20
+#define TCP_IP_SERVER_ADDR "192.168.1.70"
+#define TCP_IP_SERVER_PORT 3400
 
-char *EXIT_STRING = "exit";
-// 소켓 생성 및 서버 연결, 생성된 소켓리턴
+char *socket_ext_msg = "exit";
 int tcp_connect(int af, char *servip, unsigned short port);
-void errquit(char *mesg) { perror(mesg); exit(1); }
 
 int main(int argc, char *argv[]) {
-	char bufname[NAME_LEN];	// 이름
-	char bufmsg[MAXLINE];	// 메시지부분
-	char bufall[MAXLINE + NAME_LEN];
+	char bufname[TCP_IP_NAME_LEN];	// 이름
+	char bufmsg[TCP_IP_MAXLINE];	// 메시지부분
+	char bufall[TCP_IP_MAXLINE + TCP_IP_NAME_LEN];
 	int maxfdp1;	// 최대 소켓 디스크립터
 	int s;		// 소켓
 	int namelen;	// 이름의 길이
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	s = tcp_connect(AF_INET, argv[1], atoi(argv[2]));
+	s = tcp_connect(AF_INET, TCP_IP_SERVER_ADDR, TCP_IP_SERVER_PORT);
 	if (s == -1)
 		errquit("tcp_connect fail");
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 			errquit("select fail");
 		if (FD_ISSET(s, &read_fds)) {
 			int nbyte;
-			if ((nbyte = recv(s, bufmsg, MAXLINE, 0)) > 0) {
+			if ((nbyte = recv(s, bufmsg, TCP_IP_MAXLINE, 0)) > 0) {
 				bufmsg[nbyte] = 0;
 				write(1, "\033[0G", 4);		//커서의 X좌표를 0으로 이동
 				printf("%s", bufmsg);		//메시지 출력
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		if (FD_ISSET(0, &read_fds)) {
-			if (fgets(bufmsg, MAXLINE, stdin)) {
+			if (fgets(bufmsg, TCP_IP_MAXLINE, stdin)) {
 				fprintf(stderr, "\033[1;33m"); //글자색을 노란색으로 변경
 				fprintf(stderr, "\033[1A"); //Y좌표를 현재 위치로부터 -1만큼 이동
 				ct = time(NULL);	//현재 시간을 받아옴
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 				sprintf(bufall, "[%02d:%02d:%02d]%s>%s", tm.tm_hour, tm.tm_min, tm.tm_sec, argv[3], bufmsg);//메시지에 현재시간 추가
 				if (send(s, bufall, strlen(bufall), 0) < 0)
 					puts("Error : Write error on socket.");
-				if (strstr(bufmsg, EXIT_STRING) != NULL) {
+				if (strstr(bufmsg, socket_ext_msg) != NULL) {
 					puts("Good bye.");
 					close(s);
 					exit(0);

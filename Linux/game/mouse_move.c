@@ -4,8 +4,10 @@ typedef unsigned int U32;
 typedef short U16;
 typedef int S32;
 
-char mouse_thread[] = "mouse thread";
+char mouse_func_msg[] = "mouse thread";
 char chat_func_msg[] = "keyboard thread";
+char tcp_ip_func_msg[] = "tcp ip thread";
+char *socket_ext_msg = "exit";
 
 #define SCREEN_X_MAX 1024
 #define SCREEN_Y_MAX 600
@@ -25,6 +27,7 @@ char chat_func_msg[] = "keyboard thread";
 #define ICON_8_Y_START 414
 #define ICON_9_Y_START 472
 #define ICON_10_Y_START 530
+#define MY_NAME "Yoo"
 
 U16 menubox_color;
 char text_lcd_mode;	// on = 1, off = 0
@@ -69,6 +72,8 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 char u16_to_char(short target);
 void* mouse_ev_func(void *data);
 void* chat_func(void *data);
+void* tcp_ip_func(void *data);
+int tcp_connect(int af, char *servip, unsigned short port);
 
 int main(int argc, char** argv) {
 	int text_lcd_dev;
@@ -76,6 +81,8 @@ int main(int argc, char** argv) {
 	int mouse_thread_id;						// pthread ID
 	pthread_t chat_thread;
 	int chat_thread_id;						// pthread ID
+	pthread_t tcp_id_thread;
+	int tcp_id_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
 	int status;							// mutex result
 
@@ -94,8 +101,8 @@ int main(int argc, char** argv) {
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 
-	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
-
+	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_func_msg);
+	tcp_id_thread_id = pthread_create(&tcp_id_thread, NULL, tcp_ip_func, (void *)&tcp_ip_func_msg);
 
 	while (1) {
 		if (text_lcd_mode) {
@@ -122,6 +129,7 @@ int main(int argc, char** argv) {
 	}
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
+	pthread_join(tcp_id_thread, (void *)&thread_result);
 	free(text_lcd_buf);
 	close(text_lcd_dev);
 
@@ -727,11 +735,6 @@ void* chat_func(void *data) {
 	
 	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
-	//memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
-	//memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
-	//memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
-	//text_buf_index = 0;
-
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
 	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
 
@@ -791,7 +794,7 @@ void* chat_func(void *data) {
 
 			//printf("%c", pnt);
 
-			printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
+			//printf("type : %hu, code : %hu, value : %d\n", ev.type, ev.code, ev.value);
 
 		}
 	}
@@ -802,4 +805,75 @@ void* chat_func(void *data) {
 	pthread_exit((void*)&retval);
 
 	return 0;
+}
+
+void* tcp_ip_func(void *data) {
+	char bufname[TCP_IP_NAME_LEN];	// 이름
+	char bufmsg[TCP_IP_MAXLINE];	// 메시지부분
+	char bufall[TCP_IP_MAXLINE + TCP_IP_NAME_LEN];
+	int maxfdp1;	// 최대 소켓 디스크립터
+	int socket;		// 소켓
+	int namelen;	// 이름의 길이
+	fd_set read_fds;
+	time_t ct;
+	struct tm tm;
+
+	socket = tcp_connect(AF_INET, TCP_IP_SERVER_ADDR, TCP_IP_SERVER_PORT);
+	assert(socket != -1, "tcp_connect fail\n");
+
+	puts("서버에 접속되었습니다.");
+	maxfdp1 = socket + 1;
+	FD_ZERO(&read_fds);
+
+	while (1) {
+		FD_SET(0, &read_fds);
+		FD_SET(socket, &read_fds);
+		assert(select(maxfdp1, &read_fds, NULL, NULL, NULL) >= 0, "select fail\n");
+		if (FD_ISSET(socket, &read_fds)) {
+			int nbyte;
+			if ((nbyte = recv(socket, bufmsg, TCP_IP_MAXLINE, 0)) > 0) {
+				bufmsg[nbyte] = 0;
+				write(1, "\033[0G", 4);		//커서의 X좌표를 0으로 이동
+				printf("%s", bufmsg);		//메시지 출력
+				fprintf(stderr, "\033[1;32m");	//글자색을 녹색으로 변경
+				fprintf(stderr, "%s>", MY_NAME);//내 닉네임 출력
+
+			}
+		}
+		if (FD_ISSET(0, &read_fds)) {
+			if (fgets(bufmsg, TCP_IP_MAXLINE, stdin)) {
+				fprintf(stderr, "\033[1;33m"); //글자색을 노란색으로 변경
+				fprintf(stderr, "\033[1A"); //Y좌표를 현재 위치로부터 -1만큼 이동
+				ct = time(NULL);	//현재 시간을 받아옴
+				tm = *localtime(&ct);
+				sprintf(bufall, "[%02d:%02d:%02d]%s>%s", tm.tm_hour, tm.tm_min, tm.tm_sec, argv[3], bufmsg);//메시지에 현재시간 추가
+				if (send(socket, bufall, strlen(bufall), 0) < 0)
+					puts("Error : Write error on socket.");
+				if (strstr(bufmsg, socket_ext_msg) != NULL) {
+					puts("Good bye.");
+					close(socket);
+					exit(0);
+				}
+			}
+		}
+	} // end of while
+}
+
+int tcp_connect(int af, char *servip, unsigned short port) {
+	struct sockaddr_in servaddr;
+	int  s;
+	// 소켓 생성
+	if ((s = socket(af, SOCK_STREAM, 0)) < 0)
+		return -1;
+	// 채팅 서버의 소켓주소 구조체 servaddr 초기화
+	bzero((char *)&servaddr, sizeof(servaddr));
+	servaddr.sin_family = af;
+	inet_pton(AF_INET, servip, &servaddr.sin_addr);
+	servaddr.sin_port = htons(port);
+
+	// 연결요청
+	if (connect(s, (struct sockaddr *)&servaddr, sizeof(servaddr))
+		< 0)
+		return -1;
+	return s;
 }
