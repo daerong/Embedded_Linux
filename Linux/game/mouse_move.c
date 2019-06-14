@@ -105,7 +105,7 @@ int main(int argc, char* argv[]){
 	char usage[50];
 
 	sprintf(usage, "Usage : %s <ip> <port> <name>\n", argv[0]);
-	assert(argc != 4, usage);
+	assert(argc == 4, usage);
 
 	/* local time */
 	struct tm *t;
