@@ -140,7 +140,6 @@ int main(int argc, char* argv[]){
 	serv_addr.sin_port = htons(atoi(argv[2]));
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_func_msg);
-	tcp_id_thread_id = pthread_create(&tcp_id_thread, NULL, tcp_ip_func, (void *)&tcp_ip_func_msg);
 
 	if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1) {
 		error_handling(" conncet() error");
@@ -175,7 +174,6 @@ int main(int argc, char* argv[]){
 	}
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
-	pthread_join(tcp_id_thread, (void *)&thread_result);
 	pthread_join(snd_thread, &thread_return);
 	pthread_join(rcv_thread, &thread_return);
 	close(sock);
