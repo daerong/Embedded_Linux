@@ -721,12 +721,16 @@ void* mouse_ev_func(void *data) {
 void* chat_func(void *data) {
 	int keyboard_fd;
 	char *inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
-	int text_buf_index;
+	int text_buf_index = 0;
 	char changed_char;
 	static int retval = 1;			// 종료되는 프로세스 번호
 	
 	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
-	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
+
+	//memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
+	//memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
+	//memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
+	//text_buf_index = 0;
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
 	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
