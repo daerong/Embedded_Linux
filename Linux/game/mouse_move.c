@@ -897,6 +897,7 @@ void* recv_msg(void* arg)
 	int str_len;
 
 	while (1){
+		memset(name_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
 		if (str_len == -1)
 			return (void*)-1;
@@ -908,7 +909,7 @@ void* recv_msg(void* arg)
 			strncpy(text_lcd_buf, name_msg, str_len - 1);
 		}
 		else {
-			printf("%d : %s\n", str_len, name_msg);
+			printf("%d : %s\n", str_len, name_msg, );
 			//strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
 		}
 
