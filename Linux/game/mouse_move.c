@@ -88,7 +88,6 @@ int main(int argc, char** argv) {
 	delete_thread = 0;
 	icon_off = 0;
 
-
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 
@@ -116,7 +115,7 @@ int main(int argc, char** argv) {
 	}
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
-
+	free(text_lcd_buf);
 
 	return 0;
 }
@@ -727,10 +726,6 @@ void* chat_func(void *data) {
 	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
 	while (1) {
-		if (text_lcd_mode) {
-			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
-		}
-
 		struct input_event ev;
 
 		if (read(keyboard_fd, &ev, sizeof(struct input_event)) < 0) {
