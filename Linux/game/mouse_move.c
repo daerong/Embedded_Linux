@@ -89,7 +89,7 @@ char serv_port[NORMAL_SIZE];        // server port number
 char clnt_ip[NORMAL_SIZE];            // client ip address
 /* tcp function */
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[]) {
 	int text_lcd_dev;
 	pthread_t mouse_ev_thread;
 	int mouse_thread_id;						// pthread ID
@@ -322,7 +322,7 @@ void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *
 	int width = 0;
 	int height = 0;
 
-	unsigned char info [54];
+	unsigned char info[54];
 
 	fp = fopen(file_name, "rb");
 	if (fp == NULL) {
@@ -392,7 +392,7 @@ void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DIS
 		for (horizon = 3; horizon < width; horizon += 4) {
 			locate = (width * height - vertical * width + horizon) * 3;
 			pixel = makepixel(data[locate + 2], data[locate + 1], data[locate]);
-			set_pixel(target, horizon/4 + xpos, vertical/4 + ypos, pixel);
+			set_pixel(target, horizon / 4 + xpos, vertical / 4 + ypos, pixel);
 		}
 	}
 }
@@ -461,7 +461,7 @@ char u16_to_char(short target) {
 		return '=';
 	case 14:
 		return 'B';			// BACKSPACE
-	case 15:	
+	case 15:
 		return 'T';			// TAP
 	case 16:
 		return 'q';
@@ -487,7 +487,7 @@ char u16_to_char(short target) {
 		return '[';
 	case 27:
 		return ']';
-	case 28:	
+	case 28:
 		return 'E';			// ENTER
 	case 30:
 		return 'a';
@@ -630,7 +630,7 @@ void* mouse_ev_func(void *data) {
 					if (cur.x > TOOLBAR_X_START) {
 						if (cur.x >= ICON_START && cur.x < ICON_END) {
 							if (cur.y >= ICON_1_Y_START && cur.y < ICON_1_Y_START + ICON_WIDTH) {	// 채팅
-								if (!text_lcd_mode){
+								if (!text_lcd_mode) {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1on.bmp");
 									menu_copy(display, proc_display);
 									menu_update(&fvs, pfbdata, display);
@@ -782,7 +782,7 @@ void* chat_func(void *data) {
 	int text_buf_index = 0;
 	char changed_char;
 	static int retval = 1;			// 종료되는 프로세스 번호
-	
+
 	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
@@ -825,10 +825,10 @@ void* chat_func(void *data) {
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
-					send_msg_stat = 0;
+					send_msg_stat = 1;
 					break;
 				case 'U':		// Up
-					if(text_buf_index < TEXT_LCD_LINE_BUF - 1) text_buf_index++;
+					if (text_buf_index < TEXT_LCD_LINE_BUF - 1) text_buf_index++;
 					break;
 				case 'D':		// Down
 					if (text_buf_index > 0) text_buf_index--;
@@ -839,7 +839,7 @@ void* chat_func(void *data) {
 				default:
 					insert_text_buf(inner_text, &text_buf_index, changed_char);
 				}
-				
+
 				memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 			}
 
@@ -858,7 +858,7 @@ void* chat_func(void *data) {
 	return 0;
 }
 
-void* send_msg(void* arg){
+void* send_msg(void* arg) {
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 
@@ -874,13 +874,27 @@ void* send_msg(void* arg){
 	while (1)
 	{
 		if (send_msg_stat) {
-			fgets(msg, MSG_BUF_SIZE, stdin);
+			strcpy(msg, "hello world\n");
+
+			//// menu_mode command -> !menu
+			//if (!strcmp(msg, "!menu\n"))
+			//{
+			//	menuOptions();
+			//	continue;
+			//}
+
+			//else if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n"))
+			//{
+			//	close(sock);
+			//	exit(0);
+			//}
 
 			// send message
 			sprintf(name_msg, "%s %s", name, msg);
-			write(sock, name_msg, strlen(name_msg));
+			write(sock, (void*)&name_msg, sizeof(name_msg));
+			send_msg_stat = 0;
 		}
-		
+
 	}
 	return NULL;
 }
