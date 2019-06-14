@@ -894,6 +894,7 @@ void* recv_msg(void* arg)
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
+	int show_len;
 	char *recv_trash;
 	char *recv_chat;
 
@@ -909,7 +910,15 @@ void* recv_msg(void* arg)
 		ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
 		recv_chat = ptr;
 
-		strncpy(text_lcd_buf, recv_chat, TEXT_LCD_LINE_BUF);
+		show_len = sizeof(recv_chat);
+		printf("%d\n", show_len);
+		if (recv_chat <= TEXT_LCD_LINE_BUF) {
+			strncpy(text_lcd_buf, recv_chat, show_len);
+		}
+		else {
+			strncpy(text_lcd_buf, recv_chat, TEXT_LCD_LINE_BUF);
+		}
+
 		recv_msg_stat = 1;
 	}
 	return NULL;
