@@ -74,11 +74,19 @@ void* mouse_ev_func(void *data);
 void* chat_func(void *data);
 void* tcp_ip_func(void *data);
 /* tcp function */
-void * handle_clnt(void *arg);
-void send_msg(char *msg, int len);
-void error_handling(char *msg);
-char* serverState(int count);
-void menu(char port[]);
+void* send_msg(void* arg);
+void* recv_msg(void* arg);
+void error_handling(char* msg);
+void menu();
+void changeName();
+void menuOptions();
+
+char name[NORMAL_SIZE] = "[DEFALT]";     // name
+char msg_form[NORMAL_SIZE];            // msg form
+char serv_time[NORMAL_SIZE];        // server time
+char msg[MSG_BUF_SIZE];                    // msg
+char serv_port[NORMAL_SIZE];        // server port number
+char clnt_ip[NORMAL_SIZE];            // client ip address
 /* tcp function */
 
 int main(int argc, char** argv) {
