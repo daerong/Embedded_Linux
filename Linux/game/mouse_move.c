@@ -902,7 +902,13 @@ void* recv_msg(void* arg)
 		name_msg[str_len] = 0;
 		fputs(name_msg, stdout);
 
-		strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
+		if (str_len < TEXT_LCD_LINE_BUF) {
+			strncpy(text_lcd_buf, name_msg, str_len);
+		}
+		else {
+			strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
+		}
+
 		recv_msg_stat = 1;
 	}
 	return NULL;
