@@ -846,7 +846,7 @@ void* tcp_ip_func(void *data) {
 				fprintf(stderr, "\033[1A"); //Y좌표를 현재 위치로부터 -1만큼 이동
 				ct = time(NULL);	//현재 시간을 받아옴
 				tm = *localtime(&ct);
-				sprintf(bufall, "[%02d:%02d:%02d]%s>%s", tm.tm_hour, tm.tm_min, tm.tm_sec, argv[3], bufmsg);//메시지에 현재시간 추가
+				sprintf(bufall, "[%02d:%02d:%02d]%s>%s", tm.tm_hour, tm.tm_min, tm.tm_sec, MY_NAME, bufmsg);//메시지에 현재시간 추가
 				if (send(socket, bufall, strlen(bufall), 0) < 0)
 					puts("Error : Write error on socket.");
 				if (strstr(bufmsg, socket_ext_msg) != NULL) {
