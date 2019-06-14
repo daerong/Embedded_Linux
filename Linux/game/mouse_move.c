@@ -717,6 +717,7 @@ void* chat_func(void *data) {
 	char *inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
 	int text_buf_index;
 	char changed_char;
+	static int retval = 1;			// 종료되는 프로세스 번호
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
 	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
