@@ -717,6 +717,7 @@ void* keyboard_ev_func(void *data) {
 				switch (changed_char) {
 				case 'Q':		// ESC
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
+					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
 					text_lcd_mode = 0;
 					break;
