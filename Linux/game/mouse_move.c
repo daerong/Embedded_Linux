@@ -78,6 +78,8 @@ void* send_msg(void* arg);
 void* recv_msg(void* arg);
 void error_handling(char* msg);
 void menu();
+void changeName();
+void menuOptions();
 
 char name[NORMAL_SIZE] = "[DEFALT]";     // name
 char msg_form[NORMAL_SIZE];            // msg form
@@ -824,6 +826,7 @@ void* chat_func(void *data) {
 					insert_text_buf(inner_text, &text_buf_index, ' ');
 					break;
 				case 'E':		// ENTER
+					memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
@@ -864,23 +867,19 @@ void* send_msg(void* arg){
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 
-	while (1) {
+	while (1){
 		if (send_msg_stat) {
 			memcpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
-
-
 			sprintf(name_msg, "%s %s", name, msg);
 			write(sock, name_msg, strlen(name_msg));
-
 			send_msg_stat = 0;
 		}
 	}
-	close(sock);
-
 	return NULL;
 }
 
-void* recv_msg(void* arg){
+void* recv_msg(void* arg)
+{
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
@@ -896,16 +895,67 @@ void* recv_msg(void* arg){
 	return NULL;
 }
 
-void menu(){
+
+void menuOptions()
+{
+	int select;
+	// print menu
+	printf("\n\t**** menu mode ****\n");
+	printf("\t1. change name\n");
+	printf("\t2. clear/update\n\n");
+	printf("\tthe other key is cancel");
+	printf("\n\t*******************");
+	printf("\n\t>> ");
+	scanf("%d", &select);
+	getchar();
+	switch (select)
+	{
+		// change user name
+	case 1:
+		changeName();
+		break;
+
+		// console update(time, clear chatting log)
+	case 2:
+		menu();
+		break;
+
+		// menu error
+	default:
+		printf("\tcancel.");
+		break;
+	}
+}
+
+
+/** change user name **/
+void changeName()
+{
+	char nameTemp[100];
+	printf("\n\tInput new name -> ");
+	scanf("%s", nameTemp);
+	sprintf(name, "[%s]", nameTemp);
+	printf("\n\tComplete.\n\n");
+}
+
+void menu()
+{
 	system("clear");
 	printf(" **** moon/sum chatting client ****\n");
 	printf(" server port : %s \n", serv_port);
 	printf(" client IP   : %s \n", clnt_ip);
 	printf(" chat name   : %s \n", name);
 	printf(" server time : %s \n", serv_time);
+	printf(" ************* menu ***************\n");
+	printf(" if you want to select menu -> !menu\n");
+	printf(" 1. change name\n");
+	printf(" 2. clear/update\n");
+	printf(" **********************************\n");
+	printf(" Exit -> q & Q\n\n");
 }
 
-void error_handling(char* msg){
+void error_handling(char* msg)
+{
 	fputs(msg, stderr);
 	fputc('\n', stderr);
 	exit(1);
