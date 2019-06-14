@@ -894,6 +894,7 @@ void* recv_msg(void* arg)
 {
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
+	char tar = '[';
 	int str_len;
 	int locate = 0;;
 
@@ -911,7 +912,7 @@ void* recv_msg(void* arg)
 		}
 		else {
 			char *ptr1;
-			ptr1 = strchr(name_msg, '[');
+			ptr1 = strrchr(name_msg, tar);
 			if (ptr1) {
 				locate = ptr1 - name_msg;
 			}
