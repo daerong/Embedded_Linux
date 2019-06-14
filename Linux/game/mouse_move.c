@@ -909,14 +909,6 @@ void* recv_msg(void* arg)
 		ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
 		recv_chat = ptr;
 
-		while (ptr != NULL)            // 자른 문자열이 나오지 않을 때까지 반복
-		{
-			sArr[i] = ptr;             // 문자열을 자른 뒤 메모리 주소를 문자열 포인터 배열에 저장
-			i++;                       // 인덱스 증가
-
-			ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
-		}
-
 		strncpy(text_lcd_buf, recv_chat, TEXT_LCD_LINE_BUF);
 		recv_msg_stat = 1;
 	}
