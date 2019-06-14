@@ -555,6 +555,7 @@ void* mouse_ev_func(void *data) {
 			set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
 			menu_copy(display, proc_display);
 			menu_update(&fvs, pfbdata, display);
+			icon_off = 0;
 			break;
 		}
 
