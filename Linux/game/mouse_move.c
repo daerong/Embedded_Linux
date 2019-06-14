@@ -78,8 +78,6 @@ void* send_msg(void* arg);
 void* recv_msg(void* arg);
 void error_handling(char* msg);
 void menu();
-void changeName();
-void menuOptions();
 
 char name[NORMAL_SIZE] = "[DEFALT]";     // name
 char msg_form[NORMAL_SIZE];            // msg form
@@ -871,8 +869,7 @@ void* send_msg(void* arg) {
 	sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
 	write(sock, myInfo, strlen(myInfo));
 
-	while (1)
-	{
+	while (1){
 		if (send_msg_stat) {
 			//strcpy(msg, "hello world\n");
 			strncpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
@@ -886,65 +883,22 @@ void* send_msg(void* arg) {
 	return NULL;
 }
 
-void* recv_msg(void* arg)
-{
+void* recv_msg(void* arg){
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
 
-	while (1)
-	{
+	while (1){
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
 		if (str_len == -1)
 			return (void*)-1;
 		name_msg[str_len] = 0;
-		fputs(name_msg, stdout);
+
+		write(text_lcd_dev, name_msg, TEXT_LCD_LINE_BUF);
 	}
 	return NULL;
 }
 
-
-void menuOptions()
-{
-	int select;
-	// print menu
-	printf("\n\t**** menu mode ****\n");
-	printf("\t1. change name\n");
-	printf("\t2. clear/update\n\n");
-	printf("\tthe other key is cancel");
-	printf("\n\t*******************");
-	printf("\n\t>> ");
-	scanf("%d", &select);
-	getchar();
-	switch (select)
-	{
-		// change user name
-	case 1:
-		changeName();
-		break;
-
-		// console update(time, clear chatting log)
-	case 2:
-		menu();
-		break;
-
-		// menu error
-	default:
-		printf("\tcancel.");
-		break;
-	}
-}
-
-
-/** change user name **/
-void changeName()
-{
-	char nameTemp[100];
-	printf("\n\tInput new name -> ");
-	scanf("%s", nameTemp);
-	sprintf(name, "[%s]", nameTemp);
-	printf("\n\tComplete.\n\n");
-}
 
 void menu()
 {
