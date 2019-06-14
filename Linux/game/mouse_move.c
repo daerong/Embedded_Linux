@@ -881,6 +881,7 @@ void* send_msg(void* arg) {
 			memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, clean_text, TEXT_LCD_LINE_BUF);
 
 			// send message
+			memset(name_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
 			sprintf(name_msg, "%s %s\n", name, msg);
 			write(sock, (void*)&name_msg, sizeof(name_msg));
 			send_msg_stat = 0;
@@ -919,7 +920,7 @@ void* recv_msg(void* arg)
 
 
 			printf("%d %d : %s\n", str_len, locate, name_msg);
-			strncpy(text_lcd_buf, name_msg + 100, TEXT_LCD_LINE_BUF);
+			strncpy(text_lcd_buf, name_msg + locate, TEXT_LCD_LINE_BUF);
 		}
 
 		recv_msg_stat = 1;
