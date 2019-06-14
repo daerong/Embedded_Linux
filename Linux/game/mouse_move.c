@@ -877,8 +877,10 @@ void* send_msg(void* arg) {
 	while (1){
 		if (send_msg_stat) {
 			strncpy(msg, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
+			sleep(1);
 			memset(clean_text, ' ', TEXT_LCD_LINE_BUF);
 			memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, clean_text, TEXT_LCD_LINE_BUF);
+			sleep(1);
 			// send message
 			sprintf(name_msg, "%s %s\n", name, msg);
 			write(sock, (void*)&name_msg, sizeof(name_msg));
