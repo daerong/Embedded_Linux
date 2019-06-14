@@ -825,9 +825,6 @@ void* chat_func(void *data) {
 					insert_text_buf(inner_text, &text_buf_index, ' ');
 					break;
 				case 'E':		// ENTER
-					memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
-					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
-					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
 					send_msg_stat = 1;
 					break;
@@ -867,7 +864,7 @@ void* chat_func(void *data) {
 void* send_msg(void* arg) {
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
-
+	char *clean_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
 	char* who = NULL;
 	char temp[MSG_BUF_SIZE];
 
@@ -879,8 +876,9 @@ void* send_msg(void* arg) {
 
 	while (1){
 		if (send_msg_stat) {
-			//strcpy(msg, "hello world\n");
-			strncpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
+			strncpy(msg, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
+			memset(clean_text, ' ', TEXT_LCD_LINE_BUF);
+			memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, clean_text, TEXT_LCD_LINE_BUF);
 			// send message
 			sprintf(name_msg, "%s %s\n", name, msg);
 			write(sock, (void*)&name_msg, sizeof(name_msg));
