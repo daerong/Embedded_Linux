@@ -40,6 +40,7 @@ unsigned char *text_lcd_buf;
 char make_thread;
 char delete_thread;
 char icon_off;
+char send_msg_stat;
 
 typedef struct DISPLAY {
 	int xpos;
@@ -77,8 +78,6 @@ void* send_msg(void* arg);
 void* recv_msg(void* arg);
 void error_handling(char* msg);
 void menu();
-void changeName();
-void menuOptions();
 
 char name[NORMAL_SIZE] = "[DEFALT]";     // name
 char msg_form[NORMAL_SIZE];            // msg form
@@ -114,9 +113,9 @@ int main(int argc, char* argv[]){
 	sprintf(serv_time, "%d-%d-%d %d:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min);
 	/* local time */
 
-	sprintf(name, "[%s]", argv[2]);
+	sprintf(name, "[%s]", argv[3]);
 	sprintf(clnt_ip, "%s", argv[1]);
-	sprintf(serv_port, "%s", argv[1]);
+	sprintf(serv_port, "%s", argv[2]);
 
 	text_lcd_mode = 0;
 	camera_mode = 0;
@@ -126,6 +125,7 @@ int main(int argc, char* argv[]){
 	make_thread = 0;
 	delete_thread = 0;
 	icon_off = 0;
+	send_msg_stat = 0;
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -147,6 +147,11 @@ int main(int argc, char* argv[]){
 	}
 
 	menu();
+	char myInfo[MSG_BUF_SIZE];
+	printf(" >> join the chat !! \n");
+	sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
+	write(sock, myInfo, strlen(myInfo));
+
 	pthread_create(&snd_thread, NULL, send_msg, (void*)&sock);
 	pthread_create(&rcv_thread, NULL, recv_msg, (void*)&sock);
 
@@ -855,40 +860,23 @@ void* chat_func(void *data) {
 	return 0;
 }
 
-void* send_msg(void* arg)
-{
+void* send_msg(void* arg){
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
-	char myInfo[MSG_BUF_SIZE];
-	char* who = NULL;
-	char temp[MSG_BUF_SIZE];
 
-	/** send join messge **/
-	printf(" >> join the chat !! \n");
-	sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
-	write(sock, myInfo, strlen(myInfo));
+	while (1) {
+		if (send_msg_stat) {
+			memcpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
+			memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
-	while (1)
-	{
-		fgets(msg, MSG_BUF_SIZE, stdin);
+			sprintf(name_msg, "%s %s", name, msg);
+			write(sock, name_msg, strlen(name_msg));
 
-		// menu_mode command -> !menu
-		if (!strcmp(msg, "!menu\n"))
-		{
-			menuOptions();
-			continue;
+			send_msg_stat = 0;
 		}
-
-		else if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n"))
-		{
-			close(sock);
-			exit(0);
-		}
-
-		// send message
-		sprintf(name_msg, "%s %s", name, msg);
-		write(sock, name_msg, strlen(name_msg));
 	}
+	close(sock);
+
 	return NULL;
 }
 
@@ -909,49 +897,6 @@ void* recv_msg(void* arg)
 	return NULL;
 }
 
-
-void menuOptions()
-{
-	int select;
-	// print menu
-	printf("\n\t**** menu mode ****\n");
-	printf("\t1. change name\n");
-	printf("\t2. clear/update\n\n");
-	printf("\tthe other key is cancel");
-	printf("\n\t*******************");
-	printf("\n\t>> ");
-	scanf("%d", &select);
-	getchar();
-	switch (select)
-	{
-		// change user name
-	case 1:
-		changeName();
-		break;
-
-		// console update(time, clear chatting log)
-	case 2:
-		menu();
-		break;
-
-		// menu error
-	default:
-		printf("\tcancel.");
-		break;
-	}
-}
-
-
-/** change user name **/
-void changeName()
-{
-	char nameTemp[100];
-	printf("\n\tInput new name -> ");
-	scanf("%s", nameTemp);
-	sprintf(name, "[%s]", nameTemp);
-	printf("\n\tComplete.\n\n");
-}
-
 void menu()
 {
 	system("clear");
@@ -960,12 +905,6 @@ void menu()
 	printf(" client IP   : %s \n", clnt_ip);
 	printf(" chat name   : %s \n", name);
 	printf(" server time : %s \n", serv_time);
-	printf(" ************* menu ***************\n");
-	printf(" if you want to select menu -> !menu\n");
-	printf(" 1. change name\n");
-	printf(" 2. clear/update\n");
-	printf(" **********************************\n");
-	printf(" Exit -> q & Q\n\n");
 }
 
 void error_handling(char* msg)

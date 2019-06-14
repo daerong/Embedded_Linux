@@ -71,7 +71,7 @@
 #define KEYBOARD_EVENT "/dev/input/event6"
 
 // tcp-ip
-#define MSG_BUF_SIZE 1000
+#define MSG_BUF_SIZE 100
 #define MAX_CLNT 10
 #define MAX_IP 30
 #define NORMAL_SIZE 20
