@@ -32,6 +32,7 @@ char camera_mode;
 char num_baseball_mode;
 char lenna_img_mode;
 
+char *inner_text;
 unsigned char *text_lcd_buf;
 
 char make_thread;
@@ -122,7 +123,7 @@ int main(int argc, char** argv) {
 	}
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
-	//free(text_lcd_buf);
+	free(text_lcd_buf);
 	close(text_lcd_dev);
 
 	return 0;
@@ -720,7 +721,7 @@ void* mouse_ev_func(void *data) {
 
 void* chat_func(void *data) {
 	int keyboard_fd;
-	char *inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
+	inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
 	int text_buf_index;
 	char changed_char;
 	static int retval = 1;			// 종료되는 프로세스 번호
