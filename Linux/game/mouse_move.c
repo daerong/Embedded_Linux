@@ -741,6 +741,8 @@ void* chat_func(void *data) {
 		}
 		if (!text_lcd_mode) {
 			delete_thread = 1;
+			free(inner_text);
+			close(keyboard_fd);
 			pthread_exit((void*)&retval);
 			break;
 		}
