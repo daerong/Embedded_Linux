@@ -901,9 +901,7 @@ void* recv_msg(void* arg)
 			return (void*)-1;
 		name_msg[str_len] = 0;
 		fputs(name_msg, stdout);
-
-		char *ptr = strtok(name_msg, "]");      // " " 공백 문자를 기준으로 문자열을 자름, 포인터 반환
-		strncpy(text_lcd_buf, ptr, TEXT_LCD_LINE_BUF);
+		strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
 		recv_msg_stat = 1;
 	}
 	return NULL;
