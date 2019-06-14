@@ -907,6 +907,7 @@ void* recv_msg(void* arg)
 		else {
 			memset(clean_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
 			memcpy(clean_msg, name_msg, str_len);
+			printf("%d\n", str_len);
 		}
 
 		name_msg[str_len] = 0;
