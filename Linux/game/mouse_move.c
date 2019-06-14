@@ -72,7 +72,6 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 char u16_to_char(short target);
 void* mouse_ev_func(void *data);
 void* chat_func(void *data);
-void* tcp_ip_func(void *data);
 /* tcp function */
 void* send_msg(void* arg);
 void* recv_msg(void* arg);
@@ -99,6 +98,24 @@ int main(int argc, char* argv[]){
 	int tcp_id_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
 	int status;							// mutex result
+	int sock;
+	struct sockaddr_in serv_addr;
+	pthread_t snd_thread, rcv_thread;
+	void* thread_return;
+
+	sprintf(usage, "Usage : %s <ip> <port> <name>\n", argv[0]);
+	assert(argc != 4, usage);
+
+	/* local time */
+	struct tm *t;
+	time_t timer = time(NULL);
+	t = localtime(&timer);
+	sprintf(serv_time, "%d-%d-%d %d:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min);
+	/* local time */
+
+	sprintf(name, "[%s]", argv[2]);
+	sprintf(clnt_ip, "%s", argv[1]);
+	sprintf(serv_port, "%s", argv[1]);
 
 	text_lcd_mode = 0;
 	camera_mode = 0;
@@ -109,14 +126,29 @@ int main(int argc, char* argv[]){
 	delete_thread = 0;
 	icon_off = 0;
 
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
+	serv_addr.sin_port = htons(atoi(argv[2]));
+
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_func_msg);
 	tcp_id_thread_id = pthread_create(&tcp_id_thread, NULL, tcp_ip_func, (void *)&tcp_ip_func_msg);
+
+	if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1) {
+		error_handling(" conncet() error");
+	}
+
+	menu();
+	pthread_create(&snd_thread, NULL, send_msg, (void*)&sock);
+	pthread_create(&rcv_thread, NULL, recv_msg, (void*)&sock);
 
 	while (1) {
 		if (text_lcd_mode) {
@@ -144,6 +176,9 @@ int main(int argc, char* argv[]){
 
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
 	pthread_join(tcp_id_thread, (void *)&thread_result);
+	pthread_join(snd_thread, &thread_return);
+	pthread_join(rcv_thread, &thread_return);
+	close(sock);
 	free(text_lcd_buf);
 	close(text_lcd_dev);
 
@@ -819,48 +854,6 @@ void* chat_func(void *data) {
 	pthread_exit((void*)&retval);
 
 	return 0;
-}
-
-void* tcp_ip_func(void *data) {
-	int sock;
-	struct sockaddr_in serv_addr;
-	pthread_t snd_thread, rcv_thread;
-	void* thread_return;
-
-	if (argc != 4)
-	{
-		printf(" Usage : %s <ip> <port> <name>\n", argv[0]);
-		exit(1);
-	}
-
-	/** local time **/
-	struct tm *t;
-	time_t timer = time(NULL);
-	t = localtime(&timer);
-	sprintf(serv_time, "%d-%d-%d %d:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour,
-		t->tm_min);
-
-	sprintf(name, "[%s]", argv[2]);
-	sprintf(clnt_ip, "%s", argv[1]);
-	sprintf(serv_port, "%s", argv[1]);
-	sock = socket(PF_INET, SOCK_STREAM, 0);
-
-	memset(&serv_addr, 0, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
-	serv_addr.sin_port = htons(atoi(argv[2]));
-
-	if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1)
-		error_handling(" conncet() error");
-
-	/** call menu **/
-	menu();
-
-	pthread_create(&snd_thread, NULL, send_msg, (void*)&sock);
-	pthread_create(&rcv_thread, NULL, recv_msg, (void*)&sock);
-	pthread_join(snd_thread, &thread_return);
-	pthread_join(rcv_thread, &thread_return);
-	close(sock);
 }
 
 void* send_msg(void* arg)
