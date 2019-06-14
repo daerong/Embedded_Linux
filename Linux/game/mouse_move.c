@@ -89,7 +89,7 @@ char serv_port[NORMAL_SIZE];        // server port number
 char clnt_ip[NORMAL_SIZE];            // client ip address
 /* tcp function */
 
-int main(int argc, char** argv) {
+int main(int argc, char *argv[]) {
 	int text_lcd_dev;
 	pthread_t mouse_ev_thread;
 	int mouse_thread_id;						// pthread ID
