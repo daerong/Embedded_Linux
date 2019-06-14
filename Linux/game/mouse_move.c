@@ -874,21 +874,8 @@ void* send_msg(void* arg) {
 	while (1)
 	{
 		if (send_msg_stat) {
-			strcpy(msg, "hello world\n");
-
-			//// menu_mode command -> !menu
-			//if (!strcmp(msg, "!menu\n"))
-			//{
-			//	menuOptions();
-			//	continue;
-			//}
-
-			//else if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n"))
-			//{
-			//	close(sock);
-			//	exit(0);
-			//}
-
+			//strcpy(msg, "hello world\n");
+			memcpy(msg, text_lcd_buf, TEXT_LCD_MAX_BUF);
 			// send message
 			sprintf(name_msg, "%s %s", name, msg);
 			write(sock, (void*)&name_msg, sizeof(name_msg));
