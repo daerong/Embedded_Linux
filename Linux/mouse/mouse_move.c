@@ -4,7 +4,7 @@ typedef unsigned int U32;
 typedef short U16;
 typedef int S32;
 
-char mouse_thread[] = "mouse thread";
+char mouse_func_msg[] = "mouse thread";
 char chat_func_msg[] = "keyboard thread";
 
 #define SCREEN_X_MAX 1024
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 
 
 
-	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_thread);
+	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_func_msg);
 	keyboard_thread_id = pthread_create(&keyboard_ev_thread, NULL, chat_func, (void *)&chat_func_msg);
 
 	while (1) {
