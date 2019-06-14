@@ -703,7 +703,7 @@ void* keyboard_ev_func(void *data) {
 
 	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
-	while (1) {
+	while (text_lcd_mode) {
 		struct input_event ev;
 
 		if (read(keyboard_fd, &ev, sizeof(struct input_event)) < 0) {
@@ -711,16 +711,12 @@ void* keyboard_ev_func(void *data) {
 			if (errno == EINTR) continue;
 			break;
 		}
-		if (!text_lcd_mode) {
-
-		}
 		else if (ev.value == 1) {
 			if (ev.type == 1) {
 				changed_char = u16_to_char(ev.code);
 				switch (changed_char) {
 				case 'Q':		// ESC
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
-					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
 					text_lcd_mode = 0;
 					break;
