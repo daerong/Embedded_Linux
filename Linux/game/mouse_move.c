@@ -903,7 +903,7 @@ void* recv_msg(void* arg)
 		fputs(name_msg, stdout);
 
 		if (str_len < TEXT_LCD_LINE_BUF) {
-			strncpy(text_lcd_buf, name_msg, str_len);
+			strncpy(text_lcd_buf, name_msg, str_len - 1);
 		}
 		else {
 			strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
