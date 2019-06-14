@@ -842,7 +842,9 @@ void* chat_func(void *data) {
 					insert_text_buf(inner_text, &text_buf_index, changed_char);
 				}
 
-				if(text_lcd_mode) memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
+				if (text_lcd_mode) {
+					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
+				}
 			}
 
 			//printf("%c", pnt);
