@@ -875,7 +875,6 @@ void* send_msg(void* arg) {
 	{
 		if (send_msg_stat) {
 			//strcpy(msg, "hello world\n");
-			printf("on\n");
 			strncpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
 			// send message
 			sprintf(name_msg, "%s %s\n", name, msg);
