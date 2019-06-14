@@ -102,6 +102,7 @@ int main(int argc, char* argv[]){
 	struct sockaddr_in serv_addr;
 	pthread_t snd_thread, rcv_thread;
 	void* thread_return;
+	char usage[50];
 
 	sprintf(usage, "Usage : %s <ip> <port> <name>\n", argv[0]);
 	assert(argc != 4, usage);
