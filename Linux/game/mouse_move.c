@@ -107,7 +107,6 @@ int main(int argc, char** argv) {
 			chat_thread_id = pthread_create(&chat_thread, NULL, chat_func, (void *)&chat_func_msg);
 			printf("%s\n", chat_func_msg);
 			make_thread = 0;
-			sleep(1);
 			break;
 		}
 
@@ -117,7 +116,6 @@ int main(int argc, char** argv) {
 			icon_off = 1;
 			printf("thread %d down.\n", *((int *)thread_result));
 			delete_thread = 0;
-			sleep(1);
 			break;
 		}
 
