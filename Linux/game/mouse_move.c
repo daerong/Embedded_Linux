@@ -828,6 +828,7 @@ void* chat_func(void *data) {
 					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
+					send_msg_stat = 1;
 					break;
 				case 'U':		// Up
 					if(text_buf_index < TEXT_LCD_LINE_BUF - 1) text_buf_index++;
