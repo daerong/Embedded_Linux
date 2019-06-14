@@ -908,7 +908,7 @@ void* recv_msg(void* arg)
 			strncpy(text_lcd_buf, name_msg, str_len - 1);
 		}
 		else {
-			printf("test : %s\n", name_msg);
+			printf("%d : %s\n", str_len, name_msg);
 			//strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
 		}
 
