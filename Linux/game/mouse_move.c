@@ -876,7 +876,7 @@ void* send_msg(void* arg) {
 		if (send_msg_stat) {
 			//strcpy(msg, "hello world\n");
 			printf("on\n");
-			strcpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
+			strncpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
 			// send message
 			sprintf(name_msg, "%s %s\n", name, msg);
 			write(sock, (void*)&name_msg, sizeof(name_msg));
