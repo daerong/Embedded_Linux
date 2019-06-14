@@ -32,7 +32,6 @@ char camera_mode;
 char num_baseball_mode;
 char lenna_img_mode;
 
-char *inner_text;
 unsigned char *text_lcd_buf;
 
 char make_thread;
@@ -721,15 +720,16 @@ void* mouse_ev_func(void *data) {
 
 void* chat_func(void *data) {
 	int keyboard_fd;
-	inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
+	char *inner_text = (char *)malloc(sizeof(char)*TEXT_LCD_LINE_BUF);
 	int text_buf_index;
 	char changed_char;
 	static int retval = 1;			// 종료되는 프로세스 번호
+	
+	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
+	memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 
 	keyboard_fd = open(KEYBOARD_EVENT, O_RDONLY);
 	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", KEYBOARD_EVENT);
-
-	memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 
 	while (1) {
 		struct input_event ev;
