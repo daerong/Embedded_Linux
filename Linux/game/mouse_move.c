@@ -101,9 +101,6 @@ int main(int argc, char** argv) {
 		if (text_lcd_mode) {
 			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 		}
-		else {
-			write(text_lcd_dev, chat_func_msg, TEXT_LCD_MAX_BUF);
-		}
 
 		switch (make_thread) {
 		case 1:
@@ -742,10 +739,6 @@ void* chat_func(void *data) {
 			break;
 		}
 		if (!text_lcd_mode) {
-			delete_thread = 1;
-			free(inner_text);
-			close(keyboard_fd);
-			pthread_exit((void*)&retval);
 			break;
 		}
 		else if (ev.value == 1) {
@@ -798,9 +791,10 @@ void* chat_func(void *data) {
 		}
 	}
 
+	delete_thread = 1;
 	free(inner_text);
 	close(keyboard_fd);
-	pthread_exit((void*)&retval);
+	//pthread_exit((void*)&retval);
 
 	return 0;
 }
