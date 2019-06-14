@@ -894,6 +894,8 @@ void* recv_msg(void* arg)
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
+	int recv_trash;
+	int recv_chat;
 
 	while (1){
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
@@ -901,7 +903,21 @@ void* recv_msg(void* arg)
 			return (void*)-1;
 		name_msg[str_len] = 0;
 		fputs(name_msg, stdout);
-		strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
+
+		char *ptr = strtok(name_msg, "]");   // 공백 문자열을 기준으로 문자열을 자름
+		recv_trash = ptr;
+		ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
+		recv_chat = ptr;
+
+		while (ptr != NULL)            // 자른 문자열이 나오지 않을 때까지 반복
+		{
+			sArr[i] = ptr;             // 문자열을 자른 뒤 메모리 주소를 문자열 포인터 배열에 저장
+			i++;                       // 인덱스 증가
+
+			ptr = strtok(NULL, " ");   // 다음 문자열을 잘라서 포인터를 반환
+		}
+
+		strncpy(text_lcd_buf, recv_chat, TEXT_LCD_LINE_BUF);
 		recv_msg_stat = 1;
 	}
 	return NULL;
