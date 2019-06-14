@@ -900,7 +900,8 @@ void* recv_msg(void* arg)
 		if (str_len == -1)
 			return (void*)-1;
 		name_msg[str_len] = 0;
-		memcpy(text_lcd_buf, msg, TEXT_LCD_LINE_BUF);
+		printf("%s", name_msg);
+		//memcpy(text_lcd_buf, msg, TEXT_LCD_LINE_BUF);
 		recv_msg_stat = 1;
 		fputs(name_msg, stdout);
 	}
