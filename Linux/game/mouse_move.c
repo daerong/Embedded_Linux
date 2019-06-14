@@ -875,10 +875,10 @@ void* send_msg(void* arg) {
 	{
 		if (send_msg_stat) {
 			//strcpy(msg, "hello world\n");
-			memcpy(msg, text_lcd_buf, TEXT_LCD_MAX_BUF);
-			msg[MSG_BUF_SIZE - 1] = '\n';
+			printf("on\n");
+			strcpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
 			// send message
-			sprintf(name_msg, "%s %s", name, msg);
+			sprintf(name_msg, "%s %s\n", name, msg);
 			write(sock, (void*)&name_msg, sizeof(name_msg));
 			send_msg_stat = 0;
 		}
