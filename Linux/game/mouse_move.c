@@ -897,7 +897,7 @@ void* recv_msg(void* arg)
 	int show_len;
 	char *recv_trash;
 	char *recv_chat;
-	char recv_data[TEXT_LCD_LINE_BUF;
+	char recv_data[TEXT_LCD_LINE_BUF];
 	int recv_index;
 
 
