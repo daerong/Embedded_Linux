@@ -825,6 +825,8 @@ void* chat_func(void *data) {
 					insert_text_buf(inner_text, &text_buf_index, ' ');
 					break;
 				case 'E':		// ENTER
+					memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
+					memset(inner_text, ' ', TEXT_LCD_LINE_BUF);
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
 					send_msg_stat = 1;
@@ -841,10 +843,10 @@ void* chat_func(void *data) {
 				default:
 					insert_text_buf(inner_text, &text_buf_index, changed_char);
 				}
-
 				if (text_lcd_mode) {
 					memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, inner_text, TEXT_LCD_LINE_BUF);
 				}
+
 			}
 
 			//printf("%c", pnt);
@@ -865,7 +867,6 @@ void* chat_func(void *data) {
 void* send_msg(void* arg) {
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
-	char clear_msg[TEXT_LCD_LINE_BUF];
 
 	char* who = NULL;
 	char temp[MSG_BUF_SIZE];
@@ -878,9 +879,9 @@ void* send_msg(void* arg) {
 
 	while (1){
 		if (send_msg_stat) {
-			strncpy(msg, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
-			memset(clear_msg, ' ', TEXT_LCD_LINE_BUF);
-			memcpy(text_lcd_buf + TEXT_LCD_LINE_BUF, clear_msg, TEXT_LCD_LINE_BUF);
+			//strcpy(msg, "hello world\n");
+			strncpy(msg, text_lcd_buf, TEXT_LCD_LINE_BUF);
+			// send message
 			sprintf(name_msg, "%s %s\n", name, msg);
 			write(sock, (void*)&name_msg, sizeof(name_msg));
 			send_msg_stat = 0;
@@ -908,6 +909,7 @@ void* recv_msg(void* arg)
 			strncpy(text_lcd_buf, name_msg, str_len - 1);
 		}
 		else {
+
 			strncpy(text_lcd_buf, name_msg, TEXT_LCD_LINE_BUF);
 		}
 
