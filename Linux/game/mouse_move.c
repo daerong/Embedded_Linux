@@ -773,10 +773,10 @@ void* chat_func(void *data) {
 					text_buf_index = 0;
 					break;
 				case 'U':		// Up
-					text_buf_index++;
+					if(text_buf_index < TEXT_LCD_LINE_BUF - 1) text_buf_index++;
 					break;
 				case 'D':		// Down
-					text_buf_index--;
+					if (text_buf_index > 0) text_buf_index--;
 					break;
 				case 'R':		// Right
 					text_buf_index++;
