@@ -41,6 +41,7 @@ char make_thread;
 char delete_thread;
 char icon_off;
 char send_msg_stat;
+char recv_msg_stat;
 
 typedef struct DISPLAY {
 	int xpos;
@@ -126,6 +127,7 @@ int main(int argc, char* argv[]) {
 	delete_thread = 0;
 	icon_off = 0;
 	send_msg_stat = 0;
+	recv_msg_stat = 0;
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -151,7 +153,11 @@ int main(int argc, char* argv[]) {
 	pthread_create(&rcv_thread, NULL, recv_msg, (void*)&sock);
 
 	while (1) {
-		if (text_lcd_mode) {
+		if (recv_msg_stat) {
+			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
+			recv_msg_stat = 0;
+		}
+		else if (text_lcd_mode) {
 			write(text_lcd_dev, text_lcd_buf, TEXT_LCD_MAX_BUF);
 		}
 
@@ -883,7 +889,8 @@ void* send_msg(void* arg) {
 	return NULL;
 }
 
-void* recv_msg(void* arg){
+void* recv_msg(void* arg)
+{
 	int sock = *((int*)arg);
 	char name_msg[NORMAL_SIZE + MSG_BUF_SIZE];
 	int str_len;
@@ -893,8 +900,8 @@ void* recv_msg(void* arg){
 		if (str_len == -1)
 			return (void*)-1;
 		name_msg[str_len] = 0;
-
-		write(text_lcd_dev, name_msg, TEXT_LCD_LINE_BUF);
+		strncpy(text_lcd_buf, msg, TEXT_LCD_LINE_BUF);
+		recv_msg_stat = 1;
 	}
 	return NULL;
 }
