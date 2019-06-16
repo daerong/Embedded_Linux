@@ -42,6 +42,7 @@ char camera_mode;
 char num_baseball_mode;
 char lenna_img_mode;							// lenna image를 화면에 그리기 (1 : on, 0 : off)
 char step_motor_mode;
+char step_motor_change;
 
 char camera_update;
 
@@ -162,6 +163,7 @@ int main(int argc, char* argv[]) {
 	num_baseball_mode = 0;
 	lenna_img_mode = 0;
 	step_motor_mode = 0;
+	step_motor_change = 0;
 
 	camera_update = 0;
 
