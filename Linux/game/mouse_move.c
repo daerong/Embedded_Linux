@@ -878,7 +878,7 @@ void* sonic_func(void *data) {
 	assert2(sonic_fd >= 0, "Keyboard Event Open Error!", "/dev/us");
 	while (1) {
 		if (!read(sonic_fd, &buf, 2)) {
-			printf("%d\n", buf)
+			printf("%d\n", buf);
 		}
 		usleep(200000);
 	}
