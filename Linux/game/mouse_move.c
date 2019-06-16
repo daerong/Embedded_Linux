@@ -176,45 +176,53 @@ int main(int argc, char* argv[]) {
 	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
 	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
 
+	int sdlksdg = 0;
+
 	while (status) {
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
 			if (push_sw_buf[buf_locate] == 1) {
-				answer_num[target] = buf_locate + 1;
-				ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
+				sdlksdg = buf_locate + 1;
+				answer_num[target] = sdlksdg;
+				target++;
+
+				ret = write(dot_dev, fpga_number[sdlksdg], sizeof(fpga_number[sdlksdg]));
 				ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 				assert2(ret >= 0, "Device write error", FND_DEVICE);
-				target++;
-				break;
+
+				if (target_num[3] == answer_num[3] && target_num[2] == answer_num[2] && target_num[1] == answer_num[1] && target_num[0] == answer_num[0]) status = 0;
+				else if(target > 3){
+					answer_num[0] = 0;
+					answer_num[1] = 0;
+					answer_num[2] = 0;
+					answer_num[3] = 0;
+					target = 0;
+					ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
+					assert2(ret >= 0, "Device write error", FND_DEVICE);
+				}
+				
+
 			}
 		}
 
-		if (target_num[3] == answer_num[3]) led_data += 16;
-		if (target_num[2] == answer_num[2]) led_data += 32;
-		if (target_num[1] == answer_num[1]) led_data += 64;
-		if (target_num[0] == answer_num[0]) led_data += 128;
-		if (led_data == 240) {
-			status = 0;
-			target = 0;
-			break;
-		}
 
 
-		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
 
-		ret = write(led_dev, &led_data, 1);
-		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 
-		if (target > 3) {
-			answer_num[0] = 0;
-			answer_num[1] = 0;
-			answer_num[2] = 0;
-			answer_num[3] = 0;
-			ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
-			assert2(ret >= 0, "Device write error", FND_DEVICE);
-			target = 0;
-			led_data = 0;
-		}
+		//if (target_num[3] == answer_num[3]) led_data += 16;
+		//if (target_num[2] == answer_num[2]) led_data += 32;
+		//if (target_num[1] == answer_num[1]) led_data += 64;
+		//if (target_num[0] == answer_num[0]) led_data += 128;
+		//if (led_data == 240) {
+		//	status = 0;
+		//	break;
+		//}
+
+
+		//assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
+
+		//ret = write(led_dev, &led_data, 1);
+		//assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 	}
 
 	close(fnd_dev);
