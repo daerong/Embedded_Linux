@@ -58,7 +58,7 @@ static int us_release(struct inode *inode, struct file *filp) {
 }
 static int us_write(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 	output_sonicburst();
-	mdelay(100);
+	mdelay(1000);
 	return 0;
 }
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
