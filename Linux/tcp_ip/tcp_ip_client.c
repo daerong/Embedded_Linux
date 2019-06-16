@@ -91,7 +91,7 @@ void* send_msg(void* arg)
 		}
 
 		// send message
-		sprintf(name_msg, "%s", name, msg);
+		sprintf(name_msg, "%s", name);
 		write(sock, name_msg, strlen(name_msg));
 	}
 	return NULL;
