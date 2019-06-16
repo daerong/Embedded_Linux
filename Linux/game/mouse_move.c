@@ -889,7 +889,7 @@ void* sonic_func(void *data) {
 	int dir;				// argv[2]
 	int speed;				// argv[3]
 
-	action = 0;
+	action = 1;
 	dir = 1;
 	speed = 150;
 
