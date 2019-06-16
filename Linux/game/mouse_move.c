@@ -748,7 +748,7 @@ void* mouse_ev_func(void *data) {
 			break;
 		}
 
-		if (camera_mode) {
+		if (camera_update) {
 			set_image(&fvs, pfbdata, display, 0, 0, "../nfs/test.bmp");
 			draw_display(&fvs, pfbdata, display);
 			camera_update = 0;
@@ -1033,7 +1033,7 @@ void* camera_func(void *data) {
 	if (camera_mode) {
 		camera_update = 1;
 	}
-	sleep(3);
+	sleep(1);
 }
 
 void* send_msg(void* arg) {
