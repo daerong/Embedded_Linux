@@ -205,6 +205,8 @@ int main(int argc, char* argv[]) {
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
 	pthread_join(snd_thread, &thread_return);
 	pthread_join(rcv_thread, &thread_return);
+	pthread_join(sonic_thread, &thread_return);
+	pthread_join(write_sonic_thread, &thread_return);
 	close(sock);
 	free(text_lcd_buf);
 	close(text_lcd_dev);
