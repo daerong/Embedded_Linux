@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
 	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
 
 	while (1) {
-		if (sonic_buf < 15) {
+		if (step_motor_mode == 1 && sonic_buf < 15) {
 			state = 1;
 			write(buzzer_dev, &state, 1);
 			sleep(1);
