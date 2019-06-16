@@ -178,6 +178,10 @@ int main(int argc, char* argv[]) {
 
 	int sdlksdg = 0;
 
+	led_data = 0;
+	ret = write(led_dev, &led_data, 1);
+	assert2(ret >= 0, "Device write error", LEDS_DEVICE);
+
 	while (status) {
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
@@ -194,7 +198,8 @@ int main(int argc, char* argv[]) {
 					status = 0;
 					led_data = 240;
 					assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
-
+					ret = write(led_dev, &led_data, 1);
+					assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 				}
 				else if(target > 3){
 					answer_num[0] = 0;
@@ -204,6 +209,7 @@ int main(int argc, char* argv[]) {
 					target = 0;
 					ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 					assert2(ret >= 0, "Device write error", FND_DEVICE);
+					led_data = 0;
 					ret = write(led_dev, &led_data, 1);
 					assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 				}
