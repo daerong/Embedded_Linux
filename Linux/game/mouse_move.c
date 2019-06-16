@@ -202,7 +202,11 @@ int main(int argc, char* argv[]) {
 
 		ret = write(led_dev, &led_data, 1);
 		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
-		if (target == 4 && status != 0) memset(answer_num, 0, sizeof(answer_num));
+		if (target >= 3 && status != 0) {
+			memset(answer_num, 0, sizeof(answer_num));
+			ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
+			assert2(ret >= 0, "Device write error", FND_DEVICE);
+		}
 
 	}
 
