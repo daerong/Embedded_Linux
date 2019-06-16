@@ -163,8 +163,6 @@ int main(int argc, char* argv[]) {
 	serv_addr.sin_port = htons(atoi(argv[2]));
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_func_msg);
-	sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
-	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
 
 	if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1) {
 		error_handling(" conncet() error");
@@ -189,6 +187,11 @@ int main(int argc, char* argv[]) {
 			printf("%s\n", chat_func_msg);
 			make_thread = 0;
 			break;
+		case 5:
+			sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
+			write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
+			printf("%s\n", sonic_func_msg);
+			make_thread = 0;
 		}
 
 		switch (delete_thread) {
@@ -205,8 +208,6 @@ int main(int argc, char* argv[]) {
 	pthread_join(mouse_ev_thread, (void *)&thread_result);
 	pthread_join(snd_thread, &thread_return);
 	pthread_join(rcv_thread, &thread_return);
-	pthread_join(sonic_thread, &thread_return);
-	pthread_join(write_sonic_thread, &thread_return);
 	close(sock);
 	free(text_lcd_buf);
 	close(text_lcd_dev);
@@ -723,6 +724,7 @@ void* mouse_ev_func(void *data) {
 								else {
 									step_motor_update(step_motor_dev, 1, 0, 150);
 									step_motor_mode = 1;
+									make_thread = 5;
 								}
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
@@ -895,7 +897,7 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	while (step_motor_mode) {
+	while (1) {
 		read(sonic_fd, &sonic_buf, 2);
 		printf("distance user : %d (cm)\n", sonic_buf);
 		usleep(200000);
