@@ -7,6 +7,7 @@ typedef int S32;
 char mouse_func_msg[] = "mouse thread";
 char chat_func_msg[] = "keyboard thread";
 char tcp_ip_func_msg[] = "tcp ip thread";
+char sonic_func_msg[] = "sonic thread";
 char *socket_ext_msg = "exit";
 
 #define SCREEN_X_MAX 1024						// LCD screen의 dot width
@@ -75,6 +76,7 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 char u16_to_char(short target);				// short 변수를 char변수로 변환
 void* mouse_ev_func(void *data);			// mouse의 이벤트로 LCD screen을 조작하기 위한 thread 생성 시 쓰레드로 사용될 함수
 void* chat_func(void *data);				// chat function : keyboard 이벤트 동적 사용 thread
+void* sonic_func(void *data);
 /* tcp function */
 void* send_msg(void* arg);					// tcp/ip에서 사용할 send thread
 void* recv_msg(void* arg);					// tcp/ip에서 사용할 receive thread
@@ -95,6 +97,8 @@ int main(int argc, char* argv[]) {
 	int mouse_thread_id;					// pthread ID
 	pthread_t chat_thread;
 	int chat_thread_id;						// pthread ID
+	pthread_t sonic_thread;
+	int sonic_thread_id;						// pthread ID
 	pthread_t tcp_id_thread;
 	int tcp_id_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
@@ -168,6 +172,10 @@ int main(int argc, char* argv[]) {
 			printf("%s\n", chat_func_msg);
 			make_thread = 0;
 			break;
+		case 2:
+			sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
+			printf("%s\n", sonic_func_msg);
+			make_thread = 0;
 		}
 
 		switch (delete_thread) {
@@ -691,8 +699,8 @@ void* mouse_ev_func(void *data) {
 									lenna_img_mode = 1;
 								}
 							}
-							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {
-
+							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
+								make_thread = 1;
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
 
@@ -859,6 +867,25 @@ void* chat_func(void *data) {
 	free(inner_text);
 	close(keyboard_fd);
 	pthread_exit((void*)&retval);
+
+	return 0;
+}
+
+void* sonic_func(void *data) {
+	int sonic_fd;
+	static int retval = 5;			// 종료되는 프로세스 번호
+	int *sonic_buf = (int *)malloc(sizeof(int));
+
+	keyboard_fd = open(SONIC_DEVICE, O_RDONLY);
+	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", SONIC_DEVICE);
+
+	while (1) {
+		read(sonic_fd, sonic_buf, 4);
+		printf("distance user : %d (cm)\n", *sonic_buf);
+		usleep(200000);
+	}
+
+	close(sonic_fd);
 
 	return 0;
 }

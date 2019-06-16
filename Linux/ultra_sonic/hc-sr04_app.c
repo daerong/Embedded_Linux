@@ -22,7 +22,7 @@ int main(void)
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		state = read(fd, buf, 2);
+		state = read(fd, buf, 4);
 		printf("distance user : %d (cm)\n", *buf);
 		usleep(200000);
 	}

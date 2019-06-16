@@ -76,6 +76,9 @@
 #define MAX_IP 30
 #define NORMAL_SIZE 20
 
+// sonic
+#define SONIC_DEVICE "/dev/us"
+
 
 void assert(int cond, char *msg) {
 	if (!cond) {
