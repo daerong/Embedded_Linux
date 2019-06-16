@@ -24,6 +24,7 @@ int main(void)
 		read(fd, &buf, 4);
 		for (loop = 0; loop < 100000; loop++) {};
 	}
+
 	close(fd);
 	return 0;
 }
