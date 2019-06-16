@@ -172,7 +172,7 @@ int main(int argc, char* argv[]) {
 			printf("%s\n", chat_func_msg);
 			make_thread = 0;
 			break;
-		case 2:
+		case 5:
 			sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
 			printf("%s\n", sonic_func_msg);
 			make_thread = 0;
@@ -700,7 +700,7 @@ void* mouse_ev_func(void *data) {
 								}
 							}
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
-								make_thread = 1;
+								make_thread = 5;
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
 
