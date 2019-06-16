@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 	pthread_t tcp_id_thread;
 	int tcp_id_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
-	int status;							// mutex result
+	int status = 1;							// mutex result
 	int sock;
 	struct sockaddr_in serv_addr;
 	pthread_t snd_thread, rcv_thread;
