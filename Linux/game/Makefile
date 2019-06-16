@@ -10,8 +10,10 @@ all: $(APP)
 $(APP): $(TARGET)
 	$(CC) -pthread -o $(APP) $(TARGET)
 
+hold:
+	arm-none-linux-gnueabi-gcc -pthread -o work mouse_move_work.c
 install:
-	cp -a $(APP) $(TFTPDIR)
+	cp -a work $(APP) $(TFTPDIR)
 
 clean:
 	rm -rf *.ko *.mod.* *.order *.symvers *.o $(APP)
