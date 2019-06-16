@@ -1,42 +1,43 @@
-/* Achro-i.MX6Q External Sensor GPIO Control
+ï»¿/* Achro-i.MX6Q External Sensor GPIO Control
 FILE : hc-sr04_driver.c
 AUTH : gmlee@huins.com */
 
 #include <linux/module.h>
-#include <linux/cdev.h>			// cdev_init(), cdev_add()
+#include <linux/cdev.h>         // cdev_init(), cdev_add()
 #include <linux/fs.h>
 #include <linux/gpio.h>
 #include <linux/delay.h>
-#include <linux/kdev_t.h>		// MAJOR(), MKDEV()
+#include <linux/kdev_t.h>      // MAJOR(), MKDEV()
 #include <linux/interrupt.h>
+#include <linux/uaccess.h>
 
 MODULE_LICENSE("GPL");
 
 #define HCSR04_TRIGGER IMX_GPIO_NR(2, 2)
 #define HCSR04_ECHO IMX_GPIO_NR(2, 3)
 
-int test = 0;
+int inner_distace = 0;
 static int us_major = 0;
 static int us_minor = 0;
 static int result;
 static int res;
 static dev_t us_dev;
 static struct cdev us_cdev;
-struct timeval after;		// struct timeval {
-							//		long tv_sec;		// s ´ÜÀ§
-							//		long tv_usec;		// us ´ÜÀ§
-							// };
+struct timeval after;      // struct timeval {
+					 //      long tv_sec;      // s ï¿½ï¿½
+					 //      long tv_usec;      // us ï¿½ï¿½
+					 // };
 struct timeval before;
 u32 irq = -1;
 
 static int us_open(struct inode *inode, struct file *filp);
 static int us_release(struct inode *inode, struct file *filp);
-static int us_read(struct file *filp, char *buf, size_t count, loff_t *f_pos);
+static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
 
 struct file_operations us_fops = {
-	.open = us_open,
-	.release = us_release,
-	.read = us_read
+   .open = us_open,
+   .release = us_release,
+   .read = us_read
 };
 
 static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs);
@@ -53,52 +54,53 @@ static int us_release(struct inode *inode, struct file *filp) {
 	printk(KERN_ALERT "< Device has been closed > \n");
 	return 0;
 }
-static int us_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {
-	int value = test;
+static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 	output_sonicburst();
-	//if (copy_to_user(buf, &value, 4)) {			// Á¤»ó Á¾·á ½Ã 0À» ¹ÝÈ¯
-	//	return -EFAULT;
-	//}
+
+	if (copy_to_user(buf, &inner_distace, 1)) {
+		return -EFAULT;
+	}
+
 	mdelay(1);
 	return 0;
 }
 
 static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
-	if (gpio_get_value(HCSR04_ECHO)) {		// int gpio_get_value(unsigned int gpio); : Ãâ·Â ¸ðµå GPIO ÇÉÀÇ °ªÀ» ÀÐ¾î¿Â´Ù.
-		do_gettimeofday(&before);			// do_gettimeofday(struct timeval *tv) : ÃÊ / ¸¶ÀÌÅ©·ÎÃÊ ´ÜÀ§ÀÇ Àý´ë½Ã°£À» ¾ò¾î¿È
+	if (gpio_get_value(HCSR04_ECHO)) {      // int gpio_get_value(unsigned int gpio); : ï¿½ï¿½ ï¿½ï¿½ GPIO ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+		do_gettimeofday(&before);         // do_gettimeofday(struct timeval *tv) : ï¿½ / ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 	}
 	else {
 		do_gettimeofday(&after);
-		printk(KERN_ALERT" Distance : %.0ld [cm] \n ", (after.tv_usec - before.tv_usec) / 58);		// ´ÜÀ§º¯È¯, us/58 = Centimeter
-		//test = (after.tv_usec - before.tv_usec) / 58;
+		printk(KERN_ALERT" Distance : %.0ld [cm] \n ", (after.tv_usec - before.tv_usec) / 58);      // ï¿½ï¿½ï¿½ï¿½, us/58 = Centimeter
+		inner_distace = (after.tv_usec - before.tv_usec) / 58;
 		memset(&before, 0, sizeof(struct timeval));
 		memset(&after, 0, sizeof(struct timeval));
 	}
-	return IRQ_HANDLED;		// ¿Ã¹Ù¸¥ °æ¿ì IRQ_HANDLED¸¦ °ü·Ã ¾ø´Â °æ¿ì IRQ_NONE¸¦ ¸®ÅÏ
+	return IRQ_HANDLED;      // ï¿½ï¿½ï¿½ ï¿½ï¿½ IRQ_HANDLEDï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ IRQ_NONEï¿½ ï¿½ï¿½
 }
 static int us_register_cdev(void) {
 	int error;
 	if (us_major) {
-		us_dev = MKDEV(us_major, us_minor);		// MKDEV(int major, int minor); : ÁÖ¹øÈ£ÀÎ major ¿Í ºÎ¹øÈ£ÀÎ minor °ªÀ» ÀÌ¿ëÇÏ¿© dev_t °ªÀ» ¾ò´Â´Ù.
-		error = register_chrdev_region(us_dev, 1, "us");	// int register_chrdev_region(dev_t from, unsigned count, const char *name)
-															// : fromÀÇ major ÁÖ¹øÈ£¿Í minor ºÎ¹øÈ£¸¦ ±âÁØÀ¸·Î count ¸¸Å­ major, minor¹øÈ£¸¦ ÇÒ´ç
+		us_dev = MKDEV(us_major, us_minor);      // MKDEV(int major, int minor); : ï¿½ï¿½ï¿½ï¿½ major ï¿½ ï¿½ï¿½ï¿½ï¿½ minor ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ dev_t ï¿½ï¿½ ï¿½ï¿½ï¿½.
+		error = register_chrdev_region(us_dev, 1, "us");   // int register_chrdev_region(dev_t from, unsigned count, const char *name)
+											   // : fromï¿½ major ï¿½ï¿½ï¿½ï¿½ minor ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ count ï¿½ï¿½ major, minorï¿½ï¿½ï¿½ ï¿½ï¿½
 	}
 	else {
-		error = alloc_chrdev_region(&us_dev, us_minor, 1, "us");	// int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name)
-																	// : baseminor ºÎ¹øÈ£¸¦ ±âÁØÀ¸·Î count ¸¸Å­ minor¹øÈ£¸¦ ÇÒ´ç, major ¹øÈ£´Â µ¿ÀûÀ¸·Î ºó°÷À» Ã£¾Æ¼­ ¸®ÅÏ, È£ÃâÇÑ ÂÊ¿¡¼­ Ã¹¹øÂ° ¸Å°³º¯¼ö dev_t *dev·Î ¾Ë ¼ö ÀÖ´Ù.
-		us_major = MAJOR(us_dev);				// MAJOR(dev_t dev); : dev ¿¡¼­ ÁÖ¹øÈ£ °ªÀ» ¾ò´Â´Ù.
+		error = alloc_chrdev_region(&us_dev, us_minor, 1, "us");   // int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name)
+													 // : baseminor ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ count ï¿½ï¿½ minorï¿½ï¿½ï¿½ ï¿½ï¿½, major ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ dev_t *devï¿½ ï¿½ ï¿½ ï¿½ï¿½.
+		us_major = MAJOR(us_dev);            // MAJOR(dev_t dev); : dev ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½.
 	}
 	if (error < 0) {
 		printk(KERN_WARNING "us: can't get major %d\n", us_major);
 		return result;
 	}
 	printk(KERN_ALERT "major number = %d\n", us_major);
-	cdev_init(&us_cdev, &us_fops);		// void cdev_init (	struct cdev * cdev, const struct file_operations * fops); : struct cdev ±¸Á¶Ã¼¸¦ ÃÊ±âÈ­ ½ÃÄÑÁÖ´Â ÇÔ¼ö
-										// static struct cdev dasom_cdev = {
-	us_cdev.owner = THIS_MODULE;		//	 .owner = THIS_MODULE,
-	us_cdev.ops = &us_fops;				//	 .ops = &dasom_fops,
-										// };
-	error = cdev_add(&us_cdev, us_dev, 1);	//	int cdev_add(struct cdev * p, dev_t dev, unsigned count); : major, minor °ªÀ» ÀÌ¿ëÇØ struct cdev¿Í dev_t dev¸¦ ¿¬°á
+	cdev_init(&us_cdev, &us_fops);      // void cdev_init (   struct cdev * cdev, const struct file_operations * fops); : struct cdev ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+							   // static struct cdev dasom_cdev = {
+	us_cdev.owner = THIS_MODULE;      //    .owner = THIS_MODULE,
+	us_cdev.ops = &us_fops;            //    .ops = &dasom_fops,
+							   // };
+	error = cdev_add(&us_cdev, us_dev, 1);   //   int cdev_add(struct cdev * p, dev_t dev, unsigned count); : major, minor ï¿½ï¿½ ï¿½ï¿½ï¿½ struct cdevï¿½ dev_t devï¿½ ï¿½ï¿½
 	if (error)
 	{
 		printk(KERN_NOTICE "us Register Error %d\n", error);
@@ -106,13 +108,13 @@ static int us_register_cdev(void) {
 	return 0;
 }
 void output_sonicburst(void) {
-	gpio_set_value(HCSR04_TRIGGER, 1);			// // void gpio_set_value(unsigned int gpio, int value); : Ãâ·Â ¸ðµå GPIO ÇÉ¿¡ °ªÀ» ¾´´Ù.
+	gpio_set_value(HCSR04_TRIGGER, 1);         // // void gpio_set_value(unsigned int gpio, int value); : ï¿½ï¿½ ï¿½ï¿½ GPIO ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½.
 	udelay(10);
 	gpio_set_value(HCSR04_TRIGGER, 0);
 }
 int gpio_init(void) {
 	int rtc;
-	rtc = gpio_request(HCSR04_TRIGGER, "TRIGGER");				// int gpio_request(unsigned int gpio, const char *label); : GPIO ÇÉ ÇöÀç »ç¿ëµÇ°í ÀÖ´Â Áö È®ÀÎ, »ç¿ë °¡´ÉÇÏ´Ù¸é lockÀ» °É¾î Á¡À¯ÇÑ´Ù. (ÀÖÀ¸¸é -EBUSY, ¾øÀ¸¸é 0)
+	rtc = gpio_request(HCSR04_TRIGGER, "TRIGGER");            // int gpio_request(unsigned int gpio, const char *label); : GPIO ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ ï¿½ï¿½, ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ lockï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½. (ï¿½ï¿½ï¿½ -EBUSY, ï¿½ï¿½ï¿½ 0)
 	if (rtc != 0) {
 		printk(KERN_ALERT "<Trigger Pin Request Fail>\n");
 		goto fail;
@@ -122,17 +124,17 @@ int gpio_init(void) {
 		printk(KERN_ALERT "<Echo Pin Request Fail>\n");
 		goto fail;
 	}
-	rtc = gpio_direction_output(HCSR04_TRIGGER, 0);				// int gpio_direction_output(unsigned int gpio, int value); : GPIO ÇÉÀ» Ãâ·Â ¿ëµµ·Î ÁöÁ¤, ÃÊ±â Ãâ·ÂÀ» ¼¼ÆÃÇØ¾ßÇÔ
+	rtc = gpio_direction_output(HCSR04_TRIGGER, 0);            // int gpio_direction_output(unsigned int gpio, int value); : GPIO ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (rtc != 0) {
 		printk(KERN_ALERT "<Trigget pin Setting Fail>\n");
 		goto fail;
 	}
-	rtc = gpio_direction_input(HCSR04_ECHO);					// int gpio_direction_input(unsigned int gpio); : GPIO ÇÉÀ» ÀÔ·Â ¿ëµµ·Î ÁöÁ¤
+	rtc = gpio_direction_input(HCSR04_ECHO);               // int gpio_direction_input(unsigned int gpio); : GPIO ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½
 	if (rtc != 0) {
 		printk(KERN_ALERT "<Echo Pin Setting Fail>\n");
 		goto fail;
 	}
-	rtc = gpio_to_irq(HCSR04_ECHO);								// int gpio_to_irq(unsigned int gpio); : gpio¿¡ ÇØ´çÇÏ´Â interrupt ÁÖ¼Ò¸¦ ¸®ÅÏÇØÁÖ´Â ÇÔ¼ö
+	rtc = gpio_to_irq(HCSR04_ECHO);                        // int gpio_to_irq(unsigned int gpio); : gpioï¿½ ï¿½ï¿½ï¿½ï¿½ interrupt ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 	if (rtc < 0) {
 		printk(KERN_ALERT "<irq Pin GPIO Request Fail>\n");
 		goto fail;
@@ -141,13 +143,13 @@ int gpio_init(void) {
 		irq = rtc;
 	}
 	rtc = request_irq(irq, (void*)ultrasonics_echo_interrupt, IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_DISABLED, "us", NULL);
-	// int request_irq(unsigned int irq, irqreturn_t (*handler)(int, void*, struct pt_regs*), unsigned long frags, const char* device, void* dev_id); : ÀÎÅÍ·´Æ® ¼­ºñ½º ÇÔ¼ö µî·Ï
+	// int request_irq(unsigned int irq, irqreturn_t (*handler)(int, void*, struct pt_regs*), unsigned long frags, const char* device, void* dev_id); : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½
 	if (rtc) {
 		printk(KERN_ALERT "<irq Register Fail>\n");
 		goto fail;
 	}
 	printk(KERN_INFO "HC-SR04 Enable\n");
-	gpio_set_value(HCSR04_TRIGGER, 0);				// void gpio_set_value(unsigned int gpio, int value); : Ãâ·Â ¸ðµå GPIO ÇÉ¿¡ °ªÀ» ¾´´Ù.
+	gpio_set_value(HCSR04_TRIGGER, 0);            // void gpio_set_value(unsigned int gpio, int value); : ï¿½ï¿½ ï¿½ï¿½ GPIO ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½.
 	return 0;
 fail:
 	return -1;
@@ -156,22 +158,22 @@ fail:
 
 static int us_init(void) {
 	printk(KERN_ALERT "< Ultrasonic Module is up > \n");
-	if ((result = us_register_cdev()) < 0) {						// Ä¿³Î ¿¬°áºÎ
+	if ((result = us_register_cdev()) < 0) {                  // ï¿½ï¿½ ï¿½ï¿½ï¿½
 		printk(KERN_ALERT "< Ultrasonic Register Fail > \n");
 		return result;
 	}
-	res = gpio_init();		// GPIO, ISR ¿¬°á ¹× ¼¼ÆÃ
+	res = gpio_init();      // GPIO, ISR ï¿½ï¿½ ï¿½ ï¿½ï¿½
 	if (res < 0)
 		return -1;
 	return 0;
 }
 static void us_exit(void) {
 	printk(KERN_ALERT "< Ultrasonic Module is down > \n");
-	free_irq(irq, NULL);			// void free_irq(unsigned int irq, void* dev_id); : ÀÎÅÍ·´Æ® ¼­ºñ½º ÇÔ¼ö¸¦ ÇØÁ¦
-	gpio_free(HCSR04_TRIGGER);		// gpio_request()·Î Á¡À¯ÇÑ GPIO ÇÉÀÇ lockÀ» ÇØÁ¦
+	free_irq(irq, NULL);         // void free_irq(unsigned int irq, void* dev_id); : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½
+	gpio_free(HCSR04_TRIGGER);      // gpio_request()ï¿½ ï¿½ï¿½ï¿½ GPIO ï¿½ï¿½ lockï¿½ ï¿½ï¿½
 	gpio_free(HCSR04_ECHO);
-	cdev_del(&us_cdev);				// cdev_add()·Î ¿¬°áÇÑ cdev ±¸Á¶Ã¼¸¦ Áö¿ò
-	unregister_chrdev_region(us_dev, 1);		// alloc_chrdev_region()·Î ÇÒ´çÇÑ major, minor ¹øÈ£¸¦ ÇØÁ¦
+	cdev_del(&us_cdev);            // cdev_add()ï¿½ ï¿½ï¿½ï¿½ cdev ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+	unregister_chrdev_region(us_dev, 1);      // alloc_chrdev_region()ï¿½ ï¿½ï¿½ï¿½ major, minor ï¿½ï¿½ï¿½ ï¿½ï¿½
 }
 
 MODULE_AUTHOR("gunmin, lee <gmlee@huins.com>");
