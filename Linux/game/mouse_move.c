@@ -13,6 +13,10 @@ char *socket_ext_msg = "exit";
 int sonic_buf;
 int sonic_fd;
 int step_motor_dev;					// device handler
+unsigned char step_motor_state[3];
+int step_motor_action;				// argv[1]
+int step_motor_dir;				// argv[2]
+int step_motor_speed;				// argv[3]
 
 #define SCREEN_X_MAX 1024						// LCD screen의 dot width
 #define SCREEN_Y_MAX 600						// LCD screen의 dot height
@@ -153,6 +157,7 @@ int main(int argc, char* argv[]) {
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
+	memset(step_motor_state, ' ', TEXT_LCD_MAX_BUF);
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -199,22 +204,16 @@ int main(int argc, char* argv[]) {
 			delete_thread = 0;
 			break;
 		case 5:
-			unsigned char state[3];
-			//int len;
-			int action;				// argv[1]
-			int dir;				// argv[2]
-			int speed;				// argv[3]
+			step_motor_action = 0;
+			step_motor_dir = 1;
+			step_motor_speed = 150;
 
-			action = 0;
-			dir = 1;
-			speed = 150;
+			memset(step_motor_state, 0, sizeof(step_motor_state));
+			step_motor_state[0] = (unsigned char)step_motor_action;
+			step_motor_state[1] = (unsigned char)step_motor_dir;
+			step_motor_state[2] = (unsigned char)step_motor_speed;
 
-			memset(state, 0, sizeof(state));
-			state[0] = (unsigned char)action;
-			state[1] = (unsigned char)dir;
-			state[2] = (unsigned char)speed;
-
-			write(step_motor_dev, state, 3);
+			write(step_motor_dev, step_motor_state, 3);
 			delete_thread = 0;
 		}
 
@@ -916,22 +915,19 @@ void* chat_func(void *data) {
 
 void* sonic_func(void *data) {
 	static int retval = 5;			// 종료되는 프로세스 번호
-	unsigned char state[3];
 	//int len;
-	int action;				// argv[1]
-	int dir;				// argv[2]
-	int speed;				// argv[3]
 
-	action = 1;
-	dir = 1;
-	speed = 150;
 
-	memset(state, 0, sizeof(state));
-	state[0] = (unsigned char)action;
-	state[1] = (unsigned char)dir;
-	state[2] = (unsigned char)speed;
+	step_motor_action = 1;
+	step_motor_dir = 1;
+	step_motor_speed = 150;
 
-	write(step_motor_dev, state, 3);
+	memset(step_motor_state, 0, sizeof(step_motor_state));
+	step_motor_state[0] = (unsigned char)step_motor_action;
+	step_motor_state[1] = (unsigned char)step_motor_dir;
+	step_motor_state[2] = (unsigned char)step_motor_speed;
+
+	write(step_motor_dev, step_motor_state, 3);
 
 	while (sonic_mode) {
 		read(sonic_fd, &sonic_buf, 2);
