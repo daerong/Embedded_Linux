@@ -754,6 +754,12 @@ void* mouse_ev_func(void *data) {
 			camera_update = 0;
 		}
 
+		if (step_motor_change) {
+			reset_display(display, proc_display);
+			draw_display(&fvs, pfbdata, display);
+			step_motor_change = 0;
+		}
+
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR)
@@ -838,6 +844,7 @@ void* mouse_ev_func(void *data) {
 									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 1, 0, 150);
 									step_motor_mode = 1;
+									step_motor_change = 1;
 								}
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
