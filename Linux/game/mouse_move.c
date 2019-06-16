@@ -10,8 +10,8 @@ char tcp_ip_func_msg[] = "tcp ip thread";
 char sonic_func_msg[] = "sonic thread";
 char *socket_ext_msg = "exit";
 
-int sonic_fd;
 int sonic_buf;
+int sonic_fd;
 
 #define SCREEN_X_MAX 1024						// LCD screenÀÇ dot width
 #define SCREEN_Y_MAX 600						// LCD screenÀÇ dot height
@@ -103,6 +103,8 @@ int main(int argc, char* argv[]) {
 	int chat_thread_id;						// pthread ID
 	pthread_t sonic_thread;
 	int sonic_thread_id;						// pthread ID
+	pthread_t write_sonic_thread;
+	int write_sonic_thread_id;						// pthread ID
 	pthread_t tcp_id_thread;
 	int tcp_id_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
@@ -142,6 +144,8 @@ int main(int argc, char* argv[]) {
 
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
+	sonic_fd = open(SONIC_DEVICE, O_RDWR);
+	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", SONIC_DEVICE);
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
@@ -178,6 +182,7 @@ int main(int argc, char* argv[]) {
 			break;
 		case 5:
 			sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
+			write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
 			printf("%s\n", sonic_func_msg);
 			make_thread = 0;
 		}
@@ -199,6 +204,7 @@ int main(int argc, char* argv[]) {
 	close(sock);
 	free(text_lcd_buf);
 	close(text_lcd_dev);
+	close(sonic_fd);
 
 	return 0;
 }
@@ -876,31 +882,34 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
+	int dev;					// device handler
+	unsigned char state[3];
+	//int len;
+	int action;				// argv[1]
+	int dir;				// argv[2]
+	int speed;				// argv[3]
 
-	pthread_t write_sonic_thread;
-	int write_sonic_thread_id;						// pthread ID
-	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
+	action = 1;
+	dir = 1;
+	speed = 150;
 
-	int retn;
-	int loop = 0;
-	sonic_fd = open("/dev/us", O_RDWR);
-	printf("fd = %d\n", sonic_fd);
-	if (sonic_fd < 0) {
-		perror("/dev/us error");
-		exit(-1);
-	}
-	else {
-		printf("< us device has been detected >\n");
-	}
+	memset(state, 0, sizeof(state));
+	state[0] = (unsigned char)action;
+	state[1] = (unsigned char)dir;
+	state[2] = (unsigned char)speed;
+
+	dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
+	assert2(dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
+
+	write(dev, state, 3);
+
 	while (1) {
 		read(sonic_fd, &sonic_buf, 2);
 		printf("distance user : %d (cm)\n", sonic_buf);
 		usleep(200000);
 	}
-	close(sonic_fd);
-	return 0;
 
-
+	close(dev);
 }
 
 void* write_sonic_func(void *data) {
