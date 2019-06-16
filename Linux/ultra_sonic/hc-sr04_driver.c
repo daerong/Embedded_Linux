@@ -37,7 +37,7 @@ static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
 struct file_operations us_fops = {
 	.open = us_open,
 	.release = us_release,
-	.trig = us_trig
+	.trig = us_trig,
 	.read = us_read
 };
 
