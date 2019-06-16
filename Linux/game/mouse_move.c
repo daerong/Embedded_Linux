@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
 	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
 	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
-	set_image(&fvs, pfbdata, display, 0, 0, "background.bmp");
+	set_image(&fvs, pfbdata, display, 0, 0, "hold.bmp");
 	draw_display(&fvs, pfbdata, display);
 
 
