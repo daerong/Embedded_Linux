@@ -31,7 +31,7 @@ u32 irq = -1;
 
 static int us_open(struct inode *inode, struct file *filp);
 static int us_release(struct inode *inode, struct file *filp);
-static ssize_t us_write(struct file *file, const char *buf, size_t count, loff_t *f_pos);
+static int us_write(struct file *file, const char *buf, size_t count, loff_t *f_pos);
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
 
 struct file_operations us_fops = {
@@ -56,7 +56,7 @@ static int us_release(struct inode *inode, struct file *filp) {
 	return 0;
 }
 
-static ssize_t us_write(struct file *file, const char *buf, size_t count, loff_t *f_pos) {
+static int us_write(struct file *file, const char *buf, size_t count, loff_t *f_pos) {
 	output_sonicburst();
 	mdelay(1);
 	return 0;
