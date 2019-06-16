@@ -165,6 +165,25 @@ int main(int argc, char* argv[]) {
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
+
+	int frame_fd;
+	struct fb_var_screeninfo fvs;
+	unsigned short *pfbdata;
+	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	frame_fd = open(LCD_DEVICE, O_RDWR);
+	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
+	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
+	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
+	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
+	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
+	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
+	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
+	set_image(&fvs, pfbdata, display, 0, 0, "hold.bmp");
+	draw_display(&fvs, pfbdata, display);
+	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
+	close(frame_fd);
+	free(display);
+
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
 	led_dev = open(LEDS_DEVICE, O_RDWR);
@@ -700,7 +719,7 @@ void* mouse_ev_func(void *data) {
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icondefalut.bmp");
+	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icondefalut.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icondefalut.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icondefalut.bmp");
@@ -792,10 +811,16 @@ void* mouse_ev_func(void *data) {
 							}
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
 								if (step_motor_mode) {
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 0, 0, 150);
 									step_motor_mode = 0;
 								}
 								else {
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5on.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 1, 0, 150);
 									step_motor_mode = 1;
 								}
