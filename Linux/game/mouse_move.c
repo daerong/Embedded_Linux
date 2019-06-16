@@ -886,10 +886,10 @@ void* sonic_func(void *data) {
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		read(sonic_fd, buf, 2);
-		usleep(50000);
-		printf("distance user : %d (cm)\n", &buf);
-		usleep(150000);
+		if (!read(sonic_fd, buf, 2)) {
+			printf("distance user : %d (cm)\n", &buf);
+		}
+		usleep(200000);
 	}
 
 	close(sonic_fd);
