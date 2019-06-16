@@ -184,27 +184,25 @@ int main(int argc, char* argv[]) {
 				ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
 				ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 				assert2(ret >= 0, "Device write error", FND_DEVICE);
-				target++;
+
 				break;
 			}
 		}
 
-		if (target_num[0] == answer_num[0] && target_num[1] == answer_num[1] && target_num[2] == answer_num[2] && target_num[3] == answer_num[3]) status = 0;
-		//if (target_num[3] == answer_num[3]) led_data += 16;
-		//if (target_num[2] == answer_num[2]) led_data += 32;
-		//if (target_num[1] == answer_num[1]) led_data += 64;
-		//if (target_num[0] == answer_num[0]) led_data += 128;
-		//if (led_data == 240) status = 0;
+		if (target_num[3] == answer_num[3]) led_data += 16;
+		if (target_num[2] == answer_num[2]) led_data += 32;
+		if (target_num[1] == answer_num[1]) led_data += 64;
+		if (target_num[0] == answer_num[0]) led_data += 128;
+		if (led_data == 240) status = 0;
 
 
 		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
 
 		ret = write(led_dev, &led_data, 1);
 		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
-		if (target == 4 && status != 0) {
-			memset(answer_num, 0, sizeof(answer_num));
-			ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
-			assert2(ret >= 0, "Device write error", FND_DEVICE);
+
+
+		if (target > 3 && status != 0) {
 			target = 0;
 		}
 
