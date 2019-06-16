@@ -42,7 +42,7 @@ char camera_mode;
 char num_baseball_mode;
 char lenna_img_mode;							// lenna image를 화면에 그리기 (1 : on, 0 : off)
 char step_motor_mode;
-char step_motor_change;
+char camera_delete;
 
 char camera_update;
 
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
 	num_baseball_mode = 0;
 	lenna_img_mode = 0;
 	step_motor_mode = 0;
-	step_motor_change = 0;
+	camera_delete = 0;
 
 	camera_update = 0;
 
@@ -756,10 +756,10 @@ void* mouse_ev_func(void *data) {
 			camera_update = 0;
 		}
 
-		if (step_motor_change) {
+		if (camera_delete) {
 			reset_display(display, proc_display);
 			draw_display(&fvs, pfbdata, display);
-			step_motor_change = 0;
+			camera_delete = 0;
 		}
 
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
@@ -790,6 +790,7 @@ void* mouse_ev_func(void *data) {
 									menu_copy(display, proc_display);
 									menu_update(&fvs, pfbdata, display);
 									camera_mode = 0;
+									camera_delete = 1;
 								}
 								else {
 									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2on.bmp");
@@ -846,7 +847,6 @@ void* mouse_ev_func(void *data) {
 									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 1, 0, 150);
 									step_motor_mode = 1;
-									step_motor_change = 1;
 								}
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
