@@ -21,7 +21,7 @@ int main(void)
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		read(fd, buf, 2);
+		trig(fd, buf, 2);
 		for (loop = 0; loop < 100000; loop++) {};
 	}
 	close(fd);
