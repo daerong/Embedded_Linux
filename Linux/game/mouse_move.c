@@ -219,6 +219,13 @@ int main(int argc, char* argv[]) {
 					ret = write(dot_dev, fpga_number[0], sizeof(fpga_number[0]));
 				}
 				else if(target > 3){
+					buzzer_state = BUZZER_ON;
+					write(buzzer_dev, &buzzer_state, 1);
+					sleep(1);
+					buzzer_state = BUZZER_OFF;
+					write(buzzer_dev, &buzzer_state, 1);
+					sleep(1);
+
 					answer_num[0] = 0;
 					answer_num[1] = 0;
 					answer_num[2] = 0;
