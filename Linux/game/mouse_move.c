@@ -183,6 +183,8 @@ int main(int argc, char* argv[]) {
 	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
 	dot_dev = open(DOT_DEVICE, O_WRONLY);
 	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
+	buzzer_dev = open(BUZZER_DEVICE, O_RDWR);
+	assert2(buzzer_dev >= 0, "Device open error", BUZZER_DEVICE);
 	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
 	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
 
@@ -191,6 +193,8 @@ int main(int argc, char* argv[]) {
 	led_data = 0;
 	ret = write(led_dev, &led_data, 1);
 	assert2(ret >= 0, "Device write error", LEDS_DEVICE);
+
+
 
 	while (status) {
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
@@ -255,8 +259,6 @@ int main(int argc, char* argv[]) {
 	assert2(sonic_fd >= 0, "Sonic Open Error!", SONIC_DEVICE);
 	step_motor_dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
 	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
-	buzzer_dev = open(BUZZER_DEVICE, O_RDWR);
-	assert2(buzzer_dev >= 0, "Device open error", BUZZER_DEVICE);
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
