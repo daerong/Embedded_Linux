@@ -128,12 +128,12 @@ int main(int argc, char* argv[]) {
 	char usage[50];
 	char buzzer_state = BUZZER_OFF;
 	ssize_t ret;
+	int target;
 
 	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
 	unsigned char target_num[4] = { 7,5,3,1 };
 	unsigned char answer_num[4];
 	unsigned char led_data = 0;
-	unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
 	memset(answer_num, 0, sizeof(answer_num));
 	int buf_locate;
 
