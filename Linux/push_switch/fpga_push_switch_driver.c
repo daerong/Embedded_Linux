@@ -49,7 +49,7 @@ static ssize_t iom_push_switch_read(struct file *file, char *buf, size_t count, 
 		return -EFAULT;
 	}
 
-	mdelay(300);
+	mdelay(50);
 
 	return count;
 }
