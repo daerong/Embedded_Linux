@@ -872,20 +872,27 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	int sonic_fd;
-	static int retval = 5;			// 종료되는 프로세스 번호
-	int *sonic_buf = (int *)malloc(sizeof(int));
-
-	sonic_fd = open(SONIC_DEVICE, O_RDONLY);
-	assert2(sonic_fd >= 0, "sonic Event Open Error!", SONIC_DEVICE);
-
+	int fd;
+	int retn;
+	int *buf = (int *)malloc(sizeof(int));
+	int loop = 0;
+	fd = open("/dev/us", O_RDWR);
+	printf("fd = %d\n", fd);
+	if (fd < 0) {
+		perror("/dev/us error");
+		exit(-1);
+	}
+	else {
+		printf("< us device has been detected >\n");
+	}
 	while (1) {
-		read(sonic_fd, sonic_buf, 4);
-		printf("distance user : %d (cm)\n", *sonic_buf);
-		usleep(200000);
+		read(fd, buf, 2);
+		for (loop = 0; loop < 100000; loop++) {};
+		printf("distance user : %d (cm)", *buf);
 	}
 
-	close(sonic_fd);
+	close(fd);
+	free(buf);
 	pthread_exit((void*)&retval);
 
 	return 0;
