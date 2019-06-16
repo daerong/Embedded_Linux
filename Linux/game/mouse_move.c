@@ -887,6 +887,7 @@ void* sonic_func(void *data) {
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
+		int buf = 100;
 		stat = read(fd, &buf, 2);
 		if (!stat) {
 			for (loop = 0; loop < 100000; loop++) {};
