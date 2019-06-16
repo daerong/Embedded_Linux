@@ -876,7 +876,7 @@ void* sonic_func(void *data) {
 	int retn;
 	int buf;
 	int loop = 0;
-	fd = open("/dev/us", O_RDWR);
+	sonic_fd = open("/dev/us", O_RDWR);
 	printf("fd = %d\n", sonic_fd);
 	if (sonic_fd < 0) {
 		perror("/dev/us error");
