@@ -908,6 +908,13 @@ void* write_sonic_func(void *data) {
 	while (1) {
 		write(sonic_fd, &sonic_buf, 2);
 		for (loop = 0; loop < 100000; loop++) {};
+		for (loop = 0; loop < 100000; loop++) {};
+		for (loop = 0; loop < 100000; loop++) {};
+		for (loop = 0; loop < 100000; loop++) {};
+		for (loop = 0; loop < 100000; loop++) {};
+		for (loop = 0; loop < 100000; loop++) {};
+		for (loop = 0; loop < 100000; loop++) {};
+		for (loop = 0; loop < 100000; loop++) {};
 	}
 
 }
