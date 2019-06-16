@@ -177,7 +177,6 @@ int main(int argc, char* argv[]) {
 	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
 
 	while (status) {
-
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
 			if (push_sw_buf[buf_locate] == 1) {
@@ -198,12 +197,12 @@ int main(int argc, char* argv[]) {
 		if (target_num[1] == answer_num[1]) led_data += 64;
 		if (target_num[0] == answer_num[0]) led_data += 128;
 		if (led_data == 240) status = 0;
+		else memset(answer_num, 0, sizeof(answer_num));
 
 		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
 
 		ret = write(led_dev, &led_data, 1);
 		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
-		usleep(100000);
 	}
 
 	close(fnd_dev);
