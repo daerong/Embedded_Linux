@@ -156,6 +156,17 @@ int main(int argc, char* argv[]) {
 	step_motor_dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
 	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
 
+	step_motor_action = 0;
+	step_motor_dir = 1;
+	step_motor_speed = 150;
+
+	memset(step_motor_state, 0, sizeof(step_motor_state));
+	step_motor_state[0] = (unsigned char)step_motor_action;
+	step_motor_state[1] = (unsigned char)step_motor_dir;
+	step_motor_state[2] = (unsigned char)step_motor_speed;
+
+	write(step_motor_dev, step_motor_state, 3);
+
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
 	memset(step_motor_state, ' ', TEXT_LCD_MAX_BUF);
@@ -205,6 +216,8 @@ int main(int argc, char* argv[]) {
 			delete_thread = 0;
 			break;
 		case 5:
+			pthread_join(sonic_thread, (void *)&thread_result);
+
 			step_motor_action = 0;
 			step_motor_dir = 1;
 			step_motor_speed = 150;
@@ -735,7 +748,6 @@ void* mouse_ev_func(void *data) {
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
 								if (sonic_mode) {
 									sonic_mode = 0;
-									
 								}
 								else {
 									sonic_mode = 1;
