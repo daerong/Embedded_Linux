@@ -873,14 +873,25 @@ void* chat_func(void *data) {
 
 void* sonic_func(void *data) {
 	int sonic_fd;
+	int retn;
 	int buf;
-	sonic_fd = open("/dev/us", O_RDWR);
-	assert2(sonic_fd >= 0, "Keyboard Event Open Error!", "/dev/us");
+	int loop = 0;
+	fd = open("/dev/us", O_RDWR);
+	printf("fd = %d\n", sonic_fd);
+	if (sonic_fd < 0) {
+		perror("/dev/us error");
+		exit(-1);
+	}
+	else {
+		printf("< us device has been detected >\n");
+	}
 	while (1) {
-		if (!read(sonic_fd, &buf, 2)) {
-			printf("%d\n", buf);
+		if (!read(sonic_fd, buf, 2)) {
+			printf("distance user : %d (cm)\n", &buf);
 		}
 		usleep(200000);
+
+
 	}
 
 	close(sonic_fd);
