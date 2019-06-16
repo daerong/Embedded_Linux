@@ -9,7 +9,7 @@ int main(void)
 {
 	int fd;
 	int retn;
-	char buf[10] = { 0 };
+	int data;
 	int loop = 0;
 	fd = open("/dev/us", O_RDWR);
 	printf("fd = %d\n", fd);
@@ -21,8 +21,9 @@ int main(void)
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		trig(fd, buf, 2);
+		trig(fd, &buf, 4);
 		for (loop = 0; loop < 100000; loop++) {};
+		read(fd, &buf, 4);
 	}
 	close(fd);
 	return 0;

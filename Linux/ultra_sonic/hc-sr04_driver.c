@@ -15,6 +15,7 @@ MODULE_LICENSE("GPL");
 #define HCSR04_TRIGGER IMX_GPIO_NR(2, 2)
 #define HCSR04_ECHO IMX_GPIO_NR(2, 3)
 
+int distance_record_int = 0;
 static int us_major = 0;
 static int us_minor = 0;
 static int result;
@@ -31,7 +32,7 @@ u32 irq = -1;
 static int us_open(struct inode *inode, struct file *filp);
 static int us_release(struct inode *inode, struct file *filp);
 static int us_trig(struct file *filp, char *buf, size_t count, loff_t *f_pos);
-static int us_read(struct file *filp, char *buf, size_t count, loff_t *f_pos);
+static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
 
 struct file_operations us_fops = {
 	.open = us_open,
@@ -59,10 +60,12 @@ static int us_trig(struct file *filp, char *buf, size_t count, loff_t *f_pos) {
 	mdelay(1);
 	return 0;
 }
-static int us_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {
-	output_sonicburst();
-	mdelay(1);
-	return 0;
+static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
+	if (copy_to_user(buf, &distance_record_int, count)) {			// 정상 종료 시 0을 반환
+		return -EFAULT;
+	}
+
+	return 1;
 }
 
 static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
@@ -72,6 +75,7 @@ static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_r
 	else {
 		do_gettimeofday(&after);
 		printk(KERN_ALERT" Distance : %.0ld [cm] \n ", (after.tv_usec - before.tv_usec) / 58);		// 단위변환, us/58 = Centimeter
+		distance_record_int = (after.tv_usec - before.tv_usec) / 58;
 		memset(&before, 0, sizeof(struct timeval));
 		memset(&after, 0, sizeof(struct timeval));
 	}
