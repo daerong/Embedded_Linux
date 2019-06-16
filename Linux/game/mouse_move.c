@@ -893,10 +893,12 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	while (step_motor_mode) {
-		read(sonic_fd, &sonic_buf, 2);
-		printf("distance user : %d (cm)\n", sonic_buf);
-		usleep(200000);
+	while (1) {
+		if () {
+			read(sonic_fd, &sonic_buf, 2);
+			printf("distance user : %d (cm)\n", sonic_buf);
+			usleep(200000);
+		}
 	}
 
 	close(step_motor_dev);
