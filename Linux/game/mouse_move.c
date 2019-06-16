@@ -826,6 +826,7 @@ void* chat_func(void *data) {
 					insert_text_buf(inner_text, &text_buf_index, ' ');
 					break;
 				case 'E':		// ENTER
+					memcpy(text_lcd_buf, inner_text, TEXT_LCD_LINE_BUF);
 					text_buf_index = 0;
 					send_msg_stat = 1;
 					break;
@@ -913,7 +914,7 @@ void* recv_msg(void* arg)
 			strncpy(text_lcd_buf, name_msg, str_len - 1);
 		}
 		else {
-			char *ptr1;
+			/*char *ptr1;
 			ptr1 = strrchr(name_msg, tar);
 			if (ptr1) {
 				locate = ptr1 - name_msg;
@@ -921,7 +922,7 @@ void* recv_msg(void* arg)
 
 
 			printf("%d %d : %s\n", str_len, locate, name_msg);
-			strncpy(text_lcd_buf, name_msg + locate, TEXT_LCD_LINE_BUF);
+			strncpy(text_lcd_buf, name_msg + locate, TEXT_LCD_LINE_BUF);*/
 		}
 
 		recv_msg_stat = 1;
