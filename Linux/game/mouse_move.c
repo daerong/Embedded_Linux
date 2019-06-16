@@ -1,4 +1,5 @@
 #include "../include/fpga_test.h"
+#include "../include/fpga_dot_font.h"
 
 typedef unsigned int U32;
 typedef short U16;
@@ -126,6 +127,7 @@ int main(int argc, char* argv[]) {
 	void* thread_return;
 	char usage[50];
 	char buzzer_state = BUZZER_OFF;
+	ssize_t ret;
 
 	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
 	unsigned char target_num[4] = { 7,5,3,1 };
