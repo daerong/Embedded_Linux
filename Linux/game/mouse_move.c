@@ -118,6 +118,7 @@ int main(int argc, char* argv[]) {
 	pthread_t snd_thread, rcv_thread;
 	void* thread_return;
 	char usage[50];
+	char buzzer_state = BUZZER_OFF;
 
 	sprintf(usage, "Usage : %s <ip> <port> <name>\n", argv[0]);
 	assert(argc == 4, usage);
@@ -178,10 +179,10 @@ int main(int argc, char* argv[]) {
 
 	while (1) {
 		if (step_motor_mode == 1 && sonic_buf < 15) {
-			state = 1;
+			buzzer_state = BUZZER_ON;
 			write(buzzer_dev, &state, 1);
 			sleep(1);
-			state = 0;
+			buzzer_state = BUZZER_OFF;
 			write(buzzer_dev, &state, 1);
 			sleep(1);
 		}
