@@ -165,6 +165,17 @@ int main(int argc, char* argv[]) {
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
+	fnd_dev = open(FND_DEVICE, O_RDWR);
+	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
+	led_dev = open(LEDS_DEVICE, O_RDWR);
+	assert2(led_dev >= 0, "Device open error", LEDS_DEVICE);
+	push_switch_dev = open(PUSH_SWITCH_DEVICE, O_RDONLY);
+	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
+	dot_dev = open(DOT_DEVICE, O_WRONLY);
+	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
+	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
+	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
+
 	while (status) {
 		usleep(100000);
 
@@ -211,18 +222,6 @@ int main(int argc, char* argv[]) {
 	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
 	buzzer_dev = open(BUZZER_DEVICE, O_RDWR);
 	assert2(buzzer_dev >= 0, "Device open error", BUZZER_DEVICE);
-
-	fnd_dev = open(FND_DEVICE, O_RDWR);
-	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
-	led_dev = open(LEDS_DEVICE, O_RDWR);
-	assert2(led_dev >= 0, "Device open error", LEDS_DEVICE);
-	push_switch_dev = open(PUSH_SWITCH_DEVICE, O_RDONLY);
-	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
-	dot_dev = open(DOT_DEVICE, O_WRONLY);
-	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
-	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
-	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
-
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
