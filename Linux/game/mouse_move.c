@@ -165,25 +165,6 @@ int main(int argc, char* argv[]) {
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
-	int frame_fd;
-	struct fb_var_screeninfo fvs;
-	unsigned short *pfbdata;
-	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
-	frame_fd = open(LCD_DEVICE, O_RDWR);
-	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
-	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
-	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
-	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
-	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
-	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
-	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
-	set_image(&fvs, pfbdata, display, 0, 0, "hold.bmp");
-	draw_display(&fvs, pfbdata, display);
-
-	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
-	close(frame_fd);
-	free(display);
-
 	fnd_dev = open(FND_DEVICE, O_RDWR);
 	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
 	led_dev = open(LEDS_DEVICE, O_RDWR);
@@ -194,6 +175,67 @@ int main(int argc, char* argv[]) {
 	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
 	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
 	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
+
+
+
+
+
+	int ret;
+	int frame_fd;
+	struct fb_var_screeninfo fvs;
+	unsigned short *pfbdata;
+	struct input_event ev;
+
+	MOUSE_CURSOR cur;
+	char draw_mode = 0;
+	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	DISPLAY *proc_display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	DISPLAY *background = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+
+	LOCATE start;
+	LOCATE end;
+	start.xpos = TOOLBAR_X_START;
+	start.ypos = 0;
+	end.xpos = TOOLBAR_X_END;
+	end.ypos = SCREEN_Y_MAX;
+
+	cur.x = SCREEN_X_MAX / 2;
+	cur.y = SCREEN_Y_MAX / 2;
+	int past_x = cur.x;
+	int past_y = cur.y;
+
+
+	frame_fd = open(LCD_DEVICE, O_RDWR);
+	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
+
+	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
+	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
+
+	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
+	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
+
+	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
+	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
+
+	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
+	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
+	reset_display(proc_display, background);
+
+	reset_display(display, proc_display);
+
+	draw_display(&fvs, pfbdata, display);
+
+	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
+	close(frame_fd);
+
+	free(display);
+	free(proc_display);
+	free(background);
+
+	return 0;
+
+
+
 
 	while (status) {
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
@@ -216,14 +258,14 @@ int main(int argc, char* argv[]) {
 		if (target_num[1] == answer_num[1]) led_data += 64;
 		if (target_num[0] == answer_num[0]) led_data += 128;
 		if (led_data == 240) status = 0;
-		
+
 
 		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
 
 		ret = write(led_dev, &led_data, 1);
 		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 
-		if(answer_num[0] != 0 && answer_num[1] != 0 && answer_num[2] != 0 && answer_num[3] != 0) memset(answer_num, 0, sizeof(answer_num));
+		if (answer_num[0] != 0 && answer_num[1] != 0 && answer_num[2] != 0 && answer_num[3] != 0) memset(answer_num, 0, sizeof(answer_num));
 	}
 
 	close(fnd_dev);
@@ -1027,7 +1069,7 @@ void* send_msg(void* arg) {
 	sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
 	write(sock, myInfo, strlen(myInfo));
 
-	while (1){
+	while (1) {
 		if (send_msg_stat) {
 			strncpy(msg, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
 			memset(clean_text, ' ', TEXT_LCD_LINE_BUF);
@@ -1052,7 +1094,7 @@ void* recv_msg(void* arg)
 	int str_len;
 	int locate = 0;;
 
-	while (1){
+	while (1) {
 		memset(name_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
 		if (str_len == -1)
