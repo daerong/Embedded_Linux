@@ -179,8 +179,6 @@ int main(int argc, char* argv[]) {
 
 
 
-
-	int ret;
 	int frame_fd;
 	struct fb_var_screeninfo fvs;
 	unsigned short *pfbdata;
