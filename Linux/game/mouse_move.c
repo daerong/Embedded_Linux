@@ -12,6 +12,7 @@ char *socket_ext_msg = "exit";
 
 int sonic_buf;
 int sonic_fd;
+int step_motor_dev;					// device handler
 
 #define SCREEN_X_MAX 1024						// LCD screen의 dot width
 #define SCREEN_Y_MAX 600						// LCD screen의 dot height
@@ -38,6 +39,7 @@ char text_lcd_mode;								// chat function : keyboard에서 입력한 값을 실시간으�
 char camera_mode;
 char num_baseball_mode;
 char lenna_img_mode;							// lenna image를 화면에 그리기 (1 : on, 0 : off)
+char sonic_mode;
 
 unsigned char *text_lcd_buf;					// text lcd에 실제적으로 쓰여질 buffer
 
@@ -146,6 +148,8 @@ int main(int argc, char* argv[]) {
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 	sonic_fd = open(SONIC_DEVICE, O_RDWR);
 	assert2(sonic_fd >= 0, "Sonic Open Error!", SONIC_DEVICE);
+	step_motor_dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
+	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
@@ -194,6 +198,24 @@ int main(int argc, char* argv[]) {
 			printf("thread %d down.\n", *((int *)thread_result));
 			delete_thread = 0;
 			break;
+		case 5:
+			unsigned char state[3];
+			//int len;
+			int action;				// argv[1]
+			int dir;				// argv[2]
+			int speed;				// argv[3]
+
+			action = 0;
+			dir = 1;
+			speed = 150;
+
+			memset(state, 0, sizeof(state));
+			state[0] = (unsigned char)action;
+			state[1] = (unsigned char)dir;
+			state[2] = (unsigned char)speed;
+
+			write(step_motor_dev, state, 3);
+			delete_thread = 0;
 		}
 
 	}
@@ -205,6 +227,7 @@ int main(int argc, char* argv[]) {
 	free(text_lcd_buf);
 	close(text_lcd_dev);
 	close(sonic_fd);
+	close(step_motor_dev);
 
 	return 0;
 }
@@ -710,7 +733,17 @@ void* mouse_ev_func(void *data) {
 								}
 							}
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
-								make_thread = 5;
+								if (sonic_mode) {
+									sonic_mode = 1;
+									make_thread = 5;
+								}
+								else {
+									sonic_mode = 0;
+									
+								}
+
+
+
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
 
@@ -882,14 +915,14 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	int dev;					// device handler
+	static int retval = 5;			// 종료되는 프로세스 번호
 	unsigned char state[3];
 	//int len;
 	int action;				// argv[1]
 	int dir;				// argv[2]
 	int speed;				// argv[3]
 
-	action = 0;
+	action = 1;
 	dir = 1;
 	speed = 150;
 
@@ -898,18 +931,17 @@ void* sonic_func(void *data) {
 	state[1] = (unsigned char)dir;
 	state[2] = (unsigned char)speed;
 
-	dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
-	assert2(dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
+	write(step_motor_dev, state, 3);
 
-	write(dev, state, 3);
-
-	while (1) {
+	while (sonic_mode) {
 		read(sonic_fd, &sonic_buf, 2);
 		printf("distance user : %d (cm)\n", sonic_buf);
 		usleep(200000);
 	}
 
-	close(dev);
+	delete_thread = 5;
+	pthread_exit((void*)&retval);
+
 }
 
 void* write_sonic_func(void *data) {
