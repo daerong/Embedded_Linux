@@ -171,6 +171,8 @@ int main(int argc, char* argv[]) {
 	menu();
 	pthread_create(&snd_thread, NULL, send_msg, (void*)&sock);
 	pthread_create(&rcv_thread, NULL, recv_msg, (void*)&sock);
+	sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
+	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
 
 	while (1) {
 		if (recv_msg_stat) {
@@ -187,11 +189,6 @@ int main(int argc, char* argv[]) {
 			printf("%s\n", chat_func_msg);
 			make_thread = 0;
 			break;
-		case 5:
-			sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
-			write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
-			printf("%s\n", sonic_func_msg);
-			make_thread = 0;
 		}
 
 		switch (delete_thread) {
