@@ -1,5 +1,4 @@
 #include "../include/fpga_test.h"
-#include "../include/fpga_dot_font.h"
 
 typedef unsigned int U32;
 typedef short U16;
@@ -102,13 +101,6 @@ char clnt_ip[NORMAL_SIZE];					// client ip address
 int main(int argc, char* argv[]) {
 	int text_lcd_dev;
 	int buzzer_dev;
-
-	int fnd_dev;
-	int led_dev;
-	int push_switch_dev;					// device handler
-	int dot_dev;
-	//int dip_switch_dev;
-
 	pthread_t mouse_ev_thread;				// mouse event thread의 file descriptor 
 	int mouse_thread_id;					// pthread ID
 	pthread_t chat_thread;
@@ -120,22 +112,13 @@ int main(int argc, char* argv[]) {
 	pthread_t tcp_id_thread;
 	int tcp_id_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
-	int status = 1;							// mutex result
+	int status;							// mutex result
 	int sock;
 	struct sockaddr_in serv_addr;
 	pthread_t snd_thread, rcv_thread;
 	void* thread_return;
 	char usage[50];
 	char buzzer_state = BUZZER_OFF;
-	ssize_t ret;
-	int target;
-
-	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
-	unsigned char target_num[4] = { 7,5,3,1 };
-	unsigned char answer_num[4];
-	unsigned char led_data = 0;
-	memset(answer_num, 0, sizeof(answer_num));
-	int buf_locate;
 
 	sprintf(usage, "Usage : %s <ip> <port> <name>\n", argv[0]);
 	assert(argc == 4, usage);
@@ -164,77 +147,6 @@ int main(int argc, char* argv[]) {
 	recv_msg_stat = 0;
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
-
-	fnd_dev = open(FND_DEVICE, O_RDWR);
-	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
-	led_dev = open(LEDS_DEVICE, O_RDWR);
-	assert2(led_dev >= 0, "Device open error", LEDS_DEVICE);
-	push_switch_dev = open(PUSH_SWITCH_DEVICE, O_RDONLY);
-	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
-	dot_dev = open(DOT_DEVICE, O_WRONLY);
-	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
-	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
-	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
-
-
-	int frame_fd;
-	struct fb_var_screeninfo fvs;
-	unsigned short *pfbdata;
-	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
-	frame_fd = open(LCD_DEVICE, O_RDWR);
-	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
-	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
-	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
-	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
-	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
-	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
-	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
-	//set_image(&fvs, pfbdata, display, 0, 0, "hold.bmp");
-	//draw_display(&fvs, pfbdata, display);
-
-	munmap(pfbdata, fvs.xres*fvs.yres * sizeof(U16));
-	close(frame_fd);
-	free(display);
-
-
-
-
-	while (status) {
-		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
-		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
-			if (push_sw_buf[buf_locate] == 1) {
-				answer_num[target] = buf_locate + 1;
-				ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
-				if (target < 4) target++;
-				else target = 0;
-				break;
-			}
-		}
-
-		ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
-		assert2(ret >= 0, "Device write error", FND_DEVICE);
-
-
-		if (target_num[3] == answer_num[3]) led_data += 16;
-		if (target_num[2] == answer_num[2]) led_data += 32;
-		if (target_num[1] == answer_num[1]) led_data += 64;
-		if (target_num[0] == answer_num[0]) led_data += 128;
-		if (led_data == 240) status = 0;
-		
-
-		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
-
-		ret = write(led_dev, &led_data, 1);
-		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
-
-		if(answer_num[0] != 0 && answer_num[1] != 0 && answer_num[2] != 0 && answer_num[3] != 0) memset(answer_num, 0, sizeof(answer_num));
-	}
-
-	close(fnd_dev);
-	close(led_dev);
-	close(push_switch_dev);
-	close(dot_dev);
-	//close(dip_switch_dev);
 
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
@@ -723,7 +635,7 @@ void* mouse_ev_func(void *data) {
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
+	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icondefalut.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icondefalut.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icondefalut.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icondefalut.bmp");
@@ -815,16 +727,10 @@ void* mouse_ev_func(void *data) {
 							}
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
 								if (step_motor_mode) {
-									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
-									menu_copy(display, proc_display);
-									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 0, 0, 150);
 									step_motor_mode = 0;
 								}
 								else {
-									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5on.bmp");
-									menu_copy(display, proc_display);
-									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 1, 0, 150);
 									step_motor_mode = 1;
 								}
@@ -1031,7 +937,7 @@ void* send_msg(void* arg) {
 	sprintf(myInfo, "%s's join. IP_%s\n", name, clnt_ip);
 	write(sock, myInfo, strlen(myInfo));
 
-	while (1){
+	while (1) {
 		if (send_msg_stat) {
 			strncpy(msg, text_lcd_buf + TEXT_LCD_LINE_BUF, TEXT_LCD_LINE_BUF);
 			memset(clean_text, ' ', TEXT_LCD_LINE_BUF);
@@ -1056,7 +962,7 @@ void* recv_msg(void* arg)
 	int str_len;
 	int locate = 0;;
 
-	while (1){
+	while (1) {
 		memset(name_msg, ' ', NORMAL_SIZE + MSG_BUF_SIZE);
 		str_len = read(sock, name_msg, NORMAL_SIZE + MSG_BUF_SIZE - 1);
 		if (str_len == -1)
