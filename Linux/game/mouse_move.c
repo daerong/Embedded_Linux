@@ -9,15 +9,15 @@ char chat_func_msg[] = "keyboard thread";
 char tcp_ip_func_msg[] = "tcp ip thread";
 char *socket_ext_msg = "exit";
 
-#define SCREEN_X_MAX 1024
-#define SCREEN_Y_MAX 600
-#define PALETTE_X_END 949
-#define TOOLBAR_X_START 950
+#define SCREEN_X_MAX 1024						// LCD screen의 dot width
+#define SCREEN_Y_MAX 600						// LCD screen의 dot height
+#define PALETTE_X_END 949						// LCD screen에서 실제적으로 이용하는 부분 0~949
+#define TOOLBAR_X_START 950						// LCD screen에서 menu를 표시할 부분 950~1024
 #define TOOLBAR_X_END 1024
-#define ICON_WIDTH 50
-#define ICON_START TOOLBAR_X_START + 12
+#define ICON_WIDTH 50							// menu icon의 width
+#define ICON_START TOOLBAR_X_START + 12			// menu icon간 가로 space = 12
 #define ICON_END ICON_START + ICON_WIDTH
-#define ICON_1_Y_START 8
+#define ICON_1_Y_START 8						// menu icon간 세로 spcae = 8
 #define ICON_2_Y_START 66
 #define ICON_3_Y_START 124
 #define ICON_4_Y_START 182
@@ -30,12 +30,12 @@ char *socket_ext_msg = "exit";
 #define MY_NAME "Yoo"
 
 U16 menubox_color;
-char text_lcd_mode;	// on = 1, off = 0
+char text_lcd_mode;								// chat function : keyboard에서 입력한 값을 실시간으로 text lcd에 띄우기 위한 모드 (1 : on, 0 : off)
 char camera_mode;
 char num_baseball_mode;
-char lenna_img_mode;
+char lenna_img_mode;							// lenna image를 화면에 그리기 (1 : on, 0 : off)
 
-unsigned char *text_lcd_buf;
+unsigned char *text_lcd_buf;					// text lcd에 실제적으로 쓰여질 buffer
 
 char make_thread;
 char delete_thread;
@@ -43,55 +43,56 @@ char icon_off;
 char send_msg_stat;
 char recv_msg_stat;
 
-typedef struct DISPLAY {
+typedef struct DISPLAY {						// screen 색상을 저장할 구조체
 	int xpos;
 	int ypos;
 	U16 color;
 } DISPLAY;
-typedef struct LOCATE {
+typedef struct LOCATE {							// 좌표를 편리하게 다루기 위한 구조체
 	int xpos;
 	int ypos;
 } LOCATE;
-typedef struct MOUSE_CURSOR {
+typedef struct MOUSE_CURSOR {					// 커서를 지정하기 위한 구조체
 	int x;
 	int y;
 } MOUSE_CURSOR;
 
-U16 makepixel(U32  r, U32 g, U32 b);
-void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void set_pixel(DISPLAY *target, int xpos, int ypos, unsigned short pixel);
-void reset_display(DISPLAY *target, DISPLAY *background);
-void menu_copy(DISPLAY *target, DISPLAY *background);
-void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);
-void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
-void menu_update(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);
-void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);
-void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *proc_display);
-void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);
-void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
-void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);
-void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *proc_display, DISPLAY *background, int xpos, int ypos, char *file_name);
-char u16_to_char(short target);
-void* mouse_ev_func(void *data);
-void* chat_func(void *data);
-/* tcp function */
-void* send_msg(void* arg);
-void* recv_msg(void* arg);
-void error_handling(char* msg);
-void menu();
 
-char name[NORMAL_SIZE] = "[DEFALT]";     // name
-char msg_form[NORMAL_SIZE];            // msg form
-char serv_time[NORMAL_SIZE];        // server time
-char msg[MSG_BUF_SIZE];                    // msg
-char serv_port[NORMAL_SIZE];        // server port number
-char clnt_ip[NORMAL_SIZE];            // client ip address
+U16 makepixel(U32 r, U32 g, U32 b);				// r, g, b 값을 입력해 framebuffer 색상 값을 얻어내는 함수 
+void put_pixel(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);		// screen의 (xpos, ypos)위치에 pixel 색상을 가진 점을 찍는 함수
+void set_pixel(DISPLAY *target, int xpos, int ypos, unsigned short pixel);				// DISPLAY의 (xpos, ypos) 위치에 색상을 세팅하는 함수
+void reset_display(DISPLAY *target, DISPLAY *background);								// DISPLAY 구조체를 copy
+void menu_copy(DISPLAY *target, DISPLAY *background);									// DISPLAY 구조체에서 menu 영역만 copy
+void fill_box(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, LOCATE start, LOCATE end, unsigned short pixel);		// start~end 영역의 사각형을 pixel 색상으로 채움
+void draw_display(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);		// DISPLAY의 정보를 lcd 화면에 그림
+void menu_update(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target);		// menu 부분을 그림
+void draw_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, unsigned short pixel);							// cursor를 화면에 그림
+void erase_cursor(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, int xpos, int ypos, DISPLAY *target, DISPLAY *proc_display);		// 이전 좌표의 cursor를 지움
+void insert_text_buf(unsigned char *target_buf, int *locate, unsigned char insert_text);		// target_buf 배열의 locate 위치에 insert_text 값을 입력
+void set_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);				// file_name 이름을 가진 이미지를 DISPLAY 구조체에 set
+void set_small_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *target, int xpos, int ypos, char *file_name);			// 50 x 50 pixel의 이미지가 이상하게 나오는 현상으로 200 x 200 이미지를 샘플링하여 사용함
+void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY *proc_display, DISPLAY *background, int xpos, int ypos, char *file_name);		// 이미지 영역을 지운다.
+char u16_to_char(short target);				// short 변수를 char변수로 변환
+void* mouse_ev_func(void *data);			// mouse의 이벤트로 LCD screen을 조작하기 위한 thread 생성 시 쓰레드로 사용될 함수
+void* chat_func(void *data);				// chat function : keyboard 이벤트 동적 사용 thread
+/* tcp function */
+void* send_msg(void* arg);					// tcp/ip에서 사용할 send thread
+void* recv_msg(void* arg);					// tcp/ip에서 사용할 receive thread
+void error_handling(char* msg);
+void menu();								// tcp/ip에 대한 내용을 띄어줄 함수
+
+char name[NORMAL_SIZE] = "[DEFALT]";		// name
+char msg_form[NORMAL_SIZE];					// msg form
+char serv_time[NORMAL_SIZE];				// server time
+char msg[MSG_BUF_SIZE];						// msg
+char serv_port[NORMAL_SIZE];				// server port number
+char clnt_ip[NORMAL_SIZE];					// client ip address
 /* tcp function */
 
 int main(int argc, char* argv[]) {
 	int text_lcd_dev;
-	pthread_t mouse_ev_thread;
-	int mouse_thread_id;						// pthread ID
+	pthread_t mouse_ev_thread;				// mouse event thread의 file descriptor 
+	int mouse_thread_id;					// pthread ID
 	pthread_t chat_thread;
 	int chat_thread_id;						// pthread ID
 	pthread_t tcp_id_thread;
