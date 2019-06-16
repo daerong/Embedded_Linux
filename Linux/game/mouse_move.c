@@ -893,19 +893,20 @@ void* sonic_func(void *data) {
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		read(sonic_fd, &buf, 2);
-		printf("distance user : %d (cm)\n", buf);
+		read(sonic_fd, &sonic_buf, 2);
+		printf("distance user : %d (cm)\n", sonic_buf);
 		usleep(200000);
 	}
-	close(fd);
+	close(sonic_fd);
 	return 0;
 
 
 }
 
 void* write_sonic_func(void *data) {
+	int loop = 0;
 	while (1) {
-		write(sonic_fd, &buf, 2);
+		write(sonic_fd, &sonic_buf, 2);
 		for (loop = 0; loop < 100000; loop++) {};
 	}
 
