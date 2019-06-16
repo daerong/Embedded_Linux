@@ -749,7 +749,7 @@ void* mouse_ev_func(void *data) {
 		}
 
 		if (camera_mode) {
-			set_image(&fvs, pfbdata, display, 0, 0, "lenna.bmp");
+			set_image(&fvs, pfbdata, display, 0, 0, "../nfs/test.bmp");
 			draw_display(&fvs, pfbdata, display);
 			camera_update = 0;
 		}
