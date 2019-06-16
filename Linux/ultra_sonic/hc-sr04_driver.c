@@ -61,7 +61,7 @@ static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 		return -EFAULT;
 	}
 
-	mdelay(200);
+	mdelay(1000);
 	return 0;
 }
 
