@@ -628,19 +628,19 @@ void* mouse_ev_func(void *data) {
 	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
 
 	fill_box(&fvs, pfbdata, background, start, end, menubox_color);
-	set_image(&fvs, pfbdata, background, 0, 0, "background.bmp");
+	set_image(&fvs, pfbdata, background, 0, 0, "hold.bmp");
 	reset_display(proc_display, background);
 
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icondefalut.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icondefalut.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icondefalut.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icondefalut.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icondefalut.bmp");
-	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icondefalut.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_1_Y_START, "icon1.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icondefalut.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icondefalut.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icondefalut.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icondefalut.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_9_Y_START, "icondefalut.bmp");
+	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_10_Y_START, "icondefalut.bmp");
 	reset_display(display, proc_display);
 
 	draw_display(&fvs, pfbdata, display);
