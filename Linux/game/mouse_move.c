@@ -721,7 +721,6 @@ void* mouse_ev_func(void *data) {
 								else {
 									step_motor_update(step_motor_dev, 1, 0, 150);
 									step_motor_mode = 1;
-									make_thread = 5;
 								}
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
@@ -894,7 +893,7 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	while (1) {
+	while (step_motor_mode) {
 		read(sonic_fd, &sonic_buf, 2);
 		printf("distance user : %d (cm)\n", sonic_buf);
 		usleep(200000);
