@@ -887,7 +887,7 @@ void* sonic_func(void *data) {
 	}
 	while (1) {
 		read(fd, buf, 2);
-		for (loop = 0; loop < 1000000; loop++) {};
+		usleep(200000);
 		printf("distance user : %d (cm)\n", *buf);
 	}
 	close(fd);
