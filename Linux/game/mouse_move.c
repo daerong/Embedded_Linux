@@ -876,9 +876,9 @@ void* chat_func(void *data) {
 
 void* sonic_func(void *data) {
 
-	pthread_t sonic_thread;
-	int sonic_thread_id;						// pthread ID
-	sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
+	pthread_t write_sonic_thread;
+	int write_sonic_thread_id;						// pthread ID
+	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
 
 	int retn;
 	int loop = 0;
