@@ -180,10 +180,10 @@ int main(int argc, char* argv[]) {
 	while (1) {
 		if (step_motor_mode == 1 && sonic_buf < 15) {
 			buzzer_state = BUZZER_ON;
-			write(buzzer_dev, &state, 1);
+			write(buzzer_dev, &buzzer_state, 1);
 			sleep(1);
 			buzzer_state = BUZZER_OFF;
-			write(buzzer_dev, &state, 1);
+			write(buzzer_dev, &buzzer_state, 1);
 			sleep(1);
 		}
 
