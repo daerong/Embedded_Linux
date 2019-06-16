@@ -24,7 +24,7 @@ int main(void)
 	while (1) {
 		state = read(fd, buf, 2);
 		printf("distance user : %d (cm)\n", *buf);
-		msleep(200);
+		usleep(200000);
 	}
 	close(fd);
 	return 0;
