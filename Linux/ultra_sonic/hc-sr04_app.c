@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <asm/delay.h>
 
 int main(void)
 {
@@ -23,11 +24,8 @@ int main(void)
 	}
 	while (1) {
 		state = read(fd, buf, 2);
-		if (!state) {
-			printf("distance user : %d (cm)\n", *buf);
-			state = 1;
-		}
-
+		printf("distance user : %d (cm)\n", *buf);
+		msleep(200);
 	}
 	close(fd);
 	return 0;
