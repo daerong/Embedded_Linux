@@ -197,12 +197,14 @@ int main(int argc, char* argv[]) {
 		if (target_num[1] == answer_num[1]) led_data += 64;
 		if (target_num[0] == answer_num[0]) led_data += 128;
 		if (led_data == 240) status = 0;
-		else memset(answer_num, 0, sizeof(answer_num));
+		
 
 		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
 
 		ret = write(led_dev, &led_data, 1);
 		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
+
+		if(answer_num[0] != 0 && answer_num[1] != 0 && answer_num[2] != 0 && answer_num[3] != 0) memset(answer_num, 0, sizeof(answer_num));
 	}
 
 	close(fnd_dev);
