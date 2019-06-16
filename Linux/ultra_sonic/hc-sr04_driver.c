@@ -37,8 +37,8 @@ static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
 struct file_operations us_fops = {
 	.open = us_open,
 	.release = us_release,
-	.read = us_trig
-	.trig = us_read
+	.trig = us_trig
+	.read = us_read
 };
 
 static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs);
