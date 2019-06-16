@@ -872,13 +872,13 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	int sonic_fd;
+	int fd;
 	int retn;
-	int buf;
+	int *buf = (int *)malloc(sizeof(int));
 	int loop = 0;
-	sonic_fd = open("/dev/us", O_RDWR);
-	printf("fd = %d\n", sonic_fd);
-	if (sonic_fd < 0) {
+	fd = open("/dev/us", O_RDWR);
+	printf("fd = %d\n", fd);
+	if (fd < 0) {
 		perror("/dev/us error");
 		exit(-1);
 	}
@@ -886,18 +886,11 @@ void* sonic_func(void *data) {
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		if (!read(sonic_fd, &buf, 2)) {
-			printf("distance user : %d (cm)\n", buf);
-		}
+		read(fd, buf, 2);
 		usleep(200000);
-
-
+		printf("distance user : %d (cm)\n", *buf);
 	}
-
-	close(sonic_fd);
-	//free(buf);
-	//pthread_exit((void*)&retval);
-
+	close(fd);
 	return 0;
 }
 
