@@ -34,6 +34,7 @@ static int us_release(struct inode *inode, struct file *filp);
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
 
 struct file_operations us_fops = {
+	.owner = THIS_MODULE,
 	.open = us_open,
 	.release = us_release,
 	.read = us_read
