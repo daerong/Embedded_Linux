@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 	sonic_fd = open(SONIC_DEVICE, O_RDWR);
-	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", SONIC_DEVICE);
+	assert2(sonic_fd >= 0, "Sonic Open Error!", SONIC_DEVICE);
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
