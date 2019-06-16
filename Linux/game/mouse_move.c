@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
 
 				if (target_num[3] == answer_num[3] && target_num[2] == answer_num[2] && target_num[1] == answer_num[1] && target_num[0] == answer_num[0]) {
 					status = 0;
-					led_data = 256;
+					led_data = 255;
 					assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
 					ret = write(led_dev, &led_data, 1);
 					assert2(ret >= 0, "Device write error", LEDS_DEVICE);
