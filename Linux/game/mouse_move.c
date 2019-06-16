@@ -184,14 +184,10 @@ int main(int argc, char* argv[]) {
 				ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
 				ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 				assert2(ret >= 0, "Device write error", FND_DEVICE);
-				if (target < 4) target++;
-				else target = 0;
+				target++;
 				break;
 			}
 		}
-
-
-
 
 		if (target_num[3] == answer_num[3]) led_data += 16;
 		if (target_num[2] == answer_num[2]) led_data += 32;
@@ -205,7 +201,7 @@ int main(int argc, char* argv[]) {
 		ret = write(led_dev, &led_data, 1);
 		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 
-		if (answer_num[0] != 0 && answer_num[1] != 0 && answer_num[2] != 0 && answer_num[3] != 0) {
+		if (target > 3 && status != 0) {
 			memset(answer_num, 0, sizeof(answer_num));
 			ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 			assert2(ret >= 0, "Device write error", FND_DEVICE);
