@@ -803,8 +803,7 @@ void* mouse_ev_func(void *data) {
 									menu_copy(display, proc_display);
 									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 1, 0, 150);
-									step_motor_mode = 1;
-								}
+									step_mot
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
 

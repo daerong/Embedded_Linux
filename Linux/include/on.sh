@@ -7,7 +7,6 @@ insmod fpga_text_lcd_driver.ko
 insmod fpga_step_motor_driver.ko
 insmod fpga_buzzer_driver.ko
 insmod fpga_dip_switch_driver.ko
-insmod hc-sr04_driver.ko
 
 mknod /dev/fpga_fnd c 261 0
 mknod /dev/fpga_led c 260 0
@@ -17,4 +16,3 @@ mknod /dev/fpga_text_lcd c 263 0
 mknod /dev/fpga_step_motor c 267 0
 mknod /dev/fpga_buzzer c 264 0
 mknod /dev/fpga_dip_switch c 266 0
-mknod /dev/us c 246 0
