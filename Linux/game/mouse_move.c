@@ -876,8 +876,8 @@ void* sonic_func(void *data) {
 	static int retval = 5;			// 종료되는 프로세스 번호
 	int *sonic_buf = (int *)malloc(sizeof(int));
 
-	keyboard_fd = open(SONIC_DEVICE, O_RDONLY);
-	assert2(keyboard_fd >= 0, "Keyboard Event Open Error!", SONIC_DEVICE);
+	sonic_fd = open(SONIC_DEVICE, O_RDONLY);
+	assert2(sonic_fd >= 0, "sonic Event Open Error!", SONIC_DEVICE);
 
 	while (1) {
 		read(sonic_fd, sonic_buf, 4);
@@ -886,6 +886,7 @@ void* sonic_func(void *data) {
 	}
 
 	close(sonic_fd);
+	pthread_exit((void*)&retval);
 
 	return 0;
 }
