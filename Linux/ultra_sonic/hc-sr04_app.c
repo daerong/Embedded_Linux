@@ -21,7 +21,7 @@ int main(void)
 	while (1) {
 		read(fd, buf, 2);
 		for (loop = 0; loop < 100000; loop++) {};
-		printf("distance user : %d (cm)", *buf);
+		printf("distance user : %d (cm)\n", *buf);
 	}
 	close(fd);
 	return 0;
