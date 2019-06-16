@@ -139,6 +139,7 @@ int main(int argc, char* argv[]) {
 	camera_mode = 0;
 	num_baseball_mode = 0;
 	lenna_img_mode = 0;
+	sonic_mode = 0;
 
 	make_thread = 0;
 	delete_thread = 0;
@@ -733,12 +734,12 @@ void* mouse_ev_func(void *data) {
 							}
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
 								if (sonic_mode) {
-									sonic_mode = 1;
-									make_thread = 5;
-								}
-								else {
 									sonic_mode = 0;
 									
+								}
+								else {
+									sonic_mode = 1;
+									make_thread = 5;
 								}
 
 
@@ -916,7 +917,6 @@ void* chat_func(void *data) {
 void* sonic_func(void *data) {
 	static int retval = 5;			// 종료되는 프로세스 번호
 	//int len;
-
 
 	step_motor_action = 1;
 	step_motor_dir = 1;
