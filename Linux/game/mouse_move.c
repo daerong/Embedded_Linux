@@ -9,6 +9,7 @@ char mouse_func_msg[] = "mouse thread";
 char chat_func_msg[] = "keyboard thread";
 char tcp_ip_func_msg[] = "tcp ip thread";
 char sonic_func_msg[] = "sonic thread";
+char camera_func_msg[] = "camera thread";
 char *socket_ext_msg = "exit";
 
 int sonic_buf;
@@ -41,6 +42,8 @@ char camera_mode;
 char num_baseball_mode;
 char lenna_img_mode;							// lenna image¸¦ È­¸é¿¡ ±×¸®±â (1 : on, 0 : off)
 char step_motor_mode;
+
+char camera_update;
 
 unsigned char *text_lcd_buf;					// text lcd¿¡ ½ÇÁ¦ÀûÀ¸·Î ¾²¿©Áú buffer
 
@@ -84,6 +87,7 @@ void* mouse_ev_func(void *data);			// mouseÀÇ ÀÌº¥Æ®·Î LCD screenÀ» Á¶ÀÛÇÏ±â À§Ç
 void* chat_func(void *data);				// chat function : keyboard ÀÌº¥Æ® µ¿Àû »ç¿ë thread
 void* sonic_func(void *data);
 void* write_sonic_func(void *data);
+void* camera_func(void *data);
 /* tcp function */
 void* send_msg(void* arg);					// tcp/ip¿¡¼­ »ç¿ëÇÒ send thread
 void* recv_msg(void* arg);					// tcp/ip¿¡¼­ »ç¿ëÇÒ receive thread
@@ -117,8 +121,10 @@ int main(int argc, char* argv[]) {
 	int sonic_thread_id;						// pthread ID
 	pthread_t write_sonic_thread;
 	int write_sonic_thread_id;						// pthread ID
-	pthread_t tcp_id_thread;
-	int tcp_id_thread_id;						// pthread ID
+	//pthread_t tcp_id_thread;
+	//int tcp_id_thread_id;						// pthread ID
+	pthread_t camera_thread;
+	int camera_thread_id;						// pthread ID
 	void *thread_result;				// pthread return
 	int status = 1;							// mutex result
 	int sock;
@@ -156,6 +162,8 @@ int main(int argc, char* argv[]) {
 	num_baseball_mode = 0;
 	lenna_img_mode = 0;
 	step_motor_mode = 0;
+
+	camera_update = 0;
 
 	make_thread = 0;
 	delete_thread = 0;
@@ -224,25 +232,6 @@ int main(int argc, char* argv[]) {
 
 			}
 		}
-
-
-
-
-
-		//if (target_num[3] == answer_num[3]) led_data += 16;
-		//if (target_num[2] == answer_num[2]) led_data += 32;
-		//if (target_num[1] == answer_num[1]) led_data += 64;
-		//if (target_num[0] == answer_num[0]) led_data += 128;
-		//if (led_data == 240) {
-		//	status = 0;
-		//	break;
-		//}
-
-
-		//assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
-
-		//ret = write(led_dev, &led_data, 1);
-		//assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 	}
 
 	close(fnd_dev);
@@ -279,6 +268,7 @@ int main(int argc, char* argv[]) {
 	pthread_create(&rcv_thread, NULL, recv_msg, (void*)&sock);
 	sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
 	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
+	camera_thread_id = pthread_create(&camera_thread, NULL, camera_func, (void *)&camera_func_msg);
 
 	while (1) {
 		if (step_motor_mode == 1 && sonic_buf < 20) {
@@ -758,6 +748,12 @@ void* mouse_ev_func(void *data) {
 			break;
 		}
 
+		if (camera_update) {
+			set_image(&fvs, pfbdata, display, 0, 0, "~/work/OPENCV/opencv-2.4.13/test/test.bmp");
+			draw_display(&fvs, pfbdata, display);
+			camera_update = 0;
+		}
+
 		if (read(mouse_fd, &ev, sizeof(struct input_event)) < 0) {
 			printf("check\n");
 			if (errno == EINTR)
@@ -1031,6 +1027,13 @@ void* write_sonic_func(void *data) {
 		write(sonic_fd, &sonic_buf, 2);
 	}
 
+}
+
+void* camera_func(void *data) {
+	if (camera_mode) {
+		camera_update = 1;
+	}
+	sleep(3);
 }
 
 void* send_msg(void* arg) {
