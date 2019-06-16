@@ -129,7 +129,6 @@ int main(int argc, char* argv[]) {
 	char buzzer_state = BUZZER_OFF;
 	ssize_t ret;
 	int target = 0;
-	int good_num;
 
 	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
 	unsigned char target_num[4] = { 7,5,3,1 };
@@ -178,39 +177,33 @@ int main(int argc, char* argv[]) {
 	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
 
 	while (status) {
-		good_num = 99;
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
 			if (push_sw_buf[buf_locate] == 1) {
-				good_num = buf_locate + 1;
+				answer_num[target] = buf_locate + 1;
+				ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
+				ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
+				assert2(ret >= 0, "Device write error", FND_DEVICE);
+				target++;
 				break;
 			}
 		}
 
-		if (good_num != 99) {
-			answer_num[target] = good_num;
-			target++;
-			ret = write(dot_dev, fpga_number[good_num], sizeof(fpga_number[good_num]));
-			ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
-			assert2(ret >= 0, "Device write error", FND_DEVICE);
-
-
-			if (target_num[3] == answer_num[3]) led_data += 16;
-			if (target_num[2] == answer_num[2]) led_data += 32;
-			if (target_num[1] == answer_num[1]) led_data += 64;
-			if (target_num[0] == answer_num[0]) led_data += 128;
-			if (led_data == 240) {
-				status = 0;
-				break;
-			}
-
-			assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
-
-			ret = write(led_dev, &led_data, 1);
-			assert2(ret >= 0, "Device write error", LEDS_DEVICE);
+		if (target_num[3] == answer_num[3]) led_data += 16;
+		if (target_num[2] == answer_num[2]) led_data += 32;
+		if (target_num[1] == answer_num[1]) led_data += 64;
+		if (target_num[0] == answer_num[0]) led_data += 128;
+		if (led_data == 240) {
+			status = 0;
+			target = 0;
+			break;
 		}
 
 
+		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
+
+		ret = write(led_dev, &led_data, 1);
+		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 
 		if (target > 3) {
 			answer_num[0] = 0;
