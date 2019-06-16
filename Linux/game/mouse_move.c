@@ -101,6 +101,13 @@ char clnt_ip[NORMAL_SIZE];					// client ip address
 int main(int argc, char* argv[]) {
 	int text_lcd_dev;
 	int buzzer_dev;
+
+	int fnd_dev;
+	int led_dev;
+	int push_switch_dev;					// device handler
+	int dot_dev;
+	//int dip_switch_dev;
+
 	pthread_t mouse_ev_thread;				// mouse event thread¿« file descriptor 
 	int mouse_thread_id;					// pthread ID
 	pthread_t chat_thread;
@@ -119,6 +126,14 @@ int main(int argc, char* argv[]) {
 	void* thread_return;
 	char usage[50];
 	char buzzer_state = BUZZER_OFF;
+
+	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
+	unsigned char target_num[4] = { 7,5,3,1 };
+	unsigned char answer_num[4];
+	unsigned char led_data = 0;
+	unsigned char text_lcd_buf[TEXT_LCD_MAX_BUF];
+	memset(answer_num, 0, sizeof(answer_num));
+	int buf_locate;
 
 	sprintf(usage, "Usage : %s <ip> <port> <name>\n", argv[0]);
 	assert(argc == 4, usage);
@@ -148,6 +163,44 @@ int main(int argc, char* argv[]) {
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
+	while (status) {
+		usleep(100000);
+
+		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
+		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
+			if (push_sw_buf[buf_locate] == 1) {
+				answer_num[target] = buf_locate + 1;
+				ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
+				if (target < 4) target++;
+				else target = 0;
+				break;
+			}
+		}
+
+		ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
+		assert2(ret >= 0, "Device write error", FND_DEVICE);
+		usleep(100000);
+
+
+		if (target_num[3] == answer_num[3]) led_data += 16;
+		if (target_num[2] == answer_num[2]) led_data += 32;
+		if (target_num[1] == answer_num[1]) led_data += 64;
+		if (target_num[0] == answer_num[0]) led_data += 128;
+		if (led_data == 240) status = 0;
+
+		assert(LEDS_MIN <= led_data && led_data <= LEDS_MAX, "Invalid parameter range");
+
+		ret = write(led_dev, &led_data, 1);
+		assert2(ret >= 0, "Device write error", LEDS_DEVICE);
+		usleep(100000);
+	}
+
+	close(fnd_dev);
+	close(led_dev);
+	close(push_switch_dev);
+	close(dot_dev);
+	//close(dip_switch_dev);
+
 	text_lcd_dev = open(TEXT_LCD_DEVICE, O_WRONLY);
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 	sonic_fd = open(SONIC_DEVICE, O_RDWR);
@@ -156,6 +209,18 @@ int main(int argc, char* argv[]) {
 	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
 	buzzer_dev = open(BUZZER_DEVICE, O_RDWR);
 	assert2(buzzer_dev >= 0, "Device open error", BUZZER_DEVICE);
+
+	fnd_dev = open(FND_DEVICE, O_RDWR);
+	assert2(fnd_dev >= 0, "Device open error", FND_DEVICE);
+	led_dev = open(LEDS_DEVICE, O_RDWR);
+	assert2(led_dev >= 0, "Device open error", LEDS_DEVICE);
+	push_switch_dev = open(PUSH_SWITCH_DEVICE, O_RDONLY);
+	assert2(push_switch_dev >= 0, "Device open error", PUSH_SWITCH_DEVICE);
+	dot_dev = open(DOT_DEVICE, O_WRONLY);
+	assert2(dot_dev >= 0, "Device open error", DOT_DEVICE);
+	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
+	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
+
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
@@ -178,7 +243,7 @@ int main(int argc, char* argv[]) {
 	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
 
 	while (1) {
-		if (step_motor_mode == 1 && sonic_buf < 15) {
+		if (step_motor_mode == 1 && sonic_buf < 20) {
 			buzzer_state = BUZZER_ON;
 			write(buzzer_dev, &buzzer_state, 1);
 			sleep(1);
