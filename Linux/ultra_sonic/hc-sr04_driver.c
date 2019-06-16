@@ -54,8 +54,9 @@ static int us_release(struct inode *inode, struct file *filp) {
 	return 0;
 }
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
+	int value = test;
 	output_sonicburst();
-	if (copy_to_user(buf, &test, 1)) {			// 정상 종료 시 0을 반환
+	if (copy_to_user(buf, &value, 4)) {			// 정상 종료 시 0을 반환
 		return -EFAULT;
 	}
 	mdelay(1);
