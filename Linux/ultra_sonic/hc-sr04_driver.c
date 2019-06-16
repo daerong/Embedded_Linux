@@ -57,11 +57,11 @@ static int us_release(struct inode *inode, struct file *filp) {
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 	output_sonicburst();
 
-	if (copy_to_user(buf, &inner_distace, 1)) {
+	if (copy_to_user(buf, &inner_distace, 4)) {
 		return -EFAULT;
 	}
 
-	mdelay(1);
+	mdelay(100);
 	return 0;
 }
 
