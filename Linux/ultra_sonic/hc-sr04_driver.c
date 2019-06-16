@@ -63,7 +63,7 @@ static int us_write(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 }
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 
-	if (copy_to_user(buf, &inner_distace, 1)) {
+	if (copy_to_user(buf, &inner_distace, 4)) {
 		return -EFAULT;
 	}
 
