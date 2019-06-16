@@ -210,6 +210,8 @@ int main(int argc, char* argv[]) {
 			assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 		}
 
+
+
 		if (target > 3) {
 			answer_num[0] = 0;
 			answer_num[1] = 0;
@@ -218,6 +220,7 @@ int main(int argc, char* argv[]) {
 			ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 			assert2(ret >= 0, "Device write error", FND_DEVICE);
 			target = 0;
+			led_data = 0;
 		}
 	}
 
