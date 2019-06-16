@@ -700,7 +700,7 @@ void* mouse_ev_func(void *data) {
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_2_Y_START, "icon2.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_3_Y_START, "icon3.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_4_Y_START, "icon4.bmp");
-	//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
+	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_6_Y_START, "icondefalut.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_7_Y_START, "icondefalut.bmp");
 	set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_8_Y_START, "icondefalut.bmp");
@@ -792,16 +792,16 @@ void* mouse_ev_func(void *data) {
 							}
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
 								if (step_motor_mode) {
-									//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
-									//menu_copy(display, proc_display);
-									//menu_update(&fvs, pfbdata, display);
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 0, 0, 150);
 									step_motor_mode = 0;
 								}
 								else {
-									//set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5on.bmp");
-									//menu_copy(display, proc_display);
-									//menu_update(&fvs, pfbdata, display);
+									set_small_image(&fvs, pfbdata, proc_display, ICON_START, ICON_5_Y_START, "icon5on.bmp");
+									menu_copy(display, proc_display);
+									menu_update(&fvs, pfbdata, display);
 									step_motor_update(step_motor_dev, 1, 0, 150);
 									step_motor_mode = 1;
 								}
