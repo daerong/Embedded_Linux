@@ -893,7 +893,7 @@ void* sonic_func(void *data) {
 
 	close(fd);
 	free(buf);
-	pthread_exit((void*)&retval);
+	//pthread_exit((void*)&retval);
 
 	return 0;
 }
