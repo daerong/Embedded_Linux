@@ -874,7 +874,7 @@ void* chat_func(void *data) {
 void* sonic_func(void *data) {
 	int fd;
 	int retn;
-	int buf = (int *)malloc(sizeof(int));
+	int *buf = (int *)malloc(sizeof(int));
 	int loop = 0;
 	fd = open("/dev/us", O_RDWR);
 	printf("fd = %d\n", fd);
