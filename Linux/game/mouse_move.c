@@ -177,7 +177,6 @@ int main(int argc, char* argv[]) {
 	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
 
 	while (status) {
-		usleep(100000);
 
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
@@ -192,7 +191,6 @@ int main(int argc, char* argv[]) {
 
 		ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 		assert2(ret >= 0, "Device write error", FND_DEVICE);
-		usleep(100000);
 
 
 		if (target_num[3] == answer_num[3]) led_data += 16;
