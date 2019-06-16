@@ -80,6 +80,7 @@ char u16_to_char(short target);				// short 변수를 char변수로 변환
 void* mouse_ev_func(void *data);			// mouse의 이벤트로 LCD screen을 조작하기 위한 thread 생성 시 쓰레드로 사용될 함수
 void* chat_func(void *data);				// chat function : keyboard 이벤트 동적 사용 thread
 void* sonic_func(void *data);
+void* write_sonic_func(void *data);
 /* tcp function */
 void* send_msg(void* arg);					// tcp/ip에서 사용할 send thread
 void* recv_msg(void* arg);					// tcp/ip에서 사용할 receive thread
