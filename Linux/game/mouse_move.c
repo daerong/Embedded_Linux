@@ -887,11 +887,12 @@ void* sonic_func(void *data) {
 	}
 	while (1) {
 		read(fd, buf, 2);
-		usleep(200000);
+		for (loop = 0; loop < 100000; loop++) {};
 		printf("distance user : %d (cm)\n", *buf);
 	}
 	close(fd);
 	return 0;
+
 }
 
 void* send_msg(void* arg) {
