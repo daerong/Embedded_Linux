@@ -205,6 +205,7 @@ int main(int argc, char* argv[]) {
 			memset(answer_num, 0, sizeof(answer_num));
 			ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
 			assert2(ret >= 0, "Device write error", FND_DEVICE);
+			target = 0;
 		}
 	}
 
