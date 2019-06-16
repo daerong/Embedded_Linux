@@ -894,7 +894,7 @@ void* chat_func(void *data) {
 
 void* sonic_func(void *data) {
 	while (1) {
-		if () {
+		if (step_motor_mode) {
 			read(sonic_fd, &sonic_buf, 2);
 			printf("distance user : %d (cm)\n", sonic_buf);
 			usleep(200000);
