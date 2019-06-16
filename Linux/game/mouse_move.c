@@ -12,11 +12,6 @@ char *socket_ext_msg = "exit";
 
 int sonic_buf;
 int sonic_fd;
-int step_motor_dev;					// device handler
-unsigned char step_motor_state[3];
-int step_motor_action;				// argv[1]
-int step_motor_dir;				// argv[2]
-int step_motor_speed;				// argv[3]
 
 #define SCREEN_X_MAX 1024						// LCD screen의 dot width
 #define SCREEN_Y_MAX 600						// LCD screen의 dot height
@@ -43,7 +38,6 @@ char text_lcd_mode;								// chat function : keyboard에서 입력한 값을 실시간으�
 char camera_mode;
 char num_baseball_mode;
 char lenna_img_mode;							// lenna image를 화면에 그리기 (1 : on, 0 : off)
-char sonic_mode;
 
 unsigned char *text_lcd_buf;					// text lcd에 실제적으로 쓰여질 buffer
 
@@ -103,6 +97,7 @@ char clnt_ip[NORMAL_SIZE];					// client ip address
 
 int main(int argc, char* argv[]) {
 	int text_lcd_dev;
+	int step_motor_dev;					// device handler
 	pthread_t mouse_ev_thread;				// mouse event thread의 file descriptor 
 	int mouse_thread_id;					// pthread ID
 	pthread_t chat_thread;
@@ -139,7 +134,6 @@ int main(int argc, char* argv[]) {
 	camera_mode = 0;
 	num_baseball_mode = 0;
 	lenna_img_mode = 0;
-	sonic_mode = 0;
 
 	make_thread = 0;
 	delete_thread = 0;
@@ -156,20 +150,8 @@ int main(int argc, char* argv[]) {
 	step_motor_dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
 	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
 
-	step_motor_action = 0;
-	step_motor_dir = 1;
-	step_motor_speed = 150;
-
-	memset(step_motor_state, 0, sizeof(step_motor_state));
-	step_motor_state[0] = (unsigned char)step_motor_action;
-	step_motor_state[1] = (unsigned char)step_motor_dir;
-	step_motor_state[2] = (unsigned char)step_motor_speed;
-
-	write(step_motor_dev, step_motor_state, 3);
-
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
-	memset(step_motor_state, ' ', TEXT_LCD_MAX_BUF);
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -215,20 +197,6 @@ int main(int argc, char* argv[]) {
 			printf("thread %d down.\n", *((int *)thread_result));
 			delete_thread = 0;
 			break;
-		case 5:
-			pthread_join(sonic_thread, (void *)&thread_result);
-
-			step_motor_action = 0;
-			step_motor_dir = 1;
-			step_motor_speed = 150;
-
-			memset(step_motor_state, 0, sizeof(step_motor_state));
-			step_motor_state[0] = (unsigned char)step_motor_action;
-			step_motor_state[1] = (unsigned char)step_motor_dir;
-			step_motor_state[2] = (unsigned char)step_motor_speed;
-
-			write(step_motor_dev, step_motor_state, 3);
-			delete_thread = 0;
 		}
 
 	}
@@ -240,7 +208,6 @@ int main(int argc, char* argv[]) {
 	free(text_lcd_buf);
 	close(text_lcd_dev);
 	close(sonic_fd);
-	close(step_motor_dev);
 
 	return 0;
 }
@@ -746,16 +713,7 @@ void* mouse_ev_func(void *data) {
 								}
 							}
 							else if (cur.y >= ICON_5_Y_START && cur.y < ICON_5_Y_START + ICON_WIDTH) {		// sonic
-								if (sonic_mode) {
-									sonic_mode = 0;
-								}
-								else {
-									sonic_mode = 1;
-									make_thread = 5;
-								}
-
-
-
+								make_thread = 5;
 							}
 							else if (cur.y >= ICON_6_Y_START && cur.y < ICON_6_Y_START + ICON_WIDTH) {
 
@@ -927,29 +885,31 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	static int retval = 5;			// 종료되는 프로세스 번호
+
+	unsigned char state[3];
 	//int len;
+	int action;				// argv[1]
+	int dir;				// argv[2]
+	int speed;				// argv[3]
 
-	step_motor_action = 1;
-	step_motor_dir = 1;
-	step_motor_speed = 150;
+	action = 1;
+	dir = 1;
+	speed = 150;
 
-	memset(step_motor_state, 0, sizeof(step_motor_state));
-	step_motor_state[0] = (unsigned char)step_motor_action;
-	step_motor_state[1] = (unsigned char)step_motor_dir;
-	step_motor_state[2] = (unsigned char)step_motor_speed;
+	memset(state, 0, sizeof(state));
+	state[0] = (unsigned char)action;
+	state[1] = (unsigned char)dir;
+	state[2] = (unsigned char)speed;
 
-	write(step_motor_dev, step_motor_state, 3);
+	write(step_motor_dev, state, 3);
 
-	while (sonic_mode) {
+	while (1) {
 		read(sonic_fd, &sonic_buf, 2);
 		printf("distance user : %d (cm)\n", sonic_buf);
 		usleep(200000);
 	}
 
-	delete_thread = 5;
-	pthread_exit((void*)&retval);
-
+	close(step_motor_dev);
 }
 
 void* write_sonic_func(void *data) {
