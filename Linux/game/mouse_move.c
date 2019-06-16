@@ -10,6 +10,9 @@ char tcp_ip_func_msg[] = "tcp ip thread";
 char sonic_func_msg[] = "sonic thread";
 char *socket_ext_msg = "exit";
 
+int sonic_fd;
+int sonic_buf;
+
 #define SCREEN_X_MAX 1024						// LCD screen의 dot width
 #define SCREEN_Y_MAX 600						// LCD screen의 dot height
 #define PALETTE_X_END 949						// LCD screen에서 실제적으로 이용하는 부분 0~949
@@ -872,13 +875,16 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-	int fd;
+
+	pthread_t sonic_thread;
+	int sonic_thread_id;						// pthread ID
+	sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
+
 	int retn;
-	int buf;
 	int loop = 0;
-	fd = open("/dev/us", O_RDWR);
-	printf("fd = %d\n", fd);
-	if (fd < 0) {
+	sonic_fd = open("/dev/us", O_RDWR);
+	printf("fd = %d\n", sonic_fd);
+	if (sonic_fd < 0) {
 		perror("/dev/us error");
 		exit(-1);
 	}
@@ -886,14 +892,19 @@ void* sonic_func(void *data) {
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		write(fd, &buf, 2);
-		read(fd, &buf, 2);
+		read(sonic_fd, &buf, 2);
 		printf("distance user : %d (cm)\n", buf);
+		usleep(200000);
 	}
 	close(fd);
 	return 0;
 
 
+}
+
+void* write_sonic_func(void *data) {
+	write(sonic_fd, &buf, 2);
+	usleep(200000);
 }
 
 void* send_msg(void* arg) {
