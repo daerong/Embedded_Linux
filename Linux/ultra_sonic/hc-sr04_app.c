@@ -11,7 +11,7 @@ int main(void)
 	int retn;
 	int *buf = (int *)malloc(sizeof(int));
 	int loop = 0;
-	char state = 0;
+	char state = 1;
 	fd = open("/dev/us", O_RDWR);
 	printf("fd = %d\n", fd);
 	if (fd < 0) {
@@ -23,9 +23,9 @@ int main(void)
 	}
 	while (1) {
 		state = read(fd, buf, 2);
-		if (state) {
+		if (!state) {
 			printf("distance user : %d (cm)\n", *buf);
-			state = 0;
+			state = 1;
 		}
 
 	}
