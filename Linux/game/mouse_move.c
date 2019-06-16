@@ -904,8 +904,11 @@ void* sonic_func(void *data) {
 }
 
 void* write_sonic_func(void *data) {
-	write(sonic_fd, &buf, 2);
-	for (loop = 0; loop < 100000; loop++) {};
+	while (1) {
+		write(sonic_fd, &buf, 2);
+		for (loop = 0; loop < 100000; loop++) {};
+	}
+
 }
 
 void* send_msg(void* arg) {
