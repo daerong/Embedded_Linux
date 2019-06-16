@@ -7,7 +7,7 @@ int main(void)
 {
 	int fd;
 	int retn;
-	int *buf = (int *)malloc(sizeof(int));
+	int buf;
 	int loop = 0;
 	fd = open("/dev/us", O_RDWR);
 	printf("fd = %d\n", fd);
@@ -19,9 +19,9 @@ int main(void)
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		read(fd, buf, 2);
+		read(fd, &buf, 2);
 		usleep(200000);
-		printf("distance user : %d (cm)\n", *buf);
+		printf("distance user : %d (cm)\n", buf);
 	}
 	close(fd);
 	return 0;
