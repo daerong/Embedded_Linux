@@ -1031,6 +1031,7 @@ void* write_sonic_func(void *data) {
 
 void* camera_func(void *data) {
 	if (camera_mode) {
+		printf("sdfdsf\n");
 		camera_update = 1;
 	}
 	sleep(1);
