@@ -886,6 +886,7 @@ void* sonic_func(void *data) {
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
+		write(fd, &buf, 2);
 		read(fd, &buf, 2);
 		printf("distance user : %d (cm)\n", buf);
 	}

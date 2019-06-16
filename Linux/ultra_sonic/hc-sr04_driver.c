@@ -33,11 +33,13 @@ u32 irq = -1;
 static int us_open(struct inode *inode, struct file *filp);
 static int us_release(struct inode *inode, struct file *filp);
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
+static int us_write(struct file *filp, int *buf, size_t count, loff_t *f_pos);
 
 struct file_operations us_fops = {
    .open = us_open,
    .release = us_release,
-   .read = us_read
+   .read = us_read,
+   .write = us_write
 };
 
 static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs);
@@ -54,14 +56,17 @@ static int us_release(struct inode *inode, struct file *filp) {
 	printk(KERN_ALERT "< Device has been closed > \n");
 	return 0;
 }
-static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
+static int us_write(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 	output_sonicburst();
+	mdelay(1);
+	return 0;
+}
+static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 
 	if (copy_to_user(buf, &inner_distace, 1)) {
 		return -EFAULT;
 	}
 
-	mdelay(1);
 	return 0;
 }
 
