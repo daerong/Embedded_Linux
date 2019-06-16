@@ -9,14 +9,12 @@ AUTH : gmlee@huins.com */
 #include <linux/delay.h>
 #include <linux/kdev_t.h>		// MAJOR(), MKDEV()
 #include <linux/interrupt.h>
-#include <linux/uaccess.h>
 
 MODULE_LICENSE("GPL");
 
 #define HCSR04_TRIGGER IMX_GPIO_NR(2, 2)
 #define HCSR04_ECHO IMX_GPIO_NR(2, 3)
 
-int inner_distace = 0;
 static int us_major = 0;
 static int us_minor = 0;
 static int result;
@@ -32,7 +30,7 @@ u32 irq = -1;
 
 static int us_open(struct inode *inode, struct file *filp);
 static int us_release(struct inode *inode, struct file *filp);
-static int us_read(struct file *filp, const int *buf, size_t count, loff_t *f_pos);
+static int us_read(struct file *filp, char *buf, size_t count, loff_t *f_pos);
 
 struct file_operations us_fops = {
 	.open = us_open,
@@ -46,39 +44,33 @@ void output_sonicburst(void);
 int gpio_init(void);
 
 
-static int us_open(struct inode *inode, struct file *filp){
+static int us_open(struct inode *inode, struct file *filp) {
 	printk(KERN_ALERT "< Device has been opened >\n");
 	return 0;
 }
-static int us_release(struct inode *inode, struct file *filp){
+static int us_release(struct inode *inode, struct file *filp) {
 	printk(KERN_ALERT "< Device has been closed > \n");
 	return 0;
 }
-static int us_read(struct file *filp, const int *buf, size_t count, loff_t *f_pos){
+static int us_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) {
 	output_sonicburst();
-	
-	if (copy_to_user(buf, &inner_distace, 1)) {
-		return -EFAULT;
-	}
-
 	mdelay(1);
 	return 0;
 }
 
-static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs){
-	if (gpio_get_value(HCSR04_ECHO)){		// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
+static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_regs *regs) {
+	if (gpio_get_value(HCSR04_ECHO)) {		// int gpio_get_value(unsigned int gpio); : 출력 모드 GPIO 핀의 값을 읽어온다.
 		do_gettimeofday(&before);			// do_gettimeofday(struct timeval *tv) : 초 / 마이크로초 단위의 절대시간을 얻어옴
 	}
-	else{
+	else {
 		do_gettimeofday(&after);
 		printk(KERN_ALERT" Distance : %.0ld [cm] \n ", (after.tv_usec - before.tv_usec) / 58);		// 단위변환, us/58 = Centimeter
-		inner_distace = (after.tv_usec - before.tv_usec) / 58;
 		memset(&before, 0, sizeof(struct timeval));
 		memset(&after, 0, sizeof(struct timeval));
 	}
 	return IRQ_HANDLED;		// 올바른 경우 IRQ_HANDLED를 관련 없는 경우 IRQ_NONE를 리턴
 }
-static int us_register_cdev(void){
+static int us_register_cdev(void) {
 	int error;
 	if (us_major) {
 		us_dev = MKDEV(us_major, us_minor);		// MKDEV(int major, int minor); : 주번호인 major 와 부번호인 minor 값을 이용하여 dev_t 값을 얻는다.
@@ -107,12 +99,12 @@ static int us_register_cdev(void){
 	}
 	return 0;
 }
-void output_sonicburst(void){
+void output_sonicburst(void) {
 	gpio_set_value(HCSR04_TRIGGER, 1);			// // void gpio_set_value(unsigned int gpio, int value); : 출력 모드 GPIO 핀에 값을 쓴다.
 	udelay(10);
 	gpio_set_value(HCSR04_TRIGGER, 0);
 }
-int gpio_init(void){
+int gpio_init(void) {
 	int rtc;
 	rtc = gpio_request(HCSR04_TRIGGER, "TRIGGER");				// int gpio_request(unsigned int gpio, const char *label); : GPIO 핀 현재 사용되고 있는 지 확인, 사용 가능하다면 lock을 걸어 점유한다. (있으면 -EBUSY, 없으면 0)
 	if (rtc != 0) {
@@ -158,7 +150,7 @@ fail:
 
 static int us_init(void) {
 	printk(KERN_ALERT "< Ultrasonic Module is up > \n");
-	if ((result = us_register_cdev()) < 0){						// 커널 연결부
+	if ((result = us_register_cdev()) < 0) {						// 커널 연결부
 		printk(KERN_ALERT "< Ultrasonic Register Fail > \n");
 		return result;
 	}
