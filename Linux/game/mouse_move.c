@@ -163,6 +163,8 @@ int main(int argc, char* argv[]) {
 	serv_addr.sin_port = htons(atoi(argv[2]));
 
 	mouse_thread_id = pthread_create(&mouse_ev_thread, NULL, mouse_ev_func, (void *)&mouse_func_msg);
+	sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
+	write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
 
 	if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1) {
 		error_handling(" conncet() error");
@@ -187,11 +189,6 @@ int main(int argc, char* argv[]) {
 			printf("%s\n", chat_func_msg);
 			make_thread = 0;
 			break;
-		case 5:
-			sonic_thread_id = pthread_create(&sonic_thread, NULL, sonic_func, (void *)&sonic_func_msg);
-			write_sonic_thread_id = pthread_create(&write_sonic_thread, NULL, write_sonic_func, (void *)&sonic_func_msg);
-			printf("%s\n", sonic_func_msg);
-			make_thread = 0;
 		}
 
 		switch (delete_thread) {
