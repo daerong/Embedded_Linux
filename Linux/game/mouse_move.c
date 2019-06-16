@@ -1034,7 +1034,7 @@ void* camera_func(void *data) {
 		if (camera_mode) {
 			camera_update = 1;
 		}
-		sleep(3);
+		sleep(1);
 	}
 }
 
