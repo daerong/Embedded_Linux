@@ -57,7 +57,7 @@ static int us_release(struct inode *inode, struct file *filp) {
 static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos) {
 	output_sonicburst();
 
-	if (copy_to_user(buf, &inner_distace, count)) {
+	if (copy_to_user(buf, &inner_distace, 1)) {
 		return -EFAULT;
 	}
 
@@ -71,7 +71,7 @@ static irqreturn_t ultrasonics_echo_interrupt(int irq, void *dev_id, struct pt_r
 	}
 	else {
 		do_gettimeofday(&after);
-		printk(KERN_ALERT" Distance : %.0ld [cm] \n ", (after.tv_usec - before.tv_usec) / 58);      // ����, us/58 = Centimeter
+		printk(KERN_ALERT" Distance : %.0ld [cm]\n", (after.tv_usec - before.tv_usec) / 58);      // ����, us/58 = Centimeter
 		inner_distace = (after.tv_usec - before.tv_usec) / 58;
 		memset(&before, 0, sizeof(struct timeval));
 		memset(&after, 0, sizeof(struct timeval));
