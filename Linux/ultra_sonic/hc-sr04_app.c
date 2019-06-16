@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <asm/delay.h>
 
 int main(void)
 {
