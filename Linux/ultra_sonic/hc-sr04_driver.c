@@ -54,7 +54,7 @@ static int us_release(struct inode *inode, struct file *filp){
 	printk(KERN_ALERT "< Device has been closed > \n");
 	return 0;
 }
-static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos){
+static int us_read(struct file *filp, const int *buf, size_t count, loff_t *f_pos){
 	output_sonicburst();
 	
 	if (copy_to_user(buf, &inner_distace, 1)) {
