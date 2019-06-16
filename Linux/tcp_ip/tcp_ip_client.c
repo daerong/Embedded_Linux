@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
 	sprintf(serv_time, "%d-%d-%d %d:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour,
 		t->tm_min);
 
-	sprintf(name, "[%s]", argv[2]);
+	sprintf(name, "[%s]", argv[3]);
 	sprintf(clnt_ip, "%s", argv[1]);
-	sprintf(serv_port, "%s", argv[1]);
+	sprintf(serv_port, "%s", argv[2]);
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
