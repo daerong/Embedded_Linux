@@ -886,9 +886,9 @@ void* sonic_func(void *data) {
 		printf("< us device has been detected >\n");
 	}
 	while (1) {
-		read(fd, buf, 4);
-		usleep(200000);
-		printf("distance user : %d (cm)\n", buf);
+		read(fd, buf, 2);
+		for (loop = 0; loop < 1000000; loop++) {};
+		printf("distance user : %d (cm)\n", *buf);
 	}
 	close(fd);
 	free(buf);
