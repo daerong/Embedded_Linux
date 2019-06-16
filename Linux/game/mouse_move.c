@@ -181,15 +181,14 @@ int main(int argc, char* argv[]) {
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
 			if (push_sw_buf[buf_locate] == 1) {
 				answer_num[target] = buf_locate + 1;
+				ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
+				ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
+				assert2(ret >= 0, "Device write error", FND_DEVICE);
+				target++;
 				break;
 			}
 		}
 
-		target++;
-
-		ret = write(dot_dev, fpga_number[buf_locate + 1], sizeof(fpga_number[buf_locate + 1]));
-		ret = write(fnd_dev, answer_num, FND_MAX_DIGIT);
-		assert2(ret >= 0, "Device write error", FND_DEVICE);
 
 		if (target_num[0] == answer_num[0] && target_num[1] == answer_num[1] && target_num[2] == answer_num[2] && target_num[3] == answer_num[3]) status = 0;
 		//if (target_num[3] == answer_num[3]) led_data += 16;
