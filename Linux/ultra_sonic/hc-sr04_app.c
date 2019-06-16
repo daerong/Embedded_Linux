@@ -20,7 +20,7 @@ int main(void)
 	}
 	while (1) {
 		read(fd, buf, 2);
-		for (loop = 0; loop < 100000; loop++) {};
+		usleep(200000);
 		printf("distance user : %d (cm)\n", *buf);
 	}
 	close(fd);
