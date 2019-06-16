@@ -32,7 +32,7 @@ u32 irq = -1;
 
 static int us_open(struct inode *inode, struct file *filp);
 static int us_release(struct inode *inode, struct file *filp);
-static int us_read(struct file *filp, int *buf, size_t count, loff_t *f_pos);
+static int us_read(struct file *filp, const int *buf, size_t count, loff_t *f_pos);
 
 struct file_operations us_fops = {
 	.open = us_open,
