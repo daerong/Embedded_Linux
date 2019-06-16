@@ -176,6 +176,27 @@ int main(int argc, char* argv[]) {
 	//dip_switch_dev = open(DIP_SWITCH_DEVICE, O_RDONLY);
 	//assert2(dip_switch_dev >= 0, "Device open error", DIP_SWITCH_DEVICE);
 
+
+	int frame_fd;
+	struct fb_var_screeninfo fvs;
+	unsigned short *pfbdata;
+	DISPLAY *display = (DISPLAY *)malloc(sizeof(DISPLAY) * SCREEN_X_MAX * SCREEN_Y_MAX);
+	frame_fd = open(LCD_DEVICE, O_RDWR);
+	assert2(frame_fd >= 0, "Frame Buffer Open Error!", LCD_DEVICE);
+	ret = ioctl(frame_fd, FBIOGET_VSCREENINFO, &fvs);		// fb_var_screeninfo 정보를 얻어오기 위해 ioctl, FBIOGET_VSCREENINFO 사용
+	assert(ret >= 0, "Get Information Error - VSCREENINFO!\n");
+	assert(fvs.bits_per_pixel == 16, "bpp is not 16\n");			// bpp check
+	assert(lseek(frame_fd, 0, SEEK_SET) >= 0, "LSeek Error.\n");	// lseek error check
+	pfbdata = (unsigned short *)mmap(0, fvs.xres*fvs.yres * sizeof(U16), PROT_READ | PROT_WRITE, MAP_SHARED, frame_fd, 0);
+	assert((unsigned)pfbdata != (unsigned)-1, "fbdev mmap error.\n");
+	set_image(&fvs, pfbdata, display, 0, 0, "background.bmp");
+	draw_display(&fvs, pfbdata, display);
+
+
+
+
+
+
 	while (status) {
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
