@@ -97,7 +97,6 @@ char clnt_ip[NORMAL_SIZE];					// client ip address
 
 int main(int argc, char* argv[]) {
 	int text_lcd_dev;
-	int step_motor_dev;					// device handler
 	pthread_t mouse_ev_thread;				// mouse event threadÀÇ file descriptor 
 	int mouse_thread_id;					// pthread ID
 	pthread_t chat_thread;
@@ -147,8 +146,6 @@ int main(int argc, char* argv[]) {
 	assert2(text_lcd_dev >= 0, "Device open error", TEXT_LCD_DEVICE);
 	sonic_fd = open(SONIC_DEVICE, O_RDWR);
 	assert2(sonic_fd >= 0, "Sonic Open Error!", SONIC_DEVICE);
-	step_motor_dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
-	assert2(step_motor_dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
 
 	text_lcd_buf = (unsigned char *)malloc(sizeof(unsigned char)*TEXT_LCD_MAX_BUF);
 	memset(text_lcd_buf, ' ', TEXT_LCD_MAX_BUF);
@@ -885,7 +882,7 @@ void* chat_func(void *data) {
 }
 
 void* sonic_func(void *data) {
-
+	int dev;					// device handler
 	unsigned char state[3];
 	//int len;
 	int action;				// argv[1]
@@ -901,7 +898,10 @@ void* sonic_func(void *data) {
 	state[1] = (unsigned char)dir;
 	state[2] = (unsigned char)speed;
 
-	write(step_motor_dev, state, 3);
+	dev = open(STEP_MOTOR_DEVICE, O_WRONLY);
+	assert2(dev >= 0, "Device open error", STEP_MOTOR_DEVICE);
+
+	write(dev, state, 3);
 
 	while (1) {
 		read(sonic_fd, &sonic_buf, 2);
@@ -909,7 +909,7 @@ void* sonic_func(void *data) {
 		usleep(200000);
 	}
 
-	close(step_motor_dev);
+	close(dev);
 }
 
 void* write_sonic_func(void *data) {
