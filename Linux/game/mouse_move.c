@@ -86,15 +86,15 @@ void erase_image(struct fb_var_screeninfo *fvs, unsigned short *pfbdata, DISPLAY
 char u16_to_char(short target);				// short 변수를 char변수로 변환
 void* mouse_ev_func(void *data);			// mouse의 이벤트로 LCD screen을 조작하기 위한 thread 생성 시 쓰레드로 사용될 함수
 void* chat_func(void *data);				// chat function : keyboard 이벤트 동적 사용 thread
-void* sonic_func(void *data);
-void* write_sonic_func(void *data);
-void* camera_func(void *data);
+void* sonic_func(void *data);				// 초음파 센서 동작 thread 생성
+void* write_sonic_func(void *data);			// 초음파 센서 triger thread 생성
+void* camera_func(void *data);				// 카메라 이미지 가져오는 thread
 /* tcp function */
 void* send_msg(void* arg);					// tcp/ip에서 사용할 send thread
 void* recv_msg(void* arg);					// tcp/ip에서 사용할 receive thread
-void error_handling(char* msg);
+void error_handling(char* msg);				// 에러 제어용 handler
 void menu();								// tcp/ip에 대한 내용을 띄어줄 함수
-void step_motor_update(int step_motor_dev, int action, int dir, int speed);
+void step_motor_update(int step_motor_dev, int action, int dir, int speed);			// step moter 변경시 사용하는 함수
 
 char name[NORMAL_SIZE] = "[DEFALT]";		// name
 char msg_form[NORMAL_SIZE];					// msg form
@@ -105,54 +105,54 @@ char clnt_ip[NORMAL_SIZE];					// client ip address
 /* tcp function */
 
 int main(int argc, char* argv[]) {
-	int text_lcd_dev;
-	int buzzer_dev;
+	int text_lcd_dev;						// text lcd의 file descriptor 
+	int buzzer_dev;							// buzzer의 file descriptor 
 
-	int fnd_dev;
-	int led_dev;
-	int push_switch_dev;					// device handler
-	int dot_dev;
+	int fnd_dev;							// fnd의 file descriptor 
+	int led_dev;							// led의 file descriptor 
+	int push_switch_dev;					// push switch의 file descriptor 
+	int dot_dev;							// dot matrix의 file descriptor 
 	//int dip_switch_dev;
 
-	pthread_t mouse_ev_thread;				// mouse event thread의 file descriptor 
-	int mouse_thread_id;					// pthread ID
-	pthread_t chat_thread;
-	int chat_thread_id;						// pthread ID
-	pthread_t sonic_thread;
-	int sonic_thread_id;						// pthread ID
-	pthread_t write_sonic_thread;
-	int write_sonic_thread_id;						// pthread ID
+	pthread_t mouse_ev_thread;				// mouse event겸 frame buffer thread
+	int mouse_thread_id;					// mouse, frame buffer의 pthread ID
+	pthread_t chat_thread;					// keyboard event thread
+	int chat_thread_id;						// 채팅용 keyboard의 pthread ID
+	pthread_t sonic_thread;					// sonic 읽어오기 thread
+	int sonic_thread_id;					// sonic 읽어오기 pthread ID
+	pthread_t write_sonic_thread;			// sonic triger thread
+	int write_sonic_thread_id;				// sonic triger thread ID
 	//pthread_t tcp_id_thread;
-	//int tcp_id_thread_id;						// pthread ID
-	pthread_t camera_thread;
-	int camera_thread_id;						// pthread ID
-	void *thread_result;				// pthread return
-	int status = 1;							// mutex result
-	int sock;
-	struct sockaddr_in serv_addr;
-	pthread_t snd_thread, rcv_thread;
-	void* thread_return;
-	char usage[50];
+	//int tcp_id_thread_id;					// pthread ID
+	pthread_t camera_thread;				// camera 이미지 update thread
+	int camera_thread_id;					// camera 이미지 update thread ID
+	void *thread_result;					// pthread 결과 리턴 (process 번호를 return)
+	//int status = 1;							// mutex result로 사용할 예정
+	int sock;								// tcp/ip 통신 소켓
+	struct sockaddr_in serv_addr;			// server의 소켓정보를 담는 sockaddr_in 구조체
+	pthread_t snd_thread, rcv_thread;		// 통신 send/receive thread
+	void* thread_return;					// thread 결과값
+	char usage[50];							// 실행 구문 에러 표시할 buffer
 	char buzzer_state = BUZZER_OFF;
-	ssize_t ret;
-	int target = 0;
+	ssize_t ret;							// read/write에 대한 실행 결과
+	int target = 0;							// 비밀번호 입력 시 배열의 index로 사용
 
-	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];
-	unsigned char target_num[4] = { 7,5,3,1 };
-	unsigned char answer_num[4];
-	unsigned char led_data = 0;
+	unsigned char push_sw_buf[PUSH_SWITCH_MAX_BUTTON];			// push switch의 변수
+	unsigned char target_num[4] = { 7,5,3,1 };					// 비밀번호
+	unsigned char answer_num[4];								// 입력한 비밀번호
+	unsigned char led_data = 0;									// led write에 사용할 변수
 	memset(answer_num, 0, sizeof(answer_num));
-	int buf_locate;
+	int buf_locate;												// 눌린 push switch의 위치 
 
 	sprintf(usage, "Usage : %s <ip> <port> <name>\n", argv[0]);
 	assert(argc == 4, usage);
 
-	/* local time */
+	/* local time (인터넷 on일 경우 동작) */
 	struct tm *t;
 	time_t timer = time(NULL);
 	t = localtime(&timer);
 	sprintf(serv_time, "%d-%d-%d %d:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min);
-	/* local time */
+	/* local time (인터넷 on일 경우 동작) */
 
 	sprintf(name, "[%s]", argv[3]);
 	sprintf(clnt_ip, "%s", argv[1]);
@@ -195,7 +195,7 @@ int main(int argc, char* argv[]) {
 	assert2(ret >= 0, "Device write error", LEDS_DEVICE);
 
 
-
+	/* 로그인 기능 */
 	while (status) {
 		read(push_switch_dev, &push_sw_buf, sizeof(push_sw_buf));
 		for (buf_locate = 0; buf_locate < PUSH_SWITCH_MAX_BUTTON; buf_locate++) {
@@ -246,6 +246,8 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
+
+	/* 로그인 기능 */
 
 	close(fnd_dev);
 	close(led_dev);

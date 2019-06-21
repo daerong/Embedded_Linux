@@ -2,15 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\buzzer",
-    "\\dip_switch",
-    "\\dot",
-    "\\fnd",
+    "\\game",
     "\\include",
-    "\\led",
-    "\\push_switch",
-    "\\step_motor",
-    "\\text_lcd"
+    "\\mouse",
+    "\\ultra_sonic"
   ],
-  "SelectedNode": "\\buzzer",
+  "SelectedNode": "\\game\\mouse_move.c",
   "PreviewInSolutionExplorer": false
 }
